@@ -48,9 +48,10 @@ export function HomeDnaReport({ state }: { state: HomeDnaState }) {
       <Section index="01" title="Dobrodošli v vašem Home DNA™" body={report.intro} />
       <Section index="02" title="Vaš življenjski slog" body={report.lifestyle} />
       <Section index="03" title="Vaš slog" body={report.style} />
+      <Section index="04" title="Zakaj bo ta dom deloval za vas" body={report.why} />
 
       {report.rooms.length > 0 && (
-        <Section index="04" title="Priporočila za izbrane prostore">
+        <Section index="05" title="Priporočila za izbrane prostore">
           <div className="mt-8 space-y-8">
             {report.rooms.map((room) => (
               <div key={room.label} className="border-t border-border pt-6">
@@ -64,7 +65,7 @@ export function HomeDnaReport({ state }: { state: HomeDnaState }) {
         </Section>
       )}
 
-      <Section index="05" title="Okvirna investicija">
+      <Section index="06" title="Okvirna investicija">
         <dl className="mt-8 grid gap-px border-t border-border sm:grid-cols-2">
           <div className="py-6">
             <dt className="eyebrow">Ocenjena investicija</dt>
@@ -82,7 +83,7 @@ export function HomeDnaReport({ state }: { state: HomeDnaState }) {
         </p>
       </Section>
 
-      <Section index="06" title="Naslednji koraki">
+      <Section index="07" title="Naslednji koraki">
         <ol className="mt-8">
           {report.nextSteps.map((step, i) => (
             <li key={step.title} className="flex gap-6 border-t border-border py-6 last:border-b">
