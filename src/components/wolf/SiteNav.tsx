@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import { brand } from "@/content/site";
 
@@ -45,6 +46,12 @@ export function SiteNav() {
               {l.label}
             </a>
           ))}
+          <Link
+            to="/home-dna"
+            className="rounded-full bg-primary px-5 py-2.5 text-[13px] text-primary-foreground transition-opacity hover:opacity-85"
+          >
+            Discover your Home DNA™
+          </Link>
 
         </div>
 
