@@ -4,6 +4,7 @@ export function VisualChoiceCard({
   image,
   title,
   description,
+  badge,
   selected,
   onSelect,
   multiSelect = false,
@@ -11,6 +12,7 @@ export function VisualChoiceCard({
   image: string;
   title: string;
   description: string;
+  badge?: string;
   selected: boolean;
   onSelect: () => void;
   multiSelect?: boolean;
@@ -41,6 +43,11 @@ export function VisualChoiceCard({
             selected ? "bg-foreground/25 opacity-100" : "opacity-0"
           }`}
         />
+        {badge && (
+          <span className="absolute left-3 top-3 rounded-full bg-background px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-foreground">
+            {badge}
+          </span>
+        )}
         {selected && (
           <span
             aria-hidden="true"

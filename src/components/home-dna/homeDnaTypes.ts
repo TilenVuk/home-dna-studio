@@ -136,10 +136,24 @@ export interface RoomsState {
   homeOffice?: HomeOfficeState;
 }
 
-export type InvestmentRange = "30-50" | "50-70" | "70-100" | "100-plus";
+export type ExecutionLevel = "basic" | "premium" | "signature";
+
+export interface RoomEstimate {
+  room: RoomKey;
+  label: string;
+  amount: number;
+}
+
+export interface EstimatedInvestment {
+  min: number;
+  max: number;
+  total: number;
+}
 
 export interface InvestmentState {
-  range?: InvestmentRange;
+  level: ExecutionLevel;
+  estimatedInvestment?: EstimatedInvestment;
+  roomBreakdown?: RoomEstimate[];
 }
 
 export interface ContactState {
@@ -171,6 +185,7 @@ export interface VisualOption<T extends string = string> {
   value: T;
   title: string;
   description?: string;
+  badge?: string;
   image: string;
 }
 
@@ -185,6 +200,6 @@ export const initialHomeDnaState: HomeDnaState = {
     futureNeeds: [],
   },
   rooms: {},
-  investment: {},
+  investment: { level: "premium" },
   contact: { name: "", email: "", phone: "", consent: false },
 };
