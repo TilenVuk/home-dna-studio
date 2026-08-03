@@ -30,11 +30,9 @@ const CW = PW - M * 2;
 const BOTTOM = PH - 26;
 
 /* Brand colours */
-const INK: [number, number] = [26, 26, 24] as unknown as [number, number];
 const ink = [26, 26, 24] as const;
 const muted = [110, 106, 99] as const;
 const line = [223, 219, 212] as const;
-void INK;
 
 const DISPLAY = "SchibstedGrotesk";
 const BODY = "InterTight";
