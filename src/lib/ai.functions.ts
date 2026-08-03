@@ -11,7 +11,7 @@ const DesignTipInput = z.object({
 export const generateDesignTip = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => DesignTipInput.parse(input))
   .handler(async ({ data }) => {
-    const key = process.env['LOVABLE_API_KEY'];
+    const key = process.env["LOVABLE_API_KEY"];
     if (!key) throw new Error("Missing LOVABLE_API_KEY");
 
     const gateway = createLovableAiGatewayProvider(key);
