@@ -69,5 +69,7 @@ export function SuccessScreen({ name, state }: { name?: string; state: HomeDnaSt
         />
       </div>
     </div>
+    <HomeDnaReport state={state} />
+    </>
   );
 }
