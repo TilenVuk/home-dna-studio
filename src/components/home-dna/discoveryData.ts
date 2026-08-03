@@ -9,7 +9,16 @@ import worktopStone from "@/assets/worktop-stone.jpg";
 import wardrobeHinged from "@/assets/wardrobe-hinged.jpg";
 import wardrobeSliding from "@/assets/wardrobe-sliding.jpg";
 import wardrobeOpen from "@/assets/wardrobe-open.jpg";
-import type { KitchenState, VisualOption, WardrobeState } from "./homeDnaTypes";
+import investmentEssential from "@/assets/investment-essential.jpg";
+import investmentConsidered from "@/assets/investment-considered.jpg";
+import investmentSignature from "@/assets/investment-signature.jpg";
+import investmentBespoke from "@/assets/investment-bespoke.jpg";
+import type {
+  InvestmentRange,
+  KitchenState,
+  VisualOption,
+  WardrobeState,
+} from "./homeDnaTypes";
 
 export const priorityOptions = [
   "Družinsko življenje",
@@ -21,6 +30,36 @@ export const priorityOptions = [
   "Hobiji",
   "Čim manj vzdrževanja",
 ];
+
+export const lifestyleOptions = priorityOptions;
+
+export const investmentOptions: VisualOption<InvestmentRange>[] = [
+  {
+    value: "30-50",
+    title: "30.000 – 50.000 €",
+    description: "Osredotočen projekt z jasnimi prioritetami in premišljenimi materiali.",
+    image: investmentEssential,
+  },
+  {
+    value: "50-70",
+    title: "50.000 – 70.000 €",
+    description: "Več prostorov, usklajena zasnova in kakovostnejše površine.",
+    image: investmentConsidered,
+  },
+  {
+    value: "70-100",
+    title: "70.000 – 100.000 €",
+    description: "Celovita ureditev doma z izbranimi materiali in detajli po meri.",
+    image: investmentSignature,
+  },
+  {
+    value: "100-plus",
+    title: "Nad 100.000 €",
+    description: "Popolnoma avtorski projekt brez kompromisov pri materialih in izvedbi.",
+    image: investmentBespoke,
+  },
+];
+
 
 export const challengeOptions = [
   "Premalo prostora za shranjevanje",

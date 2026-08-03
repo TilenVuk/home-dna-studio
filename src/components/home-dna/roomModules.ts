@@ -1,5 +1,3 @@
-import lifestylePeople from "@/assets/lifestyle-people.jpg";
-import heroInterior from "@/assets/hero-interior.jpg";
 import projectKitchen from "@/assets/project-kitchen.jpg";
 import projectCloset from "@/assets/project-closet.jpg";
 import projectLiving from "@/assets/project-living.jpg";
@@ -8,283 +6,16 @@ import projectUtility from "@/assets/project-utility.jpg";
 import projectBathroom from "@/assets/project-bathroom.jpg";
 import projectOffice from "@/assets/project-office.jpg";
 import {
-  challengeOptions,
-  cookingOptions,
-  futureNeedsOptions,
-  hobbyOptions,
-  hostingOptions,
   kitchenLayoutOptions,
-  noFutureChangesLabel,
-  noHobbiesLabel,
-  otherChallengeLabel,
-  priorityOptions,
   wardrobeDoorOptions,
   wardrobeFoldedLabel,
   wardrobeHangingLabels,
   wardrobeShoesLabel,
   wardrobeStorageOptions,
-  workFromHomeOptions,
   worktopOptions,
-  yesNoOptions,
-} from "./sprint3Data";
-import type {
-  DiscoveryScreen,
-  HomeDnaState,
-  LifestyleState,
-  Priority,
-  RoomKey,
-  RoomsState,
-  VisualOption,
-} from "./homeDnaTypes";
-
-export type ScreenDef =
-  | {
-      kind: "editorial";
-      key: DiscoveryScreen;
-      eyebrow: string;
-      headline: string;
-      body: string;
-      cta: string;
-      image: string;
-    }
-  | {
-      kind: "choice";
-      key: DiscoveryScreen;
-      headline: string;
-      support?: string | undefined;
-      options: { value: string; label: string; description?: string }[];
-      value: string | undefined;
-      apply: (state: HomeDnaState, value: string) => HomeDnaState;
-    }
-  | {
-      kind: "visual";
-      key: DiscoveryScreen;
-      headline: string;
-      support?: string | undefined;
-      columns?: "two" | "three";
-      options: VisualOption[];
-      value: string | undefined;
-      apply: (state: HomeDnaState, value: string) => HomeDnaState;
-    }
-  | {
-      kind: "number";
-      key: DiscoveryScreen;
-      headline: string;
-      support?: string | undefined;
-      unit: string;
-      min: number;
-      max: number;
-      presets?: number[];
-      skippable?: boolean;
-      value: number | undefined;
-      apply: (state: HomeDnaState, value: number) => HomeDnaState;
-    }
-  | {
-      kind: "multi";
-      key: DiscoveryScreen;
-      headline: string;
-      support?: string | undefined;
-      options: string[];
-      max?: number;
-      exclusive?: string;
-      limitNotice?: string;
-      selected: string[];
-      apply: (state: HomeDnaState, values: string[]) => HomeDnaState;
-    }
-  | {
-      kind: "note";
-      key: DiscoveryScreen;
-      headline: string;
-      support?: string | undefined;
-      value: string | undefined;
-      apply: (state: HomeDnaState, value: string) => HomeDnaState;
-    };
-
-/* ---------------- state helpers ---------------- */
-
-function setLife(state: HomeDnaState, patch: Partial<LifestyleState>): HomeDnaState {
-  return { ...state, lifestyle: { ...state.lifestyle, ...patch } };
-}
-
-function setRoom<K extends keyof RoomsState>(
-  state: HomeDnaState,
-  key: K,
-  patch: Partial<NonNullable<RoomsState[K]>>,
-): HomeDnaState {
-  return {
-    ...state,
-    rooms: {
-      ...state.rooms,
-      [key]: { ...(state.rooms[key] ?? {}), ...patch },
-    } as RoomsState,
-  };
-}
-
-export function hasRoom(state: HomeDnaState, room: RoomKey): boolean {
-  return state.selectedRooms.includes("complete-home") || state.selectedRooms.includes(room);
-}
-
-export function pruneRooms(state: HomeDnaState): HomeDnaState {
-  const rooms: RoomsState = {};
-  if (hasRoom(state, "kitchen") && state.rooms.kitchen) rooms.kitchen = state.rooms.kitchen;
-  if (hasRoom(state, "wardrobe") && state.rooms.wardrobe) rooms.wardrobe = state.rooms.wardrobe;
-  if (hasRoom(state, "living-room") && state.rooms.livingRoom)
-    rooms.livingRoom = state.rooms.livingRoom;
-  if (hasRoom(state, "entry-hall") && state.rooms.entryHall) rooms.entryHall = state.rooms.entryHall;
-  if (hasRoom(state, "utility-room") && state.rooms.utilityRoom)
-    rooms.utilityRoom = state.rooms.utilityRoom;
-  if (hasRoom(state, "bathroom") && state.rooms.bathroom) rooms.bathroom = state.rooms.bathroom;
-  if (hasRoom(state, "home-office") && state.rooms.homeOffice)
-    rooms.homeOffice = state.rooms.homeOffice;
-  return { ...state, rooms };
-}
-
-function boolChoice(
-  key: DiscoveryScreen,
-  headline: string,
-  value: boolean | undefined,
-  apply: (state: HomeDnaState, value: boolean) => HomeDnaState,
-  support?: string,
-): ScreenDef {
-  return {
-    kind: "choice",
-    key,
-    headline,
-    ...(support ? { support } : {}),
-    options: yesNoOptions,
-    value: value === undefined ? undefined : value ? "yes" : "no",
-    apply: (s, v) => apply(s, v === "yes"),
-  };
-}
-
-const priorityLevels = [
-  { value: "low", label: "Manjši del" },
-  { value: "medium", label: "Približno polovica" },
-  { value: "high", label: "Večina omare" },
-];
-
-/* ---------------- lifestyle ---------------- */
-
-function lifestyleScreens(state: HomeDnaState): ScreenDef[] {
-  const life = state.lifestyle;
-  const screens: ScreenDef[] = [
-    {
-      kind: "editorial",
-      key: "lifestyle-intro",
-      eyebrow: "Vaš način življenja",
-      headline: "Dober dom podpira vsakdan, ne le videza.",
-      body: "Zdaj želimo razumeti, kaj vam je pomembno, kaj vas v trenutnem domu ovira in kako naj prihodnji prostor deluje za vas.",
-      cta: "Nadaljujmo",
-      image: lifestylePeople,
-    },
-    {
-      kind: "multi",
-      key: "priorities",
-      headline: "Kaj vam je doma najpomembnejše?",
-      support: "Izberite največ tri stvari, ki naj najbolj vplivajo na zasnovo vašega doma.",
-      options: priorityOptions,
-      max: 3,
-      limitNotice: "Izberete lahko največ tri prioritete.",
-      selected: life.priorities,
-      apply: (s, priorities) => setLife(s, { priorities }),
-    },
-    {
-      kind: "multi",
-      key: "challenges",
-      headline: "Kaj bi radi izboljšali v svojem trenutnem domu?",
-      support: "Izberite največ tri konkretne težave, ki jih mora novi projekt rešiti.",
-      options: challengeOptions,
-      max: 3,
-      limitNotice: "Izberete lahko največ tri izzive.",
-      selected: life.currentChallenges,
-      apply: (s, currentChallenges) => setLife(s, { currentChallenges }),
-    },
-  ];
-
-  if (life.currentChallenges.includes(otherChallengeLabel)) {
-    screens.push({
-      kind: "note",
-      key: "challenges-other",
-      headline: "Kaj bi še želeli izboljšati?",
-      support: "Zapis je neobvezen, a nam pomaga bolje razumeti vaš prostor.",
-      value: life.additionalNotes,
-      apply: (s, additionalNotes) => setLife(s, { additionalNotes }),
-    });
-  }
-
-  const cookingRelevant = hasRoom(state, "kitchen") || life.priorities.includes("Kuhanje");
-  if (cookingRelevant) {
-    screens.push({
-      kind: "choice",
-      key: "cooking",
-      headline: "Kako pogosto kuhate doma?",
-      options: cookingOptions.map((o) => ({
-        value: o.value,
-        label: o.label,
-        description: o.description,
-      })),
-      value: life.cookingFrequency,
-      apply: (s, v) => setLife(s, { cookingFrequency: v as NonNullable<LifestyleState["cookingFrequency"]> }),
-    });
-  }
-
-  const workRelevant = hasRoom(state, "home-office") || life.priorities.includes("Delo od doma");
-  if (workRelevant) {
-    screens.push({
-      kind: "choice",
-      key: "work-from-home",
-      headline: "Kako pogosto delate od doma?",
-      options: workFromHomeOptions.map((o) => ({
-        value: o.value,
-        label: o.label,
-        ...("description" in o && o.description ? { description: o.description } : {}),
-      })),
-      value: life.workFromHome,
-      apply: (s, v) => setLife(s, { workFromHome: v as NonNullable<LifestyleState["workFromHome"]> }),
-    });
-  }
-
-  const hostingRelevant =
-    life.priorities.includes("Gostje in druženje") ||
-    state.selectedRooms.includes("complete-home") ||
-    hasRoom(state, "kitchen") ||
-    hasRoom(state, "living-room");
-  if (hostingRelevant) {
-    screens.push({
-      kind: "choice",
-      key: "hosting",
-      headline: "Kako pogosto pri vas gostite družino ali prijatelje?",
-      options: hostingOptions.map((o) => ({ value: o.value, label: o.label })),
-      value: life.hostingFrequency,
-      apply: (s, v) => setLife(s, { hostingFrequency: v as NonNullable<LifestyleState["hostingFrequency"]> }),
-    });
-  }
-
-  screens.push(
-    {
-      kind: "multi",
-      key: "hobbies",
-      headline: "Kateri hobiji potrebujejo prostor v vašem domu?",
-      support: "Izberite vse, kar vpliva na shranjevanje ali uporabo prostora.",
-      options: hobbyOptions,
-      exclusive: noHobbiesLabel,
-      selected: life.hobbies,
-      apply: (s, hobbies) => setLife(s, { hobbies }),
-    },
-    {
-      kind: "multi",
-      key: "future-needs",
-      headline: "Kako naj se dom prilagaja prihodnosti?",
-      support: "Izberite vse spremembe, ki bi jih bilo smiselno upoštevati že danes.",
-      options: futureNeedsOptions,
-      exclusive: noFutureChangesLabel,
-      selected: life.futureNeeds,
-      apply: (s, futureNeeds) => setLife(s, { futureNeeds }),
-    },
-  );
-
-  return screens;
-}
+} from "./discoveryData";
+import { boolChoice, priorityLevels, setRoom, type ScreenDef } from "./screenDef";
+import type { HomeDnaState, Priority, RoomKey } from "./homeDnaTypes";
 
 /* ---------------- kitchen ---------------- */
 
@@ -996,19 +727,7 @@ function officeScreens(state: HomeDnaState): ScreenDef[] {
   return screens;
 }
 
-/* ---------------- assembly ---------------- */
-
-const roomIntroImages: Record<string, string> = {
-  kitchen: projectKitchen,
-  wardrobe: projectCloset,
-  "living-room": projectLiving,
-  "entry-hall": projectHall,
-  "utility-room": projectUtility,
-  bathroom: projectBathroom,
-  "home-office": projectOffice,
-};
-
-const moduleOrder: RoomKey[] = [
+export const roomModuleOrder: RoomKey[] = [
   "kitchen",
   "wardrobe",
   "living-room",
@@ -1018,7 +737,7 @@ const moduleOrder: RoomKey[] = [
   "home-office",
 ];
 
-const moduleBuilders: Record<string, (state: HomeDnaState) => ScreenDef[]> = {
+export const roomModuleBuilders: Record<string, (state: HomeDnaState) => ScreenDef[]> = {
   kitchen: kitchenScreens,
   wardrobe: wardrobeScreens,
   "living-room": livingRoomScreens,
@@ -1028,38 +747,12 @@ const moduleBuilders: Record<string, (state: HomeDnaState) => ScreenDef[]> = {
   "home-office": officeScreens,
 };
 
-export function buildSprint3Screens(state: HomeDnaState): ScreenDef[] {
-  const activeRooms = moduleOrder.filter((room) => hasRoom(state, room));
-  const firstRoom = activeRooms[0];
-
-  const roomIntro: ScreenDef[] = activeRooms.length
-    ? [
-        {
-          kind: "editorial",
-          key: "rooms-intro",
-          eyebrow: "Vaši prostori",
-          headline: "Zdaj bomo vsak izbrani prostor prilagodili vašim dejanskim potrebam.",
-          body: "Zanimajo nas približne mere in način uporabe. Natančne meritve bomo izvedli kasneje.",
-          cta: "Začnimo",
-          image: (firstRoom && roomIntroImages[firstRoom]) ?? heroInterior,
-        },
-      ]
-    : [];
-
-  const modules = activeRooms.flatMap((room) => moduleBuilders[room]?.(state) ?? []);
-
-  return [
-    ...lifestyleScreens(state),
-    ...roomIntro,
-    ...modules,
-    {
-      kind: "editorial",
-      key: "sprint4-placeholder",
-      eyebrow: "Skoraj končano",
-      headline: "Vaš dom smo spoznali. Zdaj bomo določili raven izvedbe in okvirno investicijo.",
-      body: "V naslednjem koraku bomo povezali obseg projekta, izbrane rešitve in želeni nivo izvedbe.",
-      cta: "Nadaljujemo v naslednjem sprintu",
-      image: heroInterior,
-    },
-  ];
-}
+export const roomIntroImages: Record<string, string> = {
+  kitchen: projectKitchen,
+  wardrobe: projectCloset,
+  "living-room": projectLiving,
+  "entry-hall": projectHall,
+  "utility-room": projectUtility,
+  bathroom: projectBathroom,
+  "home-office": projectOffice,
+};
