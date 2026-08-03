@@ -100,17 +100,17 @@ function recoverReport(
   const source = asRecord(value);
   if (!source) return null;
 
-  const rooms = normalizeRooms(source.rooms, requestedRooms);
-  const nextSteps = normalizeSteps(source.nextSteps ?? source.next_steps);
+  const rooms = normalizeRooms(source["rooms"], requestedRooms);
+  const nextSteps = normalizeSteps(source["nextSteps"] ?? source["next_steps"]);
   const candidate = {
-    intro: asText(source.intro),
-    lifestyle: asText(source.lifestyle),
-    style: asText(source.style),
-    why: asText(source.why),
+    intro: asText(source["intro"]),
+    lifestyle: asText(source["lifestyle"]),
+    style: asText(source["style"]),
+    why: asText(source["why"]),
     rooms,
-    investment: asText(source.investment),
+    investment: asText(source["investment"]),
     nextSteps,
-    closing: asText(source.closing),
+    closing: asText(source["closing"]),
   };
 
   const parsed = ReportSchema.safeParse(candidate);
@@ -154,8 +154,8 @@ function normalizeRooms(
     return value.flatMap((item, index) => {
       const room = asRecord(item);
       if (!room) return [];
-      const label = asText(room.label) || requestedRooms[index]?.label || "";
-      const text = asText(room.text ?? room.description ?? room.recommendation);
+      const label = asText(room["label"]) || requestedRooms[index]?.label || "";
+      const text = asText(room["text"] ?? room["description"] ?? room["recommendation"]);
       return label && text ? [{ label, text }] : [];
     });
   }
@@ -173,8 +173,8 @@ function normalizeSteps(value: unknown): Array<{ title: string; text: string }> 
   return value.flatMap((item) => {
     const step = asRecord(item);
     if (!step) return [];
-    const title = asText(step.title);
-    const text = asText(step.text ?? step.description);
+    const title = asText(step["title"]);
+    const text = asText(step["text"] ?? step["description"]);
     return title && text ? [{ title, text }] : [];
   });
 }
