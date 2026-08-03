@@ -9,64 +9,95 @@ import type { HomeDnaState } from "./homeDnaTypes";
 
 export function HomeDnaReport({ state }: { state: HomeDnaState }) {
   const generate = useServerFn(generateHomeDnaReport);
+
   const [report, setReport] = useState<Report | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pdfBusy, setPdfBusy] = useState(false);
+  const [pdfError, setPdfError] = useState<string | null>(null);
 
   const started = useRef(false);
 
   useEffect(() => {
     if (started.current) return;
+
     started.current = true;
     let active = true;
+
     const input = buildReportInput(state);
+
     generate({ data: input })
       .then((result) => {
-        if (active) setReport(result);
+        if (active) {
+          setReport(result);
+        }
       })
-      .catch(() => {
-        if (active) setError("Poročila trenutno ni bilo mogoče pripraviti. Poslali vam ga bomo po e-pošti.");
+      .catch((reportError: unknown) => {
+        console.error("Home DNA report generation failed:", reportError);
+
+        if (active) {
+          setError("Poročila trenutno ni bilo mogoče pripraviti. Poskusite ponovno čez nekaj trenutkov.");
+        }
       });
+
     return () => {
       active = false;
     };
+
+    // Poročilo se mora generirati samo enkrat ob prikazu komponente.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const est = state.investment.estimatedInvestment;
+  const estimatedInvestment = state.investment.estimatedInvestment;
   const { executionLevel } = buildReportInput(state);
 
   if (error) {
-    return <p className="mt-16 text-sm text-muted-foreground">{error}</p>;
+    return (
+      <p role="alert" className="mt-16 max-w-[62ch] text-sm leading-relaxed text-destructive">
+        {error}
+      </p>
+    );
   }
 
   if (!report) {
     return (
-      <p className="mt-16 flex items-center gap-3 text-sm text-muted-foreground">
-        <Loader2 size={16} className="animate-spin motion-reduce:animate-none" />
+      <p role="status" aria-live="polite" className="mt-16 flex items-center gap-3 text-sm text-muted-foreground">
+        <Loader2 size={16} className="animate-spin motion-reduce:animate-none" aria-hidden="true" />
         Pripravljamo vaš Home DNA™ Report …
       </p>
     );
   }
 
-  const investmentRange = est
-    ? `${formatEuro(est.min)} – ${formatEuro(est.max)}`
+  const investmentRange = estimatedInvestment
+    ? `${formatEuro(estimatedInvestment.min)} – ${formatEuro(estimatedInvestment.max)}`
     : "Po posvetu";
 
   const handleDownload = async () => {
+    // Prepreči ponovni klik, dokler se PDF že pripravlja.
+    if (pdfBusy) return;
+
     setPdfBusy(true);
+    setPdfError(null);
+
     try {
-      const roomKeyByLabel = Object.fromEntries(
-        reportRooms(state).map((key) => [roomLabel(key), key] as const),
-      );
+      const roomKeyByLabel = Object.fromEntries(reportRooms(state).map((key) => [roomLabel(key), key] as const));
+
       const blob = await generateHomeDnaPdf({
         report,
-        customerName: state.contact.name ?? "",
+        customerName: state.contact.name?.trim() ?? "",
         investmentRange,
         executionLevel,
         roomKeyByLabel,
       });
+
+      if (!(blob instanceof Blob) || blob.size === 0) {
+        throw new Error("PDF generator returned an empty file.");
+      }
+
       downloadBlob(blob, "Wolf-Studio-Home-DNA-Report.pdf");
+    } catch (downloadError: unknown) {
+      console.error("Home DNA PDF generation failed:", downloadError);
+
+      setPdfError("PDF-ja trenutno ni bilo mogoče ustvariti. Poskusite ponovno.");
     } finally {
       setPdfBusy(false);
     }
@@ -74,24 +105,38 @@ export function HomeDnaReport({ state }: { state: HomeDnaState }) {
 
   return (
     <article className="mt-20 border-t border-border pt-16">
-      <div className="mb-16 flex flex-wrap items-center gap-4">
-        <button
-          type="button"
-          onClick={handleDownload}
-          disabled={pdfBusy}
-          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary px-7 py-4 text-sm text-primary-foreground transition-transform duration-300 hover:-translate-y-0.5 disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 motion-reduce:transition-none"
-        >
-          {pdfBusy ? (
-            <Loader2 size={16} className="animate-spin motion-reduce:animate-none" />
-          ) : (
-            <Download size={16} />
-          )}
-          Prenesi Home DNA™ Report (PDF)
-        </button>
+      <div className="mb-16">
+        <div className="flex flex-wrap items-center gap-4">
+          <button
+            type="button"
+            onClick={handleDownload}
+            disabled={pdfBusy}
+            aria-busy={pdfBusy}
+            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary px-7 py-4 text-sm text-primary-foreground transition-transform duration-300 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 motion-reduce:transition-none"
+          >
+            {pdfBusy ? (
+              <Loader2 size={16} className="animate-spin motion-reduce:animate-none" aria-hidden="true" />
+            ) : (
+              <Download size={16} aria-hidden="true" />
+            )}
+
+            {pdfBusy ? "Pripravljamo PDF …" : "Prenesi Home DNA™ Report (PDF)"}
+          </button>
+        </div>
+
+        {pdfError && (
+          <p role="alert" aria-live="assertive" className="mt-4 max-w-[62ch] text-sm leading-relaxed text-destructive">
+            {pdfError}
+          </p>
+        )}
       </div>
+
       <Section index="01" title="Dobrodošli v vašem Home DNA™" body={report.intro} />
+
       <Section index="02" title="Vaš življenjski slog" body={report.lifestyle} />
+
       <Section index="03" title="Vaš slog" body={report.style} />
+
       <Section index="04" title="Zakaj bo ta dom deloval za vas" body={report.why} />
 
       {report.rooms.length > 0 && (
@@ -100,7 +145,8 @@ export function HomeDnaReport({ state }: { state: HomeDnaState }) {
             {report.rooms.map((room) => (
               <div key={room.label} className="border-t border-border pt-6">
                 <h4 className="font-display text-lg tracking-[-0.02em]">{room.label}</h4>
-                <p className="mt-3 max-w-[62ch] text-base leading-relaxed text-muted-foreground">
+
+                <p className="mt-3 max-w-[62ch] whitespace-pre-line text-base leading-relaxed text-muted-foreground">
                   {room.text}
                 </p>
               </div>
@@ -113,35 +159,38 @@ export function HomeDnaReport({ state }: { state: HomeDnaState }) {
         <dl className="mt-8 grid gap-px border-t border-border sm:grid-cols-2">
           <div className="py-6">
             <dt className="eyebrow">Ocenjena investicija</dt>
-            <dd className="mt-3 font-display text-2xl tracking-[-0.03em]">
-              {investmentRange}
-            </dd>
+            <dd className="mt-3 font-display text-2xl tracking-[-0.03em]">{investmentRange}</dd>
           </div>
+
           <div className="py-6 sm:pl-10">
             <dt className="eyebrow">Raven izvedbe</dt>
             <dd className="mt-3 font-display text-2xl tracking-[-0.03em]">{executionLevel}</dd>
           </div>
         </dl>
-        <p className="mt-6 max-w-[62ch] text-base leading-relaxed text-muted-foreground">
+
+        <p className="mt-6 max-w-[62ch] whitespace-pre-line text-base leading-relaxed text-muted-foreground">
           {report.investment}
         </p>
       </Section>
 
       <Section index="07" title="Naslednji koraki">
         <ol className="mt-8">
-          {report.nextSteps.map((step, i) => (
-            <li key={step.title} className="flex gap-6 border-t border-border py-6 last:border-b">
-              <span className="eyebrow pt-1">{String(i + 1).padStart(2, "0")}</span>
+          {report.nextSteps.map((step, index) => (
+            <li key={`${step.title}-${index}`} className="flex gap-6 border-t border-border py-6 last:border-b">
+              <span className="eyebrow pt-1">{String(index + 1).padStart(2, "0")}</span>
+
               <div>
                 <h4 className="font-display text-lg tracking-[-0.02em]">{step.title}</h4>
-                <p className="mt-2 max-w-[58ch] text-base leading-relaxed text-muted-foreground">
+
+                <p className="mt-2 max-w-[58ch] whitespace-pre-line text-base leading-relaxed text-muted-foreground">
                   {step.text}
                 </p>
               </div>
             </li>
           ))}
         </ol>
-        <p className="mt-8 max-w-[62ch] text-base leading-relaxed">{report.closing}</p>
+
+        <p className="mt-8 max-w-[62ch] whitespace-pre-line text-base leading-relaxed">{report.closing}</p>
       </Section>
     </article>
   );
@@ -161,14 +210,13 @@ function Section({
   return (
     <section className="mb-16 last:mb-0">
       <p className="eyebrow">{index}</p>
-      <h3 className="display-sm mt-4 font-display text-2xl tracking-[-0.03em] md:text-3xl">
-        {title}
-      </h3>
+
+      <h3 className="display-sm mt-4 font-display text-2xl tracking-[-0.03em] md:text-3xl">{title}</h3>
+
       {body && (
-        <p className="mt-6 max-w-[62ch] whitespace-pre-line text-base leading-relaxed text-muted-foreground">
-          {body}
-        </p>
+        <p className="mt-6 max-w-[62ch] whitespace-pre-line text-base leading-relaxed text-muted-foreground">{body}</p>
       )}
+
       {children}
     </section>
   );
