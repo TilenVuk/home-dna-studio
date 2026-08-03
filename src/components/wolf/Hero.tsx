@@ -9,7 +9,7 @@ export function Hero() {
     <section id="top" className="relative min-h-[100svh] w-full overflow-hidden">
       <img
         src={heroImage}
-        alt="Modern Scandinavian interior with custom oak cabinetry"
+        alt="Sodoben skandinavski interjer s hrastovim pohištvom po meri"
         width={1920}
         height={1200}
         className="absolute inset-0 h-full w-full object-cover"

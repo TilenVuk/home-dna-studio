@@ -10,9 +10,9 @@ import { Journey } from "@/components/wolf/Journey";
 import { Contact } from "@/components/wolf/Contact";
 import { Footer } from "@/components/wolf/Footer";
 
-const title = "Wolf Studio — Home DNA™ Interior Methodology";
+const title = "Wolf Studio — metodologija interjerja Home DNA™";
 const description =
-  "Wolf Studio designs homes around the way people live. Home DNA™ is our methodology for understanding lifestyle, routines and belongings before anything is designed.";
+  "Wolf Studio oblikuje domove okoli načina, kako ljudje živijo. Home DNA™ je naša metodologija za razumevanje življenjskega sloga, navad in stvari, preden karkoli oblikujemo.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/")({
           "@type": "InteriorDesigner",
           name: "Wolf Studio",
           description,
-          areaServed: "Slovenia",
+          areaServed: "Slovenija",
           address: { "@type": "PostalAddress", addressLocality: "Ljubljana", addressCountry: "SI" },
           email: "studio@wolfstudio.si",
           telephone: "+386 41 000 000",

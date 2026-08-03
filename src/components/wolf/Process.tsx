@@ -6,8 +6,8 @@ export function Process() {
     <section id="process" className="bg-secondary">
       <div className="mx-auto max-w-[1400px] px-6 py-28 md:px-10 md:py-40">
         <Reveal>
-          <p className="eyebrow">The methodology</p>
-          <h2 className="display-lg mt-6 max-w-[18ch]">The Home DNA™ process</h2>
+          <p className="eyebrow">Metodologija</p>
+          <h2 className="display-lg mt-6 max-w-[18ch]">Proces Home DNA™</h2>
         </Reveal>
 
         <div className="mt-16 grid gap-px bg-border md:grid-cols-2 xl:grid-cols-4">

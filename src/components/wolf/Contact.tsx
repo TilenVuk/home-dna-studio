@@ -5,21 +5,21 @@ import { brand } from "@/content/site";
 import { Reveal } from "./Reveal";
 
 const schema = z.object({
-  name: z.string().trim().min(2, "Please enter your name").max(100),
-  email: z.string().trim().email("Enter a valid email address").max(255),
+  name: z.string().trim().min(2, "Vnesite svoje ime").max(100),
+  email: z.string().trim().email("Vnesite veljaven e-naslov").max(255),
   phone: z.string().trim().max(40).optional().or(z.literal("")),
-  projectType: z.string().trim().min(1, "Select a project type"),
-  budget: z.string().trim().min(1, "Select an investment level"),
+  projectType: z.string().trim().min(1, "Izberite vrsto projekta"),
+  budget: z.string().trim().min(1, "Izberite okvirno investicijo"),
   message: z.string().trim().max(1500).optional().or(z.literal("")),
 });
 
 const projectTypes = [
-  "Complete home furnishing",
-  "Kitchen",
-  "Wardrobe",
-  "Walk-in closet",
-  "Bathroom furniture",
-  "Living room",
+  "Opremljanje celotnega doma",
+  "Kuhinja",
+  "Garderobna omara",
+  "Pohodna garderoba",
+  "Kopalniško pohištvo",
+  "Dnevni prostor",
 ];
 
 const budgets = ["8.000 – 12.000 €", "12.000 – 20.000 €", "20.000 – 35.000 €", "35.000 € +"];
@@ -53,11 +53,11 @@ export function Contact() {
       <div className="grid gap-16 lg:grid-cols-12 lg:gap-20">
         <div className="lg:col-span-4">
           <Reveal>
-            <p className="eyebrow">Contact</p>
-            <h2 className="display-lg mt-6 max-w-[14ch]">Let's start with your life</h2>
+            <p className="eyebrow">Kontakt</p>
+            <h2 className="display-lg mt-6 max-w-[14ch]">Začnimo pri vašem življenju</h2>
             <p className="mt-8 max-w-[38ch] text-sm leading-relaxed text-muted-foreground">
-              Tell us how you live. We reply within two working days and arrange a personal
-              conversation.
+              Povejte nam, kako živite. Odgovorimo v dveh delovnih dneh in se dogovorimo za
+              osebni pogovor.
             </p>
             <div className="mt-10 space-y-1 text-sm">
               <p>{brand.email}</p>
@@ -71,26 +71,26 @@ export function Contact() {
           {sent ? (
             <div className="border border-border bg-sand p-12">
               <Check size={22} className="text-forest" />
-              <h3 className="mt-8 text-2xl">Thank you — your request is with us.</h3>
+              <h3 className="mt-8 text-2xl">Hvala — vaše povpraševanje smo prejeli.</h3>
               <p className="mt-3 max-w-[46ch] text-sm text-muted-foreground">
-                We will be in touch shortly to arrange a conversation about your home and how you live in it.
+                Kmalu se vam oglasimo in se dogovorimo za pogovor o vašem domu in o tem, kako v njem živite.
               </p>
             </div>
           ) : (
             <form onSubmit={onSubmit} noValidate className="grid gap-8 sm:grid-cols-2">
-              <Field label="Name" error={errors["name"]}>
-                <input name="name" className={fieldClass} placeholder="Your full name" />
+              <Field label="Ime" error={errors["name"]}>
+                <input name="name" className={fieldClass} placeholder="Vaše ime in priimek" />
               </Field>
-              <Field label="Email" error={errors["email"]}>
-                <input name="email" type="email" className={fieldClass} placeholder="you@email.com" />
+              <Field label="E-pošta" error={errors["email"]}>
+                <input name="email" type="email" className={fieldClass} placeholder="vi@epošta.si" />
               </Field>
-              <Field label="Phone" error={errors["phone"]}>
+              <Field label="Telefon" error={errors["phone"]}>
                 <input name="phone" className={fieldClass} placeholder="+386" />
               </Field>
-              <Field label="Project type" error={errors["projectType"]}>
+              <Field label="Vrsta projekta" error={errors["projectType"]}>
                 <select name="projectType" defaultValue="" className={fieldClass}>
                   <option value="" disabled>
-                    Select
+                    Izberite
                   </option>
                   {projectTypes.map((p) => (
                     <option key={p} value={p}>
@@ -99,10 +99,10 @@ export function Contact() {
                   ))}
                 </select>
               </Field>
-              <Field label="Approximate budget" error={errors["budget"]}>
+              <Field label="Okvirna investicija" error={errors["budget"]}>
                 <select name="budget" defaultValue="" className={fieldClass}>
                   <option value="" disabled>
-                    Select
+                    Izberite
                   </option>
                   {budgets.map((b) => (
                     <option key={b} value={b}>
@@ -111,10 +111,10 @@ export function Contact() {
                   ))}
                 </select>
               </Field>
-              <Field label="Inspiration images" error={undefined}>
+              <Field label="Slike za navdih" error={undefined}>
                 <label className="flex cursor-pointer items-center gap-3 border-b border-border py-3 text-sm text-muted-foreground transition-colors hover:text-foreground">
                   <Upload size={16} />
-                  {files.length ? `${files.length} file(s) selected` : "Upload images"}
+                  {files.length ? `Izbranih datotek: ${files.length}` : "Naložite slike"}
                   <input
                     type="file"
                     accept="image/*"
@@ -127,13 +127,13 @@ export function Contact() {
                 </label>
               </Field>
               <div className="sm:col-span-2">
-                <Field label="Message" error={errors["message"]}>
+                <Field label="Sporočilo" error={errors["message"]}>
                   <textarea
                     name="message"
                     rows={4}
                     maxLength={1500}
                     className={`${fieldClass} resize-none`}
-                    placeholder="Tell us about your home, timing and what you'd like to solve."
+                    placeholder="Povejte nam o svojem domu, časovnici in kaj želite rešiti."
                   />
                 </Field>
               </div>
@@ -142,7 +142,7 @@ export function Contact() {
                   type="submit"
                   className="inline-flex items-center gap-2 rounded-full bg-primary px-8 py-4 text-sm text-primary-foreground transition-transform hover:-translate-y-0.5"
                 >
-                  Request personal consultation <ArrowRight size={16} />
+                  Naročite osebno svetovanje <ArrowRight size={16} />
                 </button>
               </div>
             </form>

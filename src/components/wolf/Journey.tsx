@@ -7,10 +7,10 @@ export function Journey() {
       <div className="grid gap-16 lg:grid-cols-12 lg:gap-20">
         <div className="lg:col-span-5">
           <Reveal>
-            <p className="eyebrow">The journey</p>
-            <h2 className="display-lg mt-6 max-w-[14ch]">From first conversation to everyday life</h2>
+            <p className="eyebrow">Pot</p>
+            <h2 className="display-lg mt-6 max-w-[14ch]">Od prvega pogovora do vsakdanjega življenja</h2>
             <p className="mt-8 max-w-[42ch] text-sm leading-relaxed text-muted-foreground">
-              One studio, one team, one understanding of your home — through every stage.
+              En studio, ena ekipa, eno razumevanje vašega doma — skozi vse faze.
             </p>
           </Reveal>
         </div>

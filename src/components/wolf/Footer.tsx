@@ -7,7 +7,7 @@ export function Footer() {
         <div>
           <p className="font-display text-2xl tracking-[-0.04em]">WOLF STUDIO</p>
           <p className="mt-2 max-w-[34ch] text-sm text-muted-foreground">
-            Homes designed around the way you live. {brand.address}.
+            Domovi, oblikovani okoli načina, kako živite. {brand.address}.
           </p>
         </div>
         <div className="flex flex-col gap-1 text-sm text-muted-foreground md:items-end">
