@@ -76,6 +76,13 @@ export function SiteNav() {
               {l.label}
             </a>
           ))}
+          <Link
+            to="/home-dna"
+            onClick={() => setOpen(false)}
+            className="mt-4 block rounded-full bg-primary px-5 py-3 text-center text-[15px] text-primary-foreground transition-opacity hover:opacity-85"
+          >
+            Discover your Home DNA™
+          </Link>
           <p className="eyebrow mt-6">{brand.email}</p>
         </div>
       )}
