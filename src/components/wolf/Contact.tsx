@@ -54,10 +54,10 @@ export function Contact() {
         <div className="lg:col-span-4">
           <Reveal>
             <p className="eyebrow">Contact</p>
-            <h2 className="display-lg mt-6 max-w-[14ch]">Let's start with a conversation</h2>
+            <h2 className="display-lg mt-6 max-w-[14ch]">Let's start with your life</h2>
             <p className="mt-8 max-w-[38ch] text-sm leading-relaxed text-muted-foreground">
-              Tell us about your space. We reply within two working days and arrange a personal
-              consultation.
+              Tell us how you live. We reply within two working days and arrange a personal
+              conversation.
             </p>
             <div className="mt-10 space-y-1 text-sm">
               <p>{brand.email}</p>
@@ -73,7 +73,7 @@ export function Contact() {
               <Check size={22} className="text-forest" />
               <h3 className="mt-8 text-2xl">Thank you — your request is with us.</h3>
               <p className="mt-3 max-w-[46ch] text-sm text-muted-foreground">
-                We will get back to you shortly to arrange your consultation and laser measurement.
+                We will be in touch shortly to arrange a conversation about your home and how you live in it.
               </p>
             </div>
           ) : (

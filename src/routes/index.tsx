@@ -10,9 +10,9 @@ import { Journey } from "@/components/wolf/Journey";
 import { Contact } from "@/components/wolf/Contact";
 import { Footer } from "@/components/wolf/Footer";
 
-const title = "Wolf Studio — Custom Interiors Designed Around Your Life";
+const title = "Wolf Studio — Home DNA™ Interior Methodology";
 const description =
-  "Wolf Studio designs custom kitchens, wardrobes and complete home interiors in Slovenia using the Home DNA™ method — furniture built around how you live.";
+  "Wolf Studio designs homes around the way people live. Home DNA™ is our methodology for understanding lifestyle, routines and belongings before anything is designed.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
