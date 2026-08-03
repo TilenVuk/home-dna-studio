@@ -13,7 +13,11 @@ export function HomeDnaReport({ state }: { state: HomeDnaState }) {
   const [error, setError] = useState<string | null>(null);
   const [pdfBusy, setPdfBusy] = useState(false);
 
+  const started = useRef(false);
+
   useEffect(() => {
+    if (started.current) return;
+    started.current = true;
     let active = true;
     const input = buildReportInput(state);
     generate({ data: input })
