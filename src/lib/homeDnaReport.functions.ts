@@ -69,7 +69,7 @@ export const generateHomeDnaReport = createServerFn({ method: "POST" })
         system: SYSTEM,
         prompt,
         maxOutputTokens: 16000,
-        providerOptions: { lovable: { reasoning: { effort: "low" } } },
+
       });
       return output;
     } catch (error) {
