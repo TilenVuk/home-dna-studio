@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Loader2 } from "lucide-react";
+import { Download, Loader2 } from "lucide-react";
 import { generateHomeDnaReport, type HomeDnaReport as Report } from "@/lib/homeDnaReport.functions";
-import { buildReportInput } from "./reportSummary";
+import { buildReportInput, reportRooms, roomLabel } from "./reportSummary";
+import { generateHomeDnaPdf, downloadBlob } from "./reportPdf";
 import { formatEuro } from "./pricing";
 import type { HomeDnaState } from "./homeDnaTypes";
 
@@ -10,6 +11,7 @@ export function HomeDnaReport({ state }: { state: HomeDnaState }) {
   const generate = useServerFn(generateHomeDnaReport);
   const [report, setReport] = useState<Report | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [pdfBusy, setPdfBusy] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -43,8 +45,46 @@ export function HomeDnaReport({ state }: { state: HomeDnaState }) {
     );
   }
 
+  const investmentRange = est
+    ? `${formatEuro(est.min)} – ${formatEuro(est.max)}`
+    : "Po posvetu";
+
+  const handleDownload = async () => {
+    setPdfBusy(true);
+    try {
+      const roomKeyByLabel = Object.fromEntries(
+        reportRooms(state).map((key) => [roomLabel(key), key] as const),
+      );
+      const blob = await generateHomeDnaPdf({
+        report,
+        customerName: state.contact.name ?? "",
+        investmentRange,
+        executionLevel,
+        roomKeyByLabel,
+      });
+      downloadBlob(blob, "Wolf-Studio-Home-DNA-Report.pdf");
+    } finally {
+      setPdfBusy(false);
+    }
+  };
+
   return (
     <article className="mt-20 border-t border-border pt-16">
+      <div className="mb-16 flex flex-wrap items-center gap-4">
+        <button
+          type="button"
+          onClick={handleDownload}
+          disabled={pdfBusy}
+          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary px-7 py-4 text-sm text-primary-foreground transition-transform duration-300 hover:-translate-y-0.5 disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 motion-reduce:transition-none"
+        >
+          {pdfBusy ? (
+            <Loader2 size={16} className="animate-spin motion-reduce:animate-none" />
+          ) : (
+            <Download size={16} />
+          )}
+          Prenesi Home DNA™ Report (PDF)
+        </button>
+      </div>
       <Section index="01" title="Dobrodošli v vašem Home DNA™" body={report.intro} />
       <Section index="02" title="Vaš življenjski slog" body={report.lifestyle} />
       <Section index="03" title="Vaš slog" body={report.style} />
@@ -70,7 +110,7 @@ export function HomeDnaReport({ state }: { state: HomeDnaState }) {
           <div className="py-6">
             <dt className="eyebrow">Ocenjena investicija</dt>
             <dd className="mt-3 font-display text-2xl tracking-[-0.03em]">
-              {est ? `${formatEuro(est.min)} – ${formatEuro(est.max)}` : "Po posvetu"}
+              {investmentRange}
             </dd>
           </div>
           <div className="py-6 sm:pl-10">
