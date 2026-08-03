@@ -12,9 +12,8 @@ import wardrobeOpen from "@/assets/wardrobe-open.jpg";
 import investmentEssential from "@/assets/investment-essential.jpg";
 import investmentConsidered from "@/assets/investment-considered.jpg";
 import investmentSignature from "@/assets/investment-signature.jpg";
-import investmentBespoke from "@/assets/investment-bespoke.jpg";
 import type {
-  InvestmentRange,
+  ExecutionLevel,
   KitchenState,
   VisualOption,
   WardrobeState,
