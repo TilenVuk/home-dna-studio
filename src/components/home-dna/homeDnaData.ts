@@ -6,7 +6,32 @@ import projectHall from "@/assets/project-hall.jpg";
 import projectUtility from "@/assets/project-utility.jpg";
 import projectBathroom from "@/assets/project-bathroom.jpg";
 import projectOffice from "@/assets/project-office.jpg";
-import type { DiscoveryScreen, RoomKey, RoomOption } from "./homeDnaTypes";
+import stageNewBuild from "@/assets/stage-new-build.jpg";
+import stageFullRenovation from "@/assets/stage-full-renovation.jpg";
+import stagePartialRenovation from "@/assets/stage-partial-renovation.jpg";
+import propertyHouse from "@/assets/property-house.jpg";
+import propertyApartment from "@/assets/property-apartment.jpg";
+import propertyHoliday from "@/assets/property-holiday.jpg";
+import styleWarmModern from "@/assets/style-warm-modern.jpg";
+import styleMinimal from "@/assets/style-minimal.jpg";
+import styleScandinavian from "@/assets/style-scandinavian.jpg";
+import styleJapandi from "@/assets/style-japandi.jpg";
+import styleNatural from "@/assets/style-natural.jpg";
+import styleClassic from "@/assets/style-classic.jpg";
+import styleDark from "@/assets/style-dark.jpg";
+import styleRustic from "@/assets/style-rustic.jpg";
+import colourLight from "@/assets/colour-light.jpg";
+import colourEarthy from "@/assets/colour-earthy.jpg";
+import colourNeutral from "@/assets/colour-neutral.jpg";
+import colourDark from "@/assets/colour-dark.jpg";
+import type {
+  PetKey,
+  ProjectStage,
+  PropertyType,
+  RoomKey,
+  RoomOption,
+  VisualOption,
+} from "./homeDnaTypes";
 
 export const completeHomeKey: RoomKey = "complete-home";
 
@@ -71,12 +96,6 @@ export const roomOptions: RoomOption[] = [
   },
 ];
 
-export const screenProgress: Record<DiscoveryScreen, number> = {
-  welcome: 0,
-  rooms: 10,
-  placeholder: 16,
-};
-
 export const welcomeCopy = {
   eyebrow: "Home DNA™",
   headline: "Vsak izjemen dom se začne z razumevanjem ljudi, ki bodo v njem živeli.",
@@ -89,3 +108,153 @@ export const welcomeCopy = {
   time: "Približno 3–10 minut, odvisno od obsega projekta.",
   cta: "Začni Home DNA™ Discovery",
 };
+
+export const projectStageOptions: VisualOption<ProjectStage>[] = [
+  {
+    value: "new-build",
+    title: "Novogradnja",
+    description: "Dom oblikujemo celostno, še preden se začne vsakdanje življenje.",
+    image: stageNewBuild,
+  },
+  {
+    value: "complete-renovation",
+    title: "Celovita prenova",
+    description: "Obstoječi prostor na novo prilagodimo vašim potrebam.",
+    image: stageFullRenovation,
+  },
+  {
+    value: "partial-renovation",
+    title: "Delna prenova",
+    description: "Osredotočimo se na izbrane prostore in izboljšave.",
+    image: stagePartialRenovation,
+  },
+];
+
+export const propertyTypeOptions: VisualOption<PropertyType>[] = [
+  {
+    value: "house",
+    title: "Hiša",
+    description: "Več prostora, več povezav med prostori in ena skupna vizija.",
+    image: propertyHouse,
+  },
+  {
+    value: "apartment",
+    title: "Stanovanje",
+    description: "Premišljena izraba prostora brez kompromisov pri udobju.",
+    image: propertyApartment,
+  },
+  {
+    value: "holiday-home",
+    title: "Počitniški dom",
+    description: "Funkcionalen in umirjen prostor za oddih.",
+    image: propertyHoliday,
+  },
+];
+
+export const floorAreaPresets = [60, 90, 120, 160, 200, 250];
+
+export const householdSizeOptions = ["1", "2", "3", "4", "5+"];
+
+export const childrenOptions = [
+  { value: "none", label: "Ne" },
+  { value: "planning", label: "V prihodnosti" },
+  { value: "yes", label: "Da" },
+] as const;
+
+export const childrenCountOptions = ["1", "2", "3", "4+"];
+
+export const petOptions: { value: PetKey; label: string }[] = [
+  { value: "dog", label: "Pes" },
+  { value: "cat", label: "Mačka" },
+  { value: "other", label: "Drugo" },
+  { value: "none", label: "Brez hišnih ljubljenčkov" },
+];
+
+export const styleOptions: VisualOption[] = [
+  {
+    value: "warm-modern",
+    title: "Toplo moderno",
+    description: "Čiste linije, topli nevtralni odtenki in prijeten lesni videz.",
+    image: styleWarmModern,
+  },
+  {
+    value: "contemporary-minimal",
+    title: "Sodobno minimalistično",
+    description: "Mirne površine, skrito shranjevanje in minimalen vizualni šum.",
+    image: styleMinimal,
+  },
+  {
+    value: "scandinavian",
+    title: "Skandinavsko",
+    description: "Svetloba, funkcionalnost in preprosta domačnost.",
+    image: styleScandinavian,
+  },
+  {
+    value: "japandi",
+    title: "Japandi",
+    description: "Umirjena kombinacija nordijske funkcionalnosti in japonske preprostosti.",
+    image: styleJapandi,
+  },
+  {
+    value: "natural-contemporary",
+    title: "Naravno sodobno",
+    description: "Topel lesni videz, zemeljski odtenki in mehkejše oblike.",
+    image: styleNatural,
+  },
+  {
+    value: "timeless-classic",
+    title: "Brezčasno klasično",
+    description: "Elegantni detajli in videz, ki ni odvisen od kratkotrajnih trendov.",
+    image: styleClassic,
+  },
+  {
+    value: "dark-elegant",
+    title: "Temno elegantno",
+    description: "Globoki kontrasti, steklo in diskretna osvetlitev.",
+    image: styleDark,
+  },
+  {
+    value: "modern-rustic",
+    title: "Moderno rustikalno",
+    description: "Topel značaj naravnih dekorjev v sodobnejši izvedbi.",
+    image: styleRustic,
+  },
+];
+
+export const atmosphereOptions = [
+  "Topel",
+  "Miren",
+  "Svetel",
+  "Eleganten",
+  "Naraven",
+  "Minimalističen",
+  "Prijeten",
+  "Funkcionalen",
+];
+
+export const colourDirectionOptions: VisualOption[] = [
+  {
+    value: "light-airy",
+    title: "Svetla in zračna",
+    description: "Svetli nevtralni toni in mehki lesni dekorji.",
+    image: colourLight,
+  },
+  {
+    value: "warm-earthy",
+    title: "Topla in zemeljska",
+    description: "Bež, peščeni, glineni in naravni odtenki.",
+    image: colourEarthy,
+  },
+  {
+    value: "neutral-timeless",
+    title: "Nevtralna in brezčasna",
+    description: "Umirjena siva, bež in uravnoteženi kontrasti.",
+    image: colourNeutral,
+  },
+  {
+    value: "dark-expressive",
+    title: "Temna in izrazita",
+    description: "Temnejše površine, globoki toni in močni kontrasti.",
+    image: colourDark,
+  },
+];
