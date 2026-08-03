@@ -1,9 +1,12 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Check } from "lucide-react";
 import heroInterior from "@/assets/hero-interior.jpg";
+import { HomeDnaReport } from "./HomeDnaReport";
+import type { HomeDnaState } from "./homeDnaTypes";
 
-export function SuccessScreen({ name }: { name?: string }) {
+export function SuccessScreen({ name, state }: { name?: string; state: HomeDnaState }) {
   return (
+    <>
     <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
       <div className="order-2 lg:order-1 lg:col-span-6">
         <p className="eyebrow">Home DNA™</p>

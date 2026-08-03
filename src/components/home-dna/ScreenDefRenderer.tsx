@@ -156,7 +156,9 @@ export function ScreenDefRenderer({
       );
 
     case "success":
-      return <SuccessScreen {...(state.contact.name ? { name: state.contact.name } : {})} />;
+      return (
+        <SuccessScreen state={state} {...(state.contact.name ? { name: state.contact.name } : {})} />
+      );
 
     default:
       return null;
