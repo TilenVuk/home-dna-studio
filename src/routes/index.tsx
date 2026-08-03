@@ -1,24 +1,63 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { SiteNav } from "@/components/wolf/SiteNav";
+import { Hero } from "@/components/wolf/Hero";
+import { Concept } from "@/components/wolf/Concept";
+import { Process } from "@/components/wolf/Process";
+import { HomeDna } from "@/components/wolf/HomeDna";
+import { Services } from "@/components/wolf/Services";
+import { Gallery } from "@/components/wolf/Gallery";
+import { Journey } from "@/components/wolf/Journey";
+import { Contact } from "@/components/wolf/Contact";
+import { Footer } from "@/components/wolf/Footer";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
+const title = "Wolf Studio — Custom Interiors Designed Around Your Life";
+const description =
+  "Wolf Studio designs custom kitchens, wardrobes and complete home interiors in Slovenia using the Home DNA™ method — furniture built around how you live.";
+
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title },
+      { name: "description", content: description },
+      { property: "og:title", content: title },
+      { property: "og:description", content: description },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "InteriorDesigner",
+          name: "Wolf Studio",
+          description,
+          areaServed: "Slovenia",
+          address: { "@type": "PostalAddress", addressLocality: "Ljubljana", addressCountry: "SI" },
+          email: "studio@wolfstudio.si",
+          telephone: "+386 41 000 000",
+        }),
+      },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="min-h-screen scroll-smooth bg-background">
+      <SiteNav />
+      <main>
+        <Hero />
+        <Concept />
+        <Process />
+        <HomeDna />
+        <Services />
+        <Gallery />
+        <Journey />
+        <Contact />
+      </main>
+      <Footer />
     </div>
   );
 }
