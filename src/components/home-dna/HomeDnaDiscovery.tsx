@@ -1,6 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
 import styleIntroImage from "@/assets/style-intro.jpg";
-import lifestyleIntroImage from "@/assets/lifestyle-intro.jpg";
 import { AtmosphereSelection } from "./AtmosphereSelection";
 import { EditorialScreen } from "./EditorialScreen";
 import { HomeDnaLayout } from "./HomeDnaLayout";
@@ -10,8 +9,10 @@ import { InspirationLink } from "./InspirationLink";
 import { OptionListScreen } from "./OptionListScreen";
 import { PetsSelection } from "./PetsSelection";
 import { RoomSelection } from "./RoomSelection";
+import { ScreenDefRenderer } from "./ScreenDefRenderer";
 import { SingleVisualChoiceScreen } from "./SingleVisualChoiceScreen";
 import { StyleSelection } from "./StyleSelection";
+import { buildSprint3Screens, pruneRooms } from "./sprint3Flow";
 import {
   childrenCountOptions,
   childrenOptions,
@@ -32,9 +33,10 @@ import {
   type RoomKey,
 } from "./homeDnaTypes";
 
-const SPRINT_2_PROGRESS_CEILING = 45;
+const STYLE_PHASE_CEILING = 45;
+const ROOM_PHASE_CEILING = 80;
 
-function visibleScreens(state: HomeDnaState): DiscoveryScreen[] {
+function sprint12Screens(state: HomeDnaState): DiscoveryScreen[] {
   const showHomeSize =
     state.selectedRooms.includes(completeHomeKey) ||
     state.selectedRooms.filter((r) => r !== completeHomeKey).length >= 3;
@@ -54,50 +56,73 @@ function visibleScreens(state: HomeDnaState): DiscoveryScreen[] {
     "atmosphere",
     "colour-direction",
     "inspiration",
-    "placeholder",
   ];
 }
 
 export function HomeDnaDiscovery() {
   const [state, setState] = useState<HomeDnaState>(initialHomeDnaState);
 
-  const flow = useMemo(() => visibleScreens(state), [state]);
+  const sprint3 = useMemo(() => buildSprint3Screens(state), [state]);
+  const flow = useMemo<DiscoveryScreen[]>(
+    () => [...sprint12Screens(state), ...sprint3.map((s) => s.key)],
+    [state, sprint3],
+  );
+
   const index = Math.max(flow.indexOf(state.currentScreen), 0);
-  const progress = (index / (flow.length - 1)) * SPRINT_2_PROGRESS_CEILING;
+  const inspirationIndex = flow.indexOf("inspiration");
+  const lastRoomIndex = flow.length - 2;
 
-  const step = useCallback((direction: 1 | -1, patch?: Partial<HomeDnaState>) => {
-    setState((prev) => {
-      const next: HomeDnaState = {
-        ...prev,
-        ...patch,
-        home: { ...prev.home, ...(patch?.home ?? {}) },
-        style: { ...prev.style, ...(patch?.style ?? {}) },
-      };
-      const screens = visibleScreens(next);
-      const current = screens.indexOf(prev.currentScreen);
-      const target = Math.min(Math.max(current + direction, 0), screens.length - 1);
-      return { ...next, currentScreen: screens[target] ?? prev.currentScreen };
-    });
-  }, []);
+  let progress: number;
+  if (index <= inspirationIndex) {
+    progress = (index / Math.max(inspirationIndex, 1)) * STYLE_PHASE_CEILING;
+  } else {
+    const span = Math.max(lastRoomIndex - inspirationIndex, 1);
+    progress =
+      STYLE_PHASE_CEILING +
+      (Math.min(index - inspirationIndex, span) / span) *
+        (ROOM_PHASE_CEILING - STYLE_PHASE_CEILING);
+  }
 
-  const next = useCallback(
-    (patch?: Partial<HomeDnaState>) => step(1, patch),
+  const step = useCallback(
+    (direction: 1 | -1, mutate?: (state: HomeDnaState) => HomeDnaState) => {
+      setState((prev) => {
+        const next = mutate ? mutate(prev) : prev;
+        const screens = [
+          ...sprint12Screens(next),
+          ...buildSprint3Screens(next).map((s) => s.key),
+        ];
+        const current = screens.indexOf(prev.currentScreen);
+        const from = current >= 0 ? current : 0;
+        const target = Math.min(Math.max(from + direction, 0), screens.length - 1);
+        return { ...next, currentScreen: screens[target] ?? prev.currentScreen };
+      });
+    },
+    [],
+  );
+
+  const advance = useCallback(
+    (mutate?: (state: HomeDnaState) => HomeDnaState) => step(1, mutate),
     [step],
   );
   const back = useCallback(() => step(-1), [step]);
+  const update = useCallback(
+    (mutate: (state: HomeDnaState) => HomeDnaState) => setState((prev) => mutate(prev)),
+    [],
+  );
 
   const screen = state.currentScreen;
+  const sprint3Def = sprint3.find((s) => s.key === screen);
 
   return (
     <HomeDnaLayout progress={progress}>
-      {screen === "welcome" && <HomeDnaWelcome onStart={() => next()} />}
+      {screen === "welcome" && <HomeDnaWelcome onStart={() => advance()} />}
 
       {screen === "rooms" && (
         <RoomSelection
           selectedRooms={state.selectedRooms}
           onChange={(selectedRooms: RoomKey[]) => setState((s) => ({ ...s, selectedRooms }))}
           onBack={back}
-          onNext={() => next()}
+          onNext={() => advance((s) => pruneRooms(s))}
         />
       )}
 
@@ -108,7 +133,9 @@ export function HomeDnaDiscovery() {
           support="Kontekst projekta nam pomaga pripraviti priporočila, primerna za vaš prostor in časovni okvir."
           options={projectStageOptions}
           {...(state.home.projectStage ? { value: state.home.projectStage } : {})}
-          onChoose={(projectStage: ProjectStage) => next({ home: { projectStage } })}
+          onChoose={(projectStage: ProjectStage) =>
+            advance((s) => ({ ...s, home: { ...s.home, projectStage } }))
+          }
           onBack={back}
         />
       )}
@@ -119,7 +146,9 @@ export function HomeDnaDiscovery() {
           headline="Kakšen dom opremljate?"
           options={propertyTypeOptions}
           {...(state.home.propertyType ? { value: state.home.propertyType } : {})}
-          onChoose={(propertyType: PropertyType) => next({ home: { propertyType } })}
+          onChoose={(propertyType: PropertyType) =>
+            advance((s) => ({ ...s, home: { ...s.home, propertyType } }))
+          }
           onBack={back}
         />
       )}
@@ -127,7 +156,7 @@ export function HomeDnaDiscovery() {
       {screen === "home-size" && (
         <HomeSizeScreen
           {...(state.home.floorArea ? { value: state.home.floorArea } : {})}
-          onSubmit={(floorArea) => next({ home: { floorArea } })}
+          onSubmit={(floorArea) => advance((s) => ({ ...s, home: { ...s.home, floorArea } }))}
           onBack={back}
         />
       )}
@@ -143,9 +172,14 @@ export function HomeDnaDiscovery() {
             ? { value: state.home.householdSizePlus ? "5+" : String(state.home.householdSize) }
             : {})}
           onChoose={(value) =>
-            next({
-              home: { householdSize: value === "5+" ? 5 : Number(value), householdSizePlus: value === "5+" },
-            })
+            advance((s) => ({
+              ...s,
+              home: {
+                ...s.home,
+                householdSize: value === "5+" ? 5 : Number(value),
+                householdSizePlus: value === "5+",
+              },
+            }))
           }
           onBack={back}
         />
@@ -157,7 +191,9 @@ export function HomeDnaDiscovery() {
           headline="Ali bodo v domu živeli otroci?"
           options={childrenOptions.map((o) => ({ value: o.value, label: o.label }))}
           {...(state.home.children ? { value: state.home.children } : {})}
-          onChoose={(value) => next({ home: { children: value as ChildrenAnswer } })}
+          onChoose={(value) =>
+            advance((s) => ({ ...s, home: { ...s.home, children: value as ChildrenAnswer } }))
+          }
           onBack={back}
         />
       )}
@@ -169,7 +205,12 @@ export function HomeDnaDiscovery() {
           large
           options={childrenCountOptions.map((o) => ({ value: o, label: o }))}
           {...(state.home.childrenCount ? { value: String(state.home.childrenCount) } : {})}
-          onChoose={(value) => next({ home: { childrenCount: Number(value.replace("+", "")) } })}
+          onChoose={(value) =>
+            advance((s) => ({
+              ...s,
+              home: { ...s.home, childrenCount: Number(value.replace("+", "")) },
+            }))
+          }
           onBack={back}
         />
       )}
@@ -178,7 +219,7 @@ export function HomeDnaDiscovery() {
         <PetsSelection
           selected={state.home.pets ?? []}
           onChange={(pets: PetKey[]) => setState((s) => ({ ...s, home: { ...s.home, pets } }))}
-          onNext={() => next()}
+          onNext={() => advance()}
           onBack={back}
         />
       )}
@@ -191,7 +232,7 @@ export function HomeDnaDiscovery() {
           body="Ne iščemo kratkotrajnega trenda. Iščemo oblikovalski jezik, v katerem si lahko predstavljate živeti še vrsto let."
           cta="Odkrijmo vaš slog"
           image={styleIntroImage}
-          onContinue={() => next()}
+          onContinue={() => advance()}
           onBack={back}
         />
       )}
@@ -202,7 +243,7 @@ export function HomeDnaDiscovery() {
           onChange={(selectedStyles) =>
             setState((s) => ({ ...s, style: { ...s.style, selectedStyles } }))
           }
-          onNext={() => next()}
+          onNext={() => advance()}
           onBack={back}
         />
       )}
@@ -211,7 +252,7 @@ export function HomeDnaDiscovery() {
         <AtmosphereSelection
           selected={state.style.atmosphere}
           onChange={(atmosphere) => setState((s) => ({ ...s, style: { ...s.style, atmosphere } }))}
-          onNext={() => next()}
+          onNext={() => advance()}
           onBack={back}
         />
       )}
@@ -223,7 +264,9 @@ export function HomeDnaDiscovery() {
           options={colourDirectionOptions}
           columns="two"
           {...(state.style.colourDirection ? { value: state.style.colourDirection } : {})}
-          onChoose={(colourDirection) => next({ style: { ...state.style, colourDirection } })}
+          onChoose={(colourDirection) =>
+            advance((s) => ({ ...s, style: { ...s.style, colourDirection } }))
+          }
           onBack={back}
         />
       )}
@@ -232,20 +275,21 @@ export function HomeDnaDiscovery() {
         <InspirationLink
           {...(state.style.inspirationUrl ? { value: state.style.inspirationUrl } : {})}
           onSubmit={(inspirationUrl) =>
-            next({ style: { ...state.style, ...(inspirationUrl ? { inspirationUrl } : {}) } })
+            advance((s) => ({
+              ...s,
+              style: { ...s.style, ...(inspirationUrl ? { inspirationUrl } : {}) },
+            }))
           }
           onBack={back}
         />
       )}
 
-      {screen === "placeholder" && (
-        <EditorialScreen
-          screenKey="placeholder"
-          eyebrow="Vaš način življenja"
-          headline="Slog smo spoznali. Zdaj želimo razumeti, kako živite."
-          body="V naslednjem koraku bomo spoznali vaše vsakodnevne navade, prioritete in izzive, ki jih mora prihodnji dom reševati."
-          cta="Nadaljujemo v naslednjem sprintu"
-          image={lifestyleIntroImage}
+      {sprint3Def && (
+        <ScreenDefRenderer
+          key={sprint3Def.key}
+          def={sprint3Def}
+          onUpdate={update}
+          onAdvance={advance}
           onBack={back}
         />
       )}
