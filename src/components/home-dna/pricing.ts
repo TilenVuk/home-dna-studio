@@ -5,6 +5,13 @@ import type {
   RoomEstimate,
   RoomKey,
   RoomsState,
+  WardrobeState,
+  LivingRoomState,
+  EntryHallState,
+  BathroomState,
+  UtilityRoomState,
+  HomeOfficeState,
+  KitchenState,
 } from "./homeDnaTypes";
 import { hasRoom } from "./screenDef";
 
@@ -72,7 +79,7 @@ const roomLabels: Record<RoomKey, string> = {
 };
 
 function kitchenPrice(rooms: RoomsState, level: ExecutionLevel): number {
-  const k = rooms.kitchen ?? {};
+  const k: KitchenState = rooms.kitchen ?? {};
   const walls = [cmToM(k.wallA), cmToM(k.wallB), cmToM(k.wallC)].filter(
     (v): v is number => v !== undefined,
   );
@@ -99,7 +106,7 @@ function kitchenPrice(rooms: RoomsState, level: ExecutionLevel): number {
 }
 
 function wardrobePrice(rooms: RoomsState, level: ExecutionLevel): number {
-  const w = rooms.wardrobe ?? {};
+  const w: WardrobeState = rooms.wardrobe ?? { storageTypes: [] };
   const length = cmToM(w.width) ?? defaultLengths.wardrobe;
   let total = length * wardrobeBase[level] * doorCoefficient[w.doorType ?? "hinged"];
   if (w.led) total += length * LED_PER_M;
@@ -108,7 +115,7 @@ function wardrobePrice(rooms: RoomsState, level: ExecutionLevel): number {
 }
 
 function livingRoomPrice(rooms: RoomsState): number {
-  const l = rooms.livingRoom ?? {};
+  const l: LivingRoomState = rooms.livingRoom ?? {};
   const length = cmToM(l.wallWidth) ?? defaultLengths.livingRoom;
   let total = length * 800;
   if (l.led) total += length * LED_PER_M;
@@ -116,7 +123,7 @@ function livingRoomPrice(rooms: RoomsState): number {
 }
 
 function entryHallPrice(rooms: RoomsState): number {
-  const e = rooms.entryHall ?? {};
+  const e: EntryHallState = rooms.entryHall ?? {};
   const length = cmToM(e.width) ?? defaultLengths.entryHall;
   let total = length * 900;
   if (e.bench) total += BENCH;
@@ -125,7 +132,7 @@ function entryHallPrice(rooms: RoomsState): number {
 }
 
 function bathroomPrice(rooms: RoomsState): number {
-  const b = rooms.bathroom ?? {};
+  const b: BathroomState = rooms.bathroom ?? {};
   const length = cmToM(b.width) ?? defaultLengths.bathroom;
   let total = length * 1200;
   if (b.mirrorCabinet) total += MIRROR_CABINET;
@@ -133,12 +140,12 @@ function bathroomPrice(rooms: RoomsState): number {
 }
 
 function utilityPrice(rooms: RoomsState): number {
-  const u = rooms.utilityRoom ?? {};
+  const u: UtilityRoomState = rooms.utilityRoom ?? {};
   return (cmToM(u.width) ?? defaultLengths.utilityRoom) * 900;
 }
 
 function homeOfficePrice(rooms: RoomsState): number {
-  const o = rooms.homeOffice ?? {};
+  const o: HomeOfficeState = rooms.homeOffice ?? {};
   return (cmToM(o.deskWidth) ?? defaultLengths.homeOffice) * 1000;
 }
 

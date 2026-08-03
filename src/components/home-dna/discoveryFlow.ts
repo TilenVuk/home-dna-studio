@@ -4,7 +4,7 @@ import lifestylePeople from "@/assets/lifestyle-people.jpg";
 import {
   challengeOptions,
   futureNeedsOptions,
-  investmentOptions,
+  executionLevelOptions,
   lifestyleOptions,
   noFutureChangesLabel,
   otherChallengeLabel,
@@ -22,10 +22,11 @@ import {
 } from "./homeDnaData";
 import { roomIntroImages, roomModuleBuilders, roomModuleOrder } from "./roomModules";
 import { hasRoom, type ScreenDef } from "./screenDef";
+import { calculateInvestment } from "./pricing";
 import type {
   ChildrenAnswer,
   HomeDnaState,
-  InvestmentRange,
+  ExecutionLevel,
   LifestyleState,
   ProjectStage,
   PropertyType,
@@ -273,19 +274,29 @@ function closingScreens(state: HomeDnaState): ScreenDef[] {
     {
       kind: "visual",
       key: "investment",
-      headline: "Kakšen okvir investicije imate v mislih?",
+      headline: "Kateri nivo izvedbe najbolj ustreza vašemu projektu?",
       support:
-        "Okvir nam pomaga uskladiti materiale in obseg izvedbe z vašimi pričakovanji. Natančno ponudbo pripravimo kasneje.",
-      columns: "two",
-      options: investmentOptions,
-      value: state.investment.range,
-      apply: (s, range) => ({ ...s, investment: { range: range as InvestmentRange } }),
+        "Ta izbira nam pomaga pripraviti okvirno oceno investicije in priporočiti primerne materiale. Končne materiale bomo določili skupaj med načrtovanjem.",
+      columns: "three",
+      options: executionLevelOptions,
+      value: state.investment.level,
+      apply: (s, level) => ({
+        ...s,
+        investment: { ...s.investment, level: level as ExecutionLevel },
+      }),
     },
     {
       kind: "contact",
       key: "contact",
       value: state.contact,
-      apply: (s, contact) => ({ ...s, contact }),
+      apply: (s, contact) => {
+        const next = { ...s, contact };
+        const { estimatedInvestment, roomBreakdown } = calculateInvestment(next);
+        return {
+          ...next,
+          investment: { ...next.investment, estimatedInvestment, roomBreakdown },
+        };
+      },
     },
     { kind: "success", key: "success" },
   ];
