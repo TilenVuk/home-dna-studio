@@ -9,8 +9,8 @@ export function ScreenShell({
 }: {
   screenKey: string;
   headline: string;
-  support?: string;
-  eyebrow?: string;
+  support?: string | undefined;
+  eyebrow?: string | undefined;
   children: ReactNode;
 }) {
   const headingRef = useRef<HTMLHeadingElement>(null);
