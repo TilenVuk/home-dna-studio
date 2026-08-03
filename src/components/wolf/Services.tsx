@@ -14,7 +14,7 @@ export function Services() {
 
       <div className="mt-16 grid gap-px bg-border md:grid-cols-2 xl:grid-cols-4">
         {services.map((s, i) => {
-          const Icon = icons[i % icons.length];
+          const Icon = icons[i % icons.length]!;
           return (
             <Reveal
               key={s.title}
