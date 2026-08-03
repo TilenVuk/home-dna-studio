@@ -83,7 +83,7 @@ export function HomeDnaReport({ state }: { state: HomeDnaState }) {
         </p>
       </Section>
 
-      <Section index="06" title="Naslednji koraki">
+      <Section index="07" title="Naslednji koraki">
         <ol className="mt-8">
           {report.nextSteps.map((step, i) => (
             <li key={step.title} className="flex gap-6 border-t border-border py-6 last:border-b">
