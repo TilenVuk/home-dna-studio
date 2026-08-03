@@ -1,4 +1,6 @@
+import { Link } from "@tanstack/react-router";
 import { ArrowDownRight } from "lucide-react";
+
 import heroImage from "@/assets/hero-interior.jpg";
 import { hero } from "@/content/site";
 
