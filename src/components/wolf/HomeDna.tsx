@@ -138,10 +138,10 @@ export function HomeDna() {
     <section id="home-dna" className="bg-forest text-background">
       <div className="mx-auto max-w-[1400px] px-6 py-28 md:px-10 md:py-40">
         <Reveal className="max-w-[52ch]">
-          <p className="eyebrow text-background/60">Our difference</p>
-          <h2 className="display-lg mt-6">Home DNA™ — designed around how you live</h2>
+          <p className="eyebrow text-background/60">Our methodology</p>
+          <h2 className="display-lg mt-6">Why Home DNA™ exists</h2>
           <p className="mt-6 text-base leading-relaxed text-background/75">
-            Most furniture is drawn from catalogues. We begin by understanding your routines, your people and the things you love — so every piece of furniture earns its place. Home DNA™ is our proprietary method for understanding how you live before we design anything. That is why our homes feel effortless.
+            Most furniture companies begin with measurements. We begin with people. Before designing a single cabinet, we take the time to understand how you live, what you own and how your home should support your everyday life. We don't ask how large your wardrobe should be. We ask what your wardrobe needs to hold. Because great interiors aren't measured only in millimetres. They're measured by how naturally they fit your life.
           </p>
         </Reveal>
 
