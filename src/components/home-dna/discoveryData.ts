@@ -33,30 +33,27 @@ export const priorityOptions = [
 
 export const lifestyleOptions = priorityOptions;
 
-export const investmentOptions: VisualOption<InvestmentRange>[] = [
+export const executionLevelOptions: VisualOption<ExecutionLevel>[] = [
   {
-    value: "30-50",
-    title: "30.000 – 50.000 €",
-    description: "Osredotočen projekt z jasnimi prioritetami in premišljenimi materiali.",
+    value: "basic",
+    title: "Osnovni",
+    description: "Kakovostna izdelava iz preverjenih materialov. Odlična izbira za večino projektov.",
     image: investmentEssential,
   },
   {
-    value: "50-70",
-    title: "50.000 – 70.000 €",
-    description: "Več prostorov, usklajena zasnova in kakovostnejše površine.",
+    value: "premium",
+    title: "Premium",
+    badge: "Priporočeno",
+    description:
+      "Najbolj priljubljena izbira. Izboljšani materiali, dovršeni detajli in najboljše razmerje med kakovostjo ter investicijo.",
     image: investmentConsidered,
   },
   {
-    value: "70-100",
-    title: "70.000 – 100.000 €",
-    description: "Celovita ureditev doma z izbranimi materiali in detajli po meri.",
+    value: "signature",
+    title: "Signature",
+    description:
+      "Individualna izvedba brez kompromisov. Vrhunski materiali, unikatni detajli in popolnoma prilagojene rešitve.",
     image: investmentSignature,
-  },
-  {
-    value: "100-plus",
-    title: "Nad 100.000 €",
-    description: "Popolnoma avtorski projekt brez kompromisov pri materialih in izvedbi.",
-    image: investmentBespoke,
   },
 ];
 
