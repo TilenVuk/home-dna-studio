@@ -48,9 +48,10 @@ export function HomeDnaReport({ state }: { state: HomeDnaState }) {
       <Section index="01" title="Dobrodošli v vašem Home DNA™" body={report.intro} />
       <Section index="02" title="Vaš življenjski slog" body={report.lifestyle} />
       <Section index="03" title="Vaš slog" body={report.style} />
+      <Section index="04" title="Zakaj bo ta dom deloval za vas" body={report.why} />
 
       {report.rooms.length > 0 && (
-        <Section index="04" title="Priporočila za izbrane prostore">
+        <Section index="05" title="Priporočila za izbrane prostore">
           <div className="mt-8 space-y-8">
             {report.rooms.map((room) => (
               <div key={room.label} className="border-t border-border pt-6">
