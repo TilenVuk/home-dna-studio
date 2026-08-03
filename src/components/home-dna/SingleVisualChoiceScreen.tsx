@@ -45,6 +45,7 @@ export function SingleVisualChoiceScreen<T extends string>({
             image={option.image}
             title={option.title}
             description={option.description ?? ""}
+            {...(option.badge ? { badge: option.badge } : {})}
             selected={(pending ?? value) === option.value}
             onSelect={() => setPending(option.value)}
           />
