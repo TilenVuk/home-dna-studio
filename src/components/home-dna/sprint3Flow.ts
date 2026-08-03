@@ -224,7 +224,7 @@ function lifestyleScreens(state: HomeDnaState): ScreenDef[] {
         description: o.description,
       })),
       value: life.cookingFrequency,
-      apply: (s, v) => setLife(s, { cookingFrequency: v as LifestyleState["cookingFrequency"] }),
+      apply: (s, v) => setLife(s, { cookingFrequency: v as NonNullable<LifestyleState["cookingFrequency"]> }),
     });
   }
 
@@ -240,7 +240,7 @@ function lifestyleScreens(state: HomeDnaState): ScreenDef[] {
         ...("description" in o && o.description ? { description: o.description } : {}),
       })),
       value: life.workFromHome,
-      apply: (s, v) => setLife(s, { workFromHome: v as LifestyleState["workFromHome"] }),
+      apply: (s, v) => setLife(s, { workFromHome: v as NonNullable<LifestyleState["workFromHome"]> }),
     });
   }
 
@@ -256,7 +256,7 @@ function lifestyleScreens(state: HomeDnaState): ScreenDef[] {
       headline: "Kako pogosto pri vas gostite družino ali prijatelje?",
       options: hostingOptions.map((o) => ({ value: o.value, label: o.label })),
       value: life.hostingFrequency,
-      apply: (s, v) => setLife(s, { hostingFrequency: v as LifestyleState["hostingFrequency"] }),
+      apply: (s, v) => setLife(s, { hostingFrequency: v as NonNullable<LifestyleState["hostingFrequency"]> }),
     });
   }
 
@@ -307,7 +307,7 @@ function kitchenScreens(state: HomeDnaState): ScreenDef[] {
       options: kitchenLayoutOptions,
       columns: "two",
       value: k.layout,
-      apply: (s, v) => setRoom(s, "kitchen", { layout: v as typeof k.layout }),
+      apply: (s, v) => setRoom(s, "kitchen", { layout: v as NonNullable<typeof k.layout> }),
     },
     {
       kind: "number",
@@ -400,7 +400,7 @@ function kitchenScreens(state: HomeDnaState): ScreenDef[] {
       options: worktopOptions,
       columns: "two",
       value: k.worktop,
-      apply: (s, v) => setRoom(s, "kitchen", { worktop: v as typeof k.worktop }),
+      apply: (s, v) => setRoom(s, "kitchen", { worktop: v as NonNullable<typeof k.worktop> }),
     },
     {
       kind: "choice",
