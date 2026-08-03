@@ -8,109 +8,8 @@ export type RoomKey =
   | "bathroom"
   | "home-office";
 
-export type DiscoveryScreen =
-  // Sprint 1 + 2
-  | "welcome"
-  | "rooms"
-  | "project-stage"
-  | "property-type"
-  | "home-size"
-  | "household-size"
-  | "children"
-  | "children-count"
-  | "pets"
-  | "style-intro"
-  | "style-selection"
-  | "atmosphere"
-  | "colour-direction"
-  | "inspiration"
-  // Sprint 3 — lifestyle
-  | "lifestyle-intro"
-  | "priorities"
-  | "challenges"
-  | "challenges-other"
-  | "cooking"
-  | "work-from-home"
-  | "hosting"
-  | "hobbies"
-  | "future-needs"
-  | "rooms-intro"
-  // Sprint 3 — kitchen
-  | "kitchen-intro"
-  | "kitchen-layout"
-  | "kitchen-wall-a"
-  | "kitchen-wall-b"
-  | "kitchen-wall-c"
-  | "kitchen-island-length"
-  | "kitchen-island-width"
-  | "kitchen-worktop"
-  | "kitchen-tall-units"
-  | "kitchen-pantry"
-  | "kitchen-led"
-  | "kitchen-led-length"
-  | "kitchen-glass"
-  | "kitchen-glass-length"
-  // Sprint 3 — wardrobe
-  | "wardrobe-intro"
-  | "wardrobe-storage-types"
-  | "wardrobe-hanging"
-  | "wardrobe-folded"
-  | "wardrobe-shoes"
-  | "wardrobe-width"
-  | "wardrobe-height"
-  | "wardrobe-depth"
-  | "wardrobe-doors"
-  | "wardrobe-led"
-  | "wardrobe-mirror"
-  // Sprint 3 — living room
-  | "living-intro"
-  | "living-wall-width"
-  | "living-tv"
-  | "living-storage"
-  | "living-display"
-  | "living-books"
-  | "living-cables"
-  | "living-led"
-  // Sprint 3 — entry hall
-  | "entry-intro"
-  | "entry-width"
-  | "entry-shoes"
-  | "entry-jackets"
-  | "entry-long-coats"
-  | "entry-bags"
-  | "entry-umbrella"
-  | "entry-bench"
-  | "entry-mirror"
-  // Sprint 3 — utility
-  | "utility-intro"
-  | "utility-width"
-  | "utility-washing"
-  | "utility-dryer"
-  | "utility-stacked"
-  | "utility-cleaning"
-  | "utility-ironing"
-  | "utility-vacuum"
-  | "utility-pantry"
-  // Sprint 3 — bathroom
-  | "bathroom-intro"
-  | "bathroom-width"
-  | "bathroom-sink"
-  | "bathroom-tall"
-  | "bathroom-laundry"
-  | "bathroom-mirror-cabinet"
-  | "bathroom-cleaning"
-  // Sprint 3 — home office
-  | "office-intro"
-  | "office-users"
-  | "office-desk-width"
-  | "office-desk-custom"
-  | "office-monitors"
-  | "office-printer"
-  | "office-documents"
-  | "office-books"
-  | "office-cables"
-  // Sprint 4 transition
-  | "sprint4-placeholder";
+/** Screen keys are plain strings — the flow is built declaratively in discoveryFlow.ts. */
+export type DiscoveryScreen = string;
 
 export type ProjectStage = "new-build" | "complete-renovation" | "partial-renovation";
 export type PropertyType = "house" | "apartment" | "holiday-home";
@@ -127,7 +26,7 @@ export interface HomeContextState {
   householdSizePlus?: boolean;
   children?: ChildrenAnswer;
   childrenCount?: number;
-  pets?: PetKey[];
+  pets: string[];
 }
 
 export interface StyleState {
@@ -140,12 +39,8 @@ export interface StyleState {
 export interface LifestyleState {
   priorities: string[];
   currentChallenges: string[];
-  cookingFrequency?: "rarely" | "weekly" | "daily";
-  workFromHome?: "never" | "sometimes" | "frequently";
-  hostingFrequency?: "rarely" | "occasionally" | "often";
-  hobbies: string[];
+  challengeNote?: string;
   futureNeeds: string[];
-  additionalNotes?: string;
 }
 
 export interface KitchenState {
@@ -241,6 +136,19 @@ export interface RoomsState {
   homeOffice?: HomeOfficeState;
 }
 
+export type InvestmentRange = "30-50" | "50-70" | "70-100" | "100-plus";
+
+export interface InvestmentState {
+  range?: InvestmentRange;
+}
+
+export interface ContactState {
+  name: string;
+  email: string;
+  phone: string;
+  consent: boolean;
+}
+
 export interface HomeDnaState {
   currentScreen: DiscoveryScreen;
   selectedRooms: RoomKey[];
@@ -248,8 +156,8 @@ export interface HomeDnaState {
   style: StyleState;
   lifestyle: LifestyleState;
   rooms: RoomsState;
-  investment: Record<string, unknown>;
-  contact: Record<string, unknown>;
+  investment: InvestmentState;
+  contact: ContactState;
 }
 
 export interface RoomOption {
@@ -269,15 +177,14 @@ export interface VisualOption<T extends string = string> {
 export const initialHomeDnaState: HomeDnaState = {
   currentScreen: "welcome",
   selectedRooms: [],
-  home: {},
+  home: { pets: [] },
   style: { selectedStyles: [], atmosphere: [] },
   lifestyle: {
     priorities: [],
     currentChallenges: [],
-    hobbies: [],
     futureNeeds: [],
   },
   rooms: {},
   investment: {},
-  contact: {},
+  contact: { name: "", email: "", phone: "", consent: false },
 };
