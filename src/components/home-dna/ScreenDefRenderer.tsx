@@ -1,24 +1,35 @@
 import { ChoiceScreen } from "./ChoiceScreen";
+import { ContactScreen } from "./ContactScreen";
 import { EditorialScreen } from "./EditorialScreen";
+import { HomeDnaWelcome } from "./HomeDnaWelcome";
+import { InspirationLink } from "./InspirationLink";
 import { MultiSelectScreen } from "./MultiSelectScreen";
 import { NoteScreen } from "./NoteScreen";
 import { NumberScreen } from "./NumberScreen";
+import { RoomSelection } from "./RoomSelection";
 import { SingleVisualChoiceScreen } from "./SingleVisualChoiceScreen";
-import type { ScreenDef } from "./sprint3Flow";
-import type { HomeDnaState } from "./homeDnaTypes";
+import { StyleSelection } from "./StyleSelection";
+import { SuccessScreen } from "./SuccessScreen";
+import { pruneRooms, type ScreenDef } from "./screenDef";
+import type { HomeDnaState, RoomKey } from "./homeDnaTypes";
 
 export function ScreenDefRenderer({
   def,
+  state,
   onUpdate,
   onAdvance,
   onBack,
 }: {
   def: ScreenDef;
+  state: HomeDnaState;
   onUpdate: (mutate: (state: HomeDnaState) => HomeDnaState) => void;
   onAdvance: (mutate?: (state: HomeDnaState) => HomeDnaState) => void;
   onBack: () => void;
 }) {
   switch (def.kind) {
+    case "welcome":
+      return <HomeDnaWelcome onStart={() => onAdvance()} />;
+
     case "editorial":
       return (
         <EditorialScreen
@@ -105,6 +116,47 @@ export function ScreenDefRenderer({
           onBack={onBack}
         />
       );
+
+    case "rooms":
+      return (
+        <RoomSelection
+          selectedRooms={def.selected}
+          onChange={(rooms: RoomKey[]) => onUpdate((s) => def.apply(s, rooms))}
+          onNext={() => onAdvance((s) => pruneRooms(s))}
+          onBack={onBack}
+        />
+      );
+
+    case "styles":
+      return (
+        <StyleSelection
+          selected={def.selected}
+          onChange={(styles) => onUpdate((s) => def.apply(s, styles))}
+          onNext={() => onAdvance()}
+          onBack={onBack}
+        />
+      );
+
+    case "link":
+      return (
+        <InspirationLink
+          {...(def.value ? { value: def.value } : {})}
+          onSubmit={(url) => onAdvance((s) => def.apply(s, url))}
+          onBack={onBack}
+        />
+      );
+
+    case "contact":
+      return (
+        <ContactScreen
+          value={def.value}
+          onSubmit={(contact) => onAdvance((s) => def.apply(s, contact))}
+          onBack={onBack}
+        />
+      );
+
+    case "success":
+      return <SuccessScreen {...(state.contact.name ? { name: state.contact.name } : {})} />;
 
     default:
       return null;
