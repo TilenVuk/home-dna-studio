@@ -10,7 +10,7 @@ const projects = [
     w: 1200,
     h: 1500,
     title: "Villa Šmarna",
-    meta: "Kitchen designed for a family of five",
+    meta: "Kuhinja, oblikovana za petčlansko družino",
     span: "lg:col-span-5 lg:row-span-2",
     ratio: "aspect-[4/5]",
   },
@@ -18,8 +18,8 @@ const projects = [
     src: living,
     w: 1200,
     h: 900,
-    title: "Apartment Vič",
-    meta: "Living room designed for family life",
+    title: "Stanovanje Vič",
+    meta: "Dnevni prostor, oblikovan za družinsko življenje",
     span: "lg:col-span-7",
     ratio: "aspect-[4/3]",
   },
@@ -27,8 +27,8 @@ const projects = [
     src: closet,
     w: 1200,
     h: 900,
-    title: "House Bled",
-    meta: "Wardrobe optimized for seasonal clothing",
+    title: "Hiša Bled",
+    meta: "Garderoba, optimizirana za sezonska oblačila",
     span: "lg:col-span-4",
     ratio: "aspect-[4/3]",
   },
@@ -37,7 +37,7 @@ const projects = [
     w: 1200,
     h: 1500,
     title: "Penthouse Center",
-    meta: "Hidden entry storage for everyday organization",
+    meta: "Skrito shranjevanje v vhodu za vsakodnevni red",
     span: "lg:col-span-3",
     ratio: "aspect-[4/3]",
   },
@@ -49,11 +49,11 @@ export function Gallery() {
       <div className="mx-auto max-w-[1400px] px-6 py-28 md:px-10 md:py-40">
         <Reveal className="flex flex-wrap items-end justify-between gap-6">
           <div>
-            <p className="eyebrow">Homes we have understood</p>
-            <h2 className="display-lg mt-6 max-w-[18ch]">Lives, translated into space</h2>
+            <p className="eyebrow">Domovi, ki smo jih razumeli</p>
+            <h2 className="display-lg mt-6 max-w-[18ch]">Življenja, prevedena v prostor</h2>
           </div>
           <p className="max-w-[34ch] text-sm leading-relaxed text-muted-foreground">
-            Each project began the same way: with the people who live there.
+            Vsak projekt se je začel enako: pri ljudeh, ki v njem živijo.
           </p>
         </Reveal>
 

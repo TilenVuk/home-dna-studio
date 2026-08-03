@@ -8,7 +8,7 @@ export function Concept() {
       <div className="grid gap-16 lg:grid-cols-12 lg:gap-20">
         <div className="lg:col-span-7">
           <Reveal>
-            <p className="eyebrow">The philosophy</p>
+            <p className="eyebrow">Filozofija</p>
             <h2 className="display-lg mt-6 max-w-[20ch]">
               {concept.title[0]}
               <span className="block text-muted-foreground">{concept.title[1]}</span>
@@ -31,7 +31,7 @@ export function Concept() {
         <Reveal delay={120} className="lg:col-span-5">
           <img
             src={detailImage}
-            alt="Oak joinery detail meeting a stone floor"
+            alt="Detajl hrastovega mizarstva ob kamnitih tleh"
             loading="lazy"
             width={1200}
             height={900}

@@ -5,12 +5,12 @@ import { brand } from "@/content/site";
 
 
 const links = [
-  { label: "Concept", href: "#concept" },
-  { label: "Process", href: "#process" },
+  { label: "Koncept", href: "#concept" },
+  { label: "Proces", href: "#process" },
   
-  { label: "Services", href: "#services" },
-  { label: "Projects", href: "#projects" },
-  { label: "Contact", href: "#contact" },
+  { label: "Storitve", href: "#services" },
+  { label: "Projekti", href: "#projects" },
+  { label: "Kontakt", href: "#contact" },
 ];
 
 export function SiteNav() {
@@ -50,13 +50,13 @@ export function SiteNav() {
             to="/home-dna"
             className="rounded-full bg-primary px-5 py-2.5 text-[13px] text-primary-foreground transition-opacity hover:opacity-85"
           >
-            Discover your Home DNA™
+            Odkrijte svoj Home DNA™
           </Link>
 
         </div>
 
         <button
-          aria-label="Menu"
+          aria-label="Meni"
           onClick={() => setOpen((v) => !v)}
           className="lg:hidden"
         >
@@ -81,7 +81,7 @@ export function SiteNav() {
             onClick={() => setOpen(false)}
             className="mt-4 block rounded-full bg-primary px-5 py-3 text-center text-[15px] text-primary-foreground transition-opacity hover:opacity-85"
           >
-            Discover your Home DNA™
+            Odkrijte svoj Home DNA™
           </Link>
           <p className="eyebrow mt-6">{brand.email}</p>
         </div>
