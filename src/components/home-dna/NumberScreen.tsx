@@ -11,6 +11,8 @@ export function NumberScreen({
   max,
   value,
   presets,
+  allowSkip = false,
+  onSkip,
   onSubmit,
   onBack,
 }: {
@@ -22,6 +24,8 @@ export function NumberScreen({
   max: number;
   value?: number | undefined;
   presets?: number[];
+  allowSkip?: boolean;
+  onSkip?: () => void;
   onSubmit: (value: number) => void;
   onBack: () => void;
 }) {
@@ -34,6 +38,10 @@ export function NumberScreen({
   }, [screenKey, value]);
 
   const handleNext = () => {
+    if (!input.trim() && allowSkip) {
+      onSkip?.();
+      return;
+    }
     const parsed = Number(input.replace(",", "."));
     if (!input.trim() || Number.isNaN(parsed)) {
       setError(`Vpišite približno mero v ${unit}.`);
@@ -106,7 +114,11 @@ export function NumberScreen({
         )}
       </div>
 
-      <DiscoveryNavigation onBack={onBack} onNext={handleNext} />
+      <DiscoveryNavigation
+        onBack={onBack}
+        onNext={handleNext}
+        nextLabel={allowSkip && !input.trim() ? "Preskoči" : "Naprej"}
+      />
     </ScreenShell>
   );
 }
