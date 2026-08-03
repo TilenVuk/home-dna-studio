@@ -138,10 +138,10 @@ export function HomeDna() {
     <section id="home-dna" className="bg-forest text-background">
       <div className="mx-auto max-w-[1400px] px-6 py-28 md:px-10 md:py-40">
         <Reveal className="max-w-[52ch]">
-          <p className="eyebrow text-background/60">The assessment</p>
-          <h2 className="display-lg mt-6">Discover your Home DNA™</h2>
+          <p className="eyebrow text-background/60">Our difference</p>
+          <h2 className="display-lg mt-6">Home DNA™ — designed around how you live</h2>
           <p className="mt-6 text-base leading-relaxed text-background/75">
-            Answer a few questions and discover what type of space fits your lifestyle.
+            Most furniture is drawn from catalogues. We begin by understanding your routines, your people and the things you love — so every piece of furniture earns its place. Home DNA™ is our proprietary method for understanding how you live before we design anything. That is why our homes feel effortless.
           </p>
         </Reveal>
 
@@ -169,7 +169,7 @@ export function HomeDna() {
 
               <div className="mt-12 min-h-[320px]">
                 {step === 0 && (
-                  <Block title="Who lives in your home?">
+                  <Block title="Who is this home for?">
                     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                       {households.map((h) => (
                         <Choice
@@ -185,7 +185,7 @@ export function HomeDna() {
                 )}
 
                 {step === 1 && (
-                  <Block title="What type of project are you planning?">
+                  <Block title="What space are we transforming?">
                     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                       {projects.map((p) => (
                         <Choice
@@ -203,7 +203,7 @@ export function HomeDna() {
                 )}
 
                 {step === 2 && (
-                  <Block title="What do you need to store?">
+                  <Block title="What needs a place in your home?">
                     <p className="-mt-4 mb-8 max-w-[54ch] text-sm text-background/60">
                       Select everything that applies. This is what turns dimensions into a plan.
                     </p>
@@ -237,7 +237,7 @@ export function HomeDna() {
                 )}
 
                 {step === 3 && (
-                  <Block title="Which style feels like home?">
+                  <Block title="Which atmosphere matches your life?">
                     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
                       {styles.map((s) => (
                         <button
@@ -264,7 +264,7 @@ export function HomeDna() {
                 )}
 
                 {step === 4 && (
-                  <Block title="What level of investment are you considering?">
+                  <Block title="What level of investment feels right?">
                     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                       {investments.map((inv) => (
                         <Choice
@@ -303,18 +303,18 @@ export function HomeDna() {
           ) : (
             <div className="grid gap-14 lg:grid-cols-12">
               <div className="lg:col-span-5">
-                <p className="eyebrow text-background/60">Your Home DNA™</p>
+                <p className="eyebrow text-background/60">This is your Home DNA™</p>
                 <h3 className="display-lg mt-5">{result.profile}</h3>
                 <div className="mt-8 space-y-2 text-sm text-background/70">
                   <p>Household — {household}</p>
                   <p>Project — {project}</p>
                   <p>Style — {style}</p>
-                  <p>Storage items mapped — {storage.length}</p>
+                  <p>Details captured — {storage.length}</p>
                 </div>
               </div>
 
               <div className="lg:col-span-7">
-                <p className="eyebrow text-background/60">Recommended solutions</p>
+                <p className="eyebrow text-background/60">How we would design it</p>
                 <ul className="mt-5">
                   {result.recs.map((r) => (
                     <li key={r} className="flex gap-4 border-t border-background/20 py-4 text-base last:border-b">
@@ -330,8 +330,7 @@ export function HomeDna() {
                     {result.lo} – {result.hi} €
                   </p>
                   <p className="mt-4 max-w-[46ch] text-sm leading-relaxed text-background/60">
-                    This is an initial estimate. After laser measurement we create a fully customized
-                    solution.
+                    This estimate is just the beginning. Because Home DNA™ starts with your life, the final design is always tailored — never templated.
                   </p>
                 </div>
 
