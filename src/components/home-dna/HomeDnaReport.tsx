@@ -65,7 +65,7 @@ export function HomeDnaReport({ state }: { state: HomeDnaState }) {
         </Section>
       )}
 
-      <Section index="05" title="Okvirna investicija">
+      <Section index="06" title="Okvirna investicija">
         <dl className="mt-8 grid gap-px border-t border-border sm:grid-cols-2">
           <div className="py-6">
             <dt className="eyebrow">Ocenjena investicija</dt>
