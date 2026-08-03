@@ -22,13 +22,14 @@ export function Hero() {
         </p>
 
         <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <a
-            href="#home-dna"
+          <Link
+            to="/home-dna"
             className="inline-flex items-center justify-center gap-2 rounded-full bg-background px-7 py-4 text-sm text-foreground transition-transform duration-300 hover:-translate-y-0.5"
           >
             {hero.primaryCta}
             <ArrowDownRight size={16} />
-          </a>
+          </Link>
+
           <a
             href="#projects"
             className="inline-flex items-center justify-center rounded-full border border-background/50 px-7 py-4 text-sm text-background transition-colors hover:bg-background/10"

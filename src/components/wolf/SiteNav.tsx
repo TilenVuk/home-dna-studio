@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import { brand } from "@/content/site";
+
 
 const links = [
   { label: "Concept", href: "#concept" },
@@ -44,12 +46,13 @@ export function SiteNav() {
               {l.label}
             </a>
           ))}
-          <a
-            href="#home-dna"
+          <Link
+            to="/home-dna"
             className="rounded-full bg-primary px-5 py-2.5 text-[13px] text-primary-foreground transition-opacity hover:opacity-85"
           >
             Discover your Home DNA™
-          </a>
+          </Link>
+
         </div>
 
         <button
