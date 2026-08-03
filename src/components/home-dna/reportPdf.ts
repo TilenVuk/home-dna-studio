@@ -244,9 +244,10 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
       doc.text(l, M + 12, ctx.y);
       ctx.y += 6;
     }
-    ctx.y += 6;
+    ctx.y += 4;
     doc.setDrawColor(...line);
-    doc.line(M, ctx.y - 3, PW - M, ctx.y - 3);
+    doc.line(M, ctx.y, PW - M, ctx.y);
+    ctx.y += 10;
   });
 
   ctx.y += 6;
