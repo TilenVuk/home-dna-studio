@@ -68,12 +68,31 @@ export const generateHomeDnaReport = createServerFn({ method: "POST" })
         output: Output.object({ schema: ReportSchema }),
         system: SYSTEM,
         prompt,
+        maxOutputTokens: 16000,
+        providerOptions: { lovable: { reasoning: { effort: "low" } } },
       });
       return output;
     } catch (error) {
       if (NoObjectGeneratedError.isInstance(error)) {
+        console.error("HomeDnaReport: no object generated", error.text?.slice(0, 2000));
+        const recovered = recoverReport(error.text);
+        if (recovered) return recovered;
         throw new Error("Poročila trenutno ni bilo mogoče pripraviti.");
       }
       throw error;
     }
   });
+
+/** Best-effort parse when the model output is wrapped in prose/code fences. */
+function recoverReport(text?: string): HomeDnaReport | null {
+  if (!text) return null;
+  const start = text.indexOf("{");
+  const end = text.lastIndexOf("}");
+  if (start === -1 || end <= start) return null;
+  try {
+    const parsed = ReportSchema.safeParse(JSON.parse(text.slice(start, end + 1)));
+    return parsed.success ? parsed.data : null;
+  } catch {
+    return null;
+  }
+}
