@@ -7,7 +7,7 @@ import { brand } from "@/content/site";
 const links = [
   { label: "Concept", href: "#concept" },
   { label: "Process", href: "#process" },
-  { label: "Home DNA™", href: "#home-dna" },
+  
   { label: "Services", href: "#services" },
   { label: "Projects", href: "#projects" },
   { label: "Contact", href: "#contact" },

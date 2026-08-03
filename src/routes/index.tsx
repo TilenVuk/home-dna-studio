@@ -3,7 +3,7 @@ import { SiteNav } from "@/components/wolf/SiteNav";
 import { Hero } from "@/components/wolf/Hero";
 import { Concept } from "@/components/wolf/Concept";
 import { Process } from "@/components/wolf/Process";
-import { HomeDna } from "@/components/wolf/HomeDna";
+
 import { Services } from "@/components/wolf/Services";
 import { Gallery } from "@/components/wolf/Gallery";
 import { Journey } from "@/components/wolf/Journey";
@@ -51,7 +51,7 @@ function Index() {
         <Hero />
         <Concept />
         <Process />
-        <HomeDna />
+        
         <Services />
         <Gallery />
         <Journey />
