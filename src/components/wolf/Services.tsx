@@ -8,8 +8,8 @@ export function Services() {
   return (
     <section id="services" className="mx-auto max-w-[1400px] px-6 py-28 md:px-10 md:py-40">
       <Reveal>
-        <p className="eyebrow">What we make</p>
-        <h2 className="display-lg mt-6 max-w-[20ch]">Complete interior solutions</h2>
+        <p className="eyebrow">The outcome</p>
+        <h2 className="display-lg mt-6 max-w-[20ch]">What Home DNA™ becomes</h2>
       </Reveal>
 
       <div className="mt-16 grid gap-px bg-border md:grid-cols-2 xl:grid-cols-4">

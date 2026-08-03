@@ -8,7 +8,7 @@ export function Concept() {
       <div className="grid gap-16 lg:grid-cols-12 lg:gap-20">
         <div className="lg:col-span-7">
           <Reveal>
-            <p className="eyebrow">The idea</p>
+            <p className="eyebrow">The philosophy</p>
             <h2 className="display-lg mt-6 max-w-[20ch]">
               {concept.title[0]}
               <span className="block text-muted-foreground">{concept.title[1]}</span>

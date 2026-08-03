@@ -10,7 +10,7 @@ const projects = [
     w: 1200,
     h: 1500,
     title: "Villa Šmarna",
-    meta: "Kitchen · Oak & stone",
+    meta: "Kitchen designed for a family of five",
     span: "lg:col-span-5 lg:row-span-2",
     ratio: "aspect-[4/5]",
   },
@@ -19,7 +19,7 @@ const projects = [
     w: 1200,
     h: 900,
     title: "Apartment Vič",
-    meta: "Living space · Integrated media wall",
+    meta: "Living room designed for family life",
     span: "lg:col-span-7",
     ratio: "aspect-[4/3]",
   },
@@ -28,7 +28,7 @@ const projects = [
     w: 1200,
     h: 900,
     title: "House Bled",
-    meta: "Walk-in closet · Lit oak system",
+    meta: "Wardrobe optimized for seasonal clothing",
     span: "lg:col-span-4",
     ratio: "aspect-[4/3]",
   },
@@ -37,7 +37,7 @@ const projects = [
     w: 1200,
     h: 1500,
     title: "Penthouse Center",
-    meta: "Entry hall · Hidden storage",
+    meta: "Hidden entry storage for everyday organization",
     span: "lg:col-span-3",
     ratio: "aspect-[4/3]",
   },
@@ -49,11 +49,11 @@ export function Gallery() {
       <div className="mx-auto max-w-[1400px] px-6 py-28 md:px-10 md:py-40">
         <Reveal className="flex flex-wrap items-end justify-between gap-6">
           <div>
-            <p className="eyebrow">Selected work</p>
-            <h2 className="display-lg mt-6 max-w-[18ch]">Spaces, materials and details</h2>
+            <p className="eyebrow">Homes we have understood</p>
+            <h2 className="display-lg mt-6 max-w-[18ch]">Lives, translated into space</h2>
           </div>
           <p className="max-w-[34ch] text-sm leading-relaxed text-muted-foreground">
-            Homes across Slovenia, designed and produced end to end by the studio.
+            Each project began the same way: with the people who live there.
           </p>
         </Reveal>
 
