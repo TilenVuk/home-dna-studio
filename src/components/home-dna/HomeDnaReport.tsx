@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Download, Loader2 } from "lucide-react";
 import { generateHomeDnaReport, type HomeDnaReport as Report } from "@/lib/homeDnaReport.functions";
@@ -13,7 +13,11 @@ export function HomeDnaReport({ state }: { state: HomeDnaState }) {
   const [error, setError] = useState<string | null>(null);
   const [pdfBusy, setPdfBusy] = useState(false);
 
+  const started = useRef(false);
+
   useEffect(() => {
+    if (started.current) return;
+    started.current = true;
     let active = true;
     const input = buildReportInput(state);
     generate({ data: input })
