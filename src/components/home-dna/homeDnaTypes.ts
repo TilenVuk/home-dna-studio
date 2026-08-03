@@ -185,6 +185,7 @@ export interface VisualOption<T extends string = string> {
   value: T;
   title: string;
   description?: string;
+  badge?: string;
   image: string;
 }
 
@@ -199,6 +200,6 @@ export const initialHomeDnaState: HomeDnaState = {
     futureNeeds: [],
   },
   rooms: {},
-  investment: {},
+  investment: { level: "premium" },
   contact: { name: "", email: "", phone: "", consent: false },
 };
