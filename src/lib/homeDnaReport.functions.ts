@@ -14,6 +14,7 @@ const ReportSchema = z.object({
   intro: z.string(),
   lifestyle: z.string(),
   style: z.string(),
+  why: z.string(),
   rooms: z.array(z.object({ label: z.string(), text: z.string() })),
   investment: z.string(),
   nextSteps: z.array(z.object({ title: z.string(), text: z.string() })),
@@ -50,6 +51,7 @@ export const generateHomeDnaReport = createServerFn({ method: "POST" })
       "intro: 3–5 stavkov osebnega uvoda (za koga je projekt, celotna vizija, kaj ta dom dela poseben).",
       "lifestyle: povzetek življenjskega sloga (vsakodnevne rutine, prioritete, trenutni izzivi, prihodnje potrebe) in kako naj dom podpira njihov vsakdan. 1–2 odstavka.",
       "style: opis izbranih slogov, vzdušja in barvne smeri. Če je stranka dodala povezavo z navdihom, omeni, da jo bomo upoštevali pri oblikovanju.",
+      "why: naslov razdelka je 'Zakaj bo ta dom deloval za vas'. Med 80 in 120 besedami poveži življenjski slog, gospodinjstvo, izbrani slog, trenutne izzive, prihodnje potrebe in izbrane prostore v eno osebno zgodbo ter pojasni, kako se te odločitve povezujejo v dom, ki podpira njihov vsakdan. Ne ponavljaj že napisanega iz prejšnjih razdelkov in ne naštevaj odgovorov; piši tekoče in naravno.",
       `rooms: priporočila SAMO za te prostore, v tem vrstnem redu: ${data.rooms
         .map((r) => r.label)
         .join(
