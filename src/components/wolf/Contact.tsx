@@ -9,7 +9,6 @@ const schema = z.object({
   email: z.string().trim().email("Vnesite veljaven e-naslov").max(255),
   phone: z.string().trim().max(40).optional().or(z.literal("")),
   projectType: z.string().trim().min(1, "Izberite vrsto projekta"),
-  budget: z.string().trim().min(1, "Izberite okvirno investicijo"),
   message: z.string().trim().max(1500).optional().or(z.literal("")),
 });
 
@@ -21,8 +20,6 @@ const projectTypes = [
   "Kopalniško pohištvo",
   "Dnevni prostor",
 ];
-
-const budgets = ["8.000 – 12.000 €", "12.000 – 20.000 €", "20.000 – 35.000 €", "35.000 € +"];
 
 const fieldClass =
   "w-full border-0 border-b border-border bg-transparent py-3 text-base outline-none transition-colors placeholder:text-muted-foreground/60 focus:border-forest";
@@ -56,8 +53,7 @@ export function Contact() {
             <p className="eyebrow">Kontakt</p>
             <h2 className="display-lg mt-6 max-w-[14ch]">Začnimo pri vašem življenju</h2>
             <p className="mt-8 max-w-[38ch] text-sm leading-relaxed text-muted-foreground">
-              Povejte nam, kako živite. Odgovorimo v dveh delovnih dneh in se dogovorimo za
-              osebni pogovor.
+              Povejte nam, kako živite. Odgovorimo v dveh delovnih dneh in se dogovorimo za osebni pogovor.
             </p>
             <div className="mt-10 space-y-1 text-sm">
               <p>{brand.email}</p>
@@ -99,18 +95,6 @@ export function Contact() {
                   ))}
                 </select>
               </Field>
-              <Field label="Okvirna investicija" error={errors["budget"]}>
-                <select name="budget" defaultValue="" className={fieldClass}>
-                  <option value="" disabled>
-                    Izberite
-                  </option>
-                  {budgets.map((b) => (
-                    <option key={b} value={b}>
-                      {b}
-                    </option>
-                  ))}
-                </select>
-              </Field>
               <Field label="Slike za navdih" error={undefined}>
                 <label className="flex cursor-pointer items-center gap-3 border-b border-border py-3 text-sm text-muted-foreground transition-colors hover:text-foreground">
                   <Upload size={16} />
@@ -121,7 +105,11 @@ export function Contact() {
                     multiple
                     className="hidden"
                     onChange={(e) =>
-                      setFiles(Array.from(e.target.files ?? []).map((f) => f.name).slice(0, 10))
+                      setFiles(
+                        Array.from(e.target.files ?? [])
+                          .map((f) => f.name)
+                          .slice(0, 10),
+                      )
                     }
                   />
                 </label>
@@ -153,15 +141,7 @@ export function Contact() {
   );
 }
 
-function Field({
-  label,
-  error,
-  children,
-}: {
-  label: string;
-  error?: string | undefined;
-  children: React.ReactNode;
-}) {
+function Field({ label, error, children }: { label: string; error?: string | undefined; children: React.ReactNode }) {
   return (
     <div>
       <span className="eyebrow">{label}</span>
