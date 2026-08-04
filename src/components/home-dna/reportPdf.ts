@@ -1,3 +1,4 @@
+import { jsPDF } from "jspdf";
 import type { HomeDnaReport } from "@/lib/homeDnaReport.functions";
 import type { RoomKey } from "./homeDnaTypes";
 
@@ -30,7 +31,6 @@ export interface ReportPdfData {
   roomKeyByLabel: Record<string, RoomKey>;
 }
 
-export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
   const { jsPDF } = await import("jspdf");
 
   const doc = new jsPDF({
