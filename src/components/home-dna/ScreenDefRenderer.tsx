@@ -122,6 +122,8 @@ export function ScreenDefRenderer({
       return (
         <RoomSelection
           selectedRooms={def.selected}
+          {...(state.home.childrenCount ? { childrenCount: state.home.childrenCount } : {})}
+          {...(state.home.childrenCountPlus ? { childrenCountPlus: true } : {})}
           onChange={(rooms: RoomKey[]) => onUpdate((s) => def.apply(s, rooms))}
           onNext={() => onAdvance((s) => pruneRooms(s))}
           onBack={onBack}
