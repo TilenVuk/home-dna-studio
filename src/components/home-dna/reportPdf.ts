@@ -138,15 +138,15 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
     y += 10;
   };
 
-  addSectionHeading("01", "DobrodoÅ¡li v vaÅ¡em Home DNAâ„¢");
+  addSectionHeading("01", "Dobrodošli v vašem Home DNA™");
   addParagraph(report.intro);
   addDivider();
 
-  addSectionHeading("02", "VaÅ¡ Å¾ivljenjski slog");
+  addSectionHeading("02", "Vaš življenjski slog");
   addParagraph(report.lifestyle);
   addDivider();
 
-  addSectionHeading("03", "VaÅ¡ slog");
+  addSectionHeading("03", "Vaš slog");
   addParagraph(report.style);
   addDivider();
 
@@ -155,7 +155,7 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
   addDivider();
 
   if (report.rooms.length > 0) {
-    addSectionHeading("05", "PriporoÄila za izbrane prostore");
+    addSectionHeading("05", "Priporočila za izbrane prostore");
 
     report.rooms.forEach((room, index) => {
       setFont(doc, DISPLAY_FONT, "bold", 13, COLORS.ink);
@@ -285,7 +285,7 @@ function registerPdfFonts(doc: PdfDocument) {
 
 /*
  * Pisavi sta v datoteki pdfFonts.ts shranjeni kot base64. Tako generiranje
- * PDF-ja ni odvisno od omreÅ¾ja, Lovable asset URL-jev ali fetch zahtevkov.
+ * PDF-ja ni odvisno od omrežja, Lovable asset URL-jev ali fetch zahtevkov.
  */
 
 function addCoverPage(doc: PdfDocument, data: ReportPdfData) {
@@ -296,7 +296,7 @@ function addCoverPage(doc: PdfDocument, data: ReportPdfData) {
   doc.text("WOLF STUDIO", MARGIN_LEFT, 48);
 
   setFont(doc, DISPLAY_FONT, "bold", 32, COLORS.ink);
-  const titleLines = wrapText(doc, "Home DNAâ„¢ Report", CONTENT_WIDTH);
+  const titleLines = wrapText(doc, "Home DNA™ Report", CONTENT_WIDTH);
   let titleY = 88;
 
   for (const line of titleLines) {
@@ -326,7 +326,7 @@ function addCoverPage(doc: PdfDocument, data: ReportPdfData) {
   setFont(doc, BODY_FONT, "normal", 10, COLORS.muted);
   doc.text(formatDate(new Date()), MARGIN_LEFT, customerY + (customerName ? 12 : 0));
 
-  const description = "Osebna analiza doma, Å¾ivljenjskega sloga in oblikovalskih prioritet.";
+  const description = "Osebna analiza doma, življenjskega sloga in oblikovalskih prioritet.";
   const descriptionLines = wrapText(doc, description, CONTENT_WIDTH);
   let descriptionY = 238;
 
@@ -435,7 +435,7 @@ function addFooters(doc: PdfDocument) {
 
     setFont(doc, BODY_FONT, "normal", 8, COLORS.muted);
     doc.text("Wolf Studio", MARGIN_LEFT, PAGE_HEIGHT - 11);
-    doc.text("Home DNAâ„¢", PAGE_WIDTH / 2, PAGE_HEIGHT - 11, {
+    doc.text("Home DNA™", PAGE_WIDTH / 2, PAGE_HEIGHT - 11, {
       align: "center",
     });
     doc.text(String(page - 1).padStart(2, "0"), CONTENT_RIGHT, PAGE_HEIGHT - 11, {
@@ -454,7 +454,7 @@ function formatDate(date: Date): string {
 
 export function downloadBlob(blob: Blob, filename: string) {
   if (!(blob instanceof Blob) || blob.size === 0) {
-    throw new Error("Datoteke ni mogoÄe prenesti, ker je prazna.");
+    throw new Error("Datoteke ni mogoče prenesti, ker je prazna.");
   }
 
   const objectUrl = URL.createObjectURL(blob);
