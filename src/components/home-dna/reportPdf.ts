@@ -1,6 +1,5 @@
 import { jsPDF } from "jspdf";
-import pdfFontRegularUrl from "@/assets/fonts/DejaVuSans.ttf?url";
-import pdfFontBoldUrl from "@/assets/fonts/DejaVuSans-Bold.ttf?url";
+import { PDF_FONT_REGULAR_BASE64, PDF_FONT_BOLD_BASE64 } from "./pdfFonts";
 import type { HomeDnaReportData, ReportImageId } from "./homeDnaTypes";
 import type { ReportImageAsset, ResolvedReportImages } from "./reportImages";
 
