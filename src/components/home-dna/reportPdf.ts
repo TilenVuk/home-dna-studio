@@ -288,14 +288,9 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
 }
 
 async function registerPdfFonts(doc: PdfDocument) {
-  const [regularFont, boldFont] = await Promise.all([
-    loadAssetAsBase64(pdfFontRegularUrl, "Pisave za PDF ni bilo mogoče naložiti"),
-    loadAssetAsBase64(pdfFontBoldUrl, "Pisave za PDF ni bilo mogoče naložiti"),
-  ]);
-
-  doc.addFileToVFS("DejaVuSans.ttf", regularFont);
+  doc.addFileToVFS("DejaVuSans.ttf", PDF_FONT_REGULAR_BASE64);
   doc.addFont("DejaVuSans.ttf", BODY_FONT, "normal");
-  doc.addFileToVFS("DejaVuSans-Bold.ttf", boldFont);
+  doc.addFileToVFS("DejaVuSans-Bold.ttf", PDF_FONT_BOLD_BASE64);
   doc.addFont("DejaVuSans-Bold.ttf", DISPLAY_FONT, "bold");
 }
 
