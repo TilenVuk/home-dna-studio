@@ -130,6 +130,7 @@ export const priorityLevels = [
 ];
 
 export function hasRoom(state: HomeDnaState, room: RoomKey): boolean {
+  if (room === "children-room" && !state.home.childrenCount) return false;
   return state.selectedRooms.includes("complete-home") || state.selectedRooms.includes(room);
 }
 
@@ -141,6 +142,7 @@ export function pruneRooms(state: HomeDnaState): HomeDnaState {
   if (hasRoom(state, "entry-hall") && state.rooms.entryHall) rooms.entryHall = state.rooms.entryHall;
   if (hasRoom(state, "utility-room") && state.rooms.utilityRoom) rooms.utilityRoom = state.rooms.utilityRoom;
   if (hasRoom(state, "bathroom") && state.rooms.bathroom) rooms.bathroom = state.rooms.bathroom;
-  if (hasRoom(state, "home-office") && state.rooms.homeOffice) rooms.homeOffice = state.rooms.homeOffice;
+  if (hasRoom(state, "bedroom") && state.rooms.bedroom) rooms.bedroom = state.rooms.bedroom;
+  if (hasRoom(state, "children-room") && state.rooms.childrenRoom) rooms.childrenRoom = state.rooms.childrenRoom;
   return { ...state, rooms };
 }
