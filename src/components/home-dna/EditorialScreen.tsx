@@ -8,6 +8,7 @@ export function EditorialScreen({
   body,
   cta,
   image,
+  prominentEyebrow = false,
   onContinue,
   onBack,
   ctaDisabled = false,
@@ -18,6 +19,7 @@ export function EditorialScreen({
   body: string;
   cta: string;
   image: string;
+  prominentEyebrow?: boolean | undefined;
   onContinue?: () => void;
   onBack?: () => void;
   ctaDisabled?: boolean;
@@ -25,11 +27,27 @@ export function EditorialScreen({
   const headingRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
-    headingRef.current?.focus();
+    headingRef.current?.focus({ preventScroll: true });
   }, [screenKey]);
 
   return (
     <div className="animate-[hd-enter_260ms_ease-out] motion-reduce:animate-none">
+      {prominentEyebrow && (
+        <div className="mb-10 max-w-[70ch] md:mb-12">
+          <p className="eyebrow">Naslednji prostor</p>
+          <h1
+            ref={headingRef}
+            tabIndex={-1}
+            className="mt-4 max-w-[16ch] font-display text-[clamp(3.5rem,10vw,7.5rem)] leading-[0.88] tracking-[-0.065em] focus:outline-none"
+          >
+            {eyebrow}
+          </h1>
+          <h2 className="mt-7 max-w-[28ch] font-display text-2xl leading-tight tracking-[-0.035em] md:text-4xl">
+            {headline}
+          </h2>
+        </div>
+      )}
+
       <div className="overflow-hidden">
         <img
           src={image}
@@ -42,14 +60,14 @@ export function EditorialScreen({
       </div>
 
       <div className="mt-12 max-w-[52ch]">
-        <p className="eyebrow">{eyebrow}</p>
-        <h1
-          ref={headingRef}
-          tabIndex={-1}
-          className="display-lg mt-6 max-w-[20ch] focus:outline-none"
-        >
-          {headline}
-        </h1>
+        {!prominentEyebrow && (
+          <>
+            <p className="eyebrow">{eyebrow}</p>
+            <h1 ref={headingRef} tabIndex={-1} className="display-lg mt-6 max-w-[20ch] focus:outline-none">
+              {headline}
+            </h1>
+          </>
+        )}
         <p className="mt-6 text-base leading-relaxed text-muted-foreground">{body}</p>
 
         {onContinue ? (
