@@ -254,13 +254,13 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
 
   const investmentStartY = y;
 
-  for (let index = 0; index < investmentLines.length; index += 1) {
-    doc.text(investmentLines[index], MARGIN_LEFT, investmentStartY + index * 7);
-  }
+  investmentLines.forEach((line, index) => {
+    doc.text(line, MARGIN_LEFT, investmentStartY + index * 7);
+  });
 
-  for (let index = 0; index < executionLevelLines.length; index += 1) {
-    doc.text(executionLevelLines[index], rightColumnX, investmentStartY + index * 7);
-  }
+  executionLevelLines.forEach((line, index) => {
+    doc.text(line, rightColumnX, investmentStartY + index * 7);
+  });
 
   y += Math.max(investmentLines.length, executionLevelLines.length) * 7 + 7;
 
