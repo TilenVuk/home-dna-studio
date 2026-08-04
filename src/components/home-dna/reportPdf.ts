@@ -11,6 +11,8 @@ const ink = [26, 26, 24] as const;
 const muted = [105, 102, 96] as const;
 const line = [220, 216, 209] as const;
 
+type PdfDocument = InstanceType<(typeof import("jspdf"))["jsPDF"]>;
+
 export interface ReportPdfData {
   report: HomeDnaReport;
   customerName: string;
@@ -32,11 +34,17 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
   const { report } = data;
 
   /*
-   * Za zanesljivo MVP-generiranje uporabljamo samo vgrajene
-   * jsPDF pisave. Ni zunanjih fetch zahtevkov za pisave ali slike.
+   * MVP-verzija namenoma uporablja samo vgrajeno pisavo
+   * in ne nalaga zunanjih slik ali pisav.
+   *
+   * Tako se izognemo nedokončanim fetch zahtevkom, zaradi
+   * katerih je generiranje PDF-ja prej ostalo v neskončnem stanju.
    */
 
+  // --------------------------------------------------
   // Naslovnica
+  // --------------------------------------------------
+
   doc.setFillColor(243, 240, 234);
   doc.rect(0, 0, PAGE_WIDTH, PAGE_HEIGHT, "F");
 
@@ -50,11 +58,20 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(32);
   doc.setTextColor(...ink);
-  doc.text("Home DNA™ Report", MARGIN, 88);
+
+  const coverTitle = wrapTextSafely(doc, "Home DNA™ Report", CONTENT_WIDTH);
+
+  doc.text(coverTitle, MARGIN, 88, {
+    maxWidth: CONTENT_WIDTH,
+  });
+
+  const coverTitleHeight = coverTitle.length * 12;
 
   doc.setDrawColor(...line);
   doc.setLineWidth(0.3);
-  doc.line(MARGIN, 104, PAGE_WIDTH - MARGIN, 104);
+  doc.line(MARGIN, 96 + coverTitleHeight, PAGE_WIDTH - MARGIN, 96 + coverTitleHeight);
+
+  const customerY = 114 + coverTitleHeight;
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(12);
@@ -63,19 +80,30 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
   const customerName = data.customerName.trim();
 
   if (customerName) {
-    doc.text(customerName, MARGIN, 122);
+    const customerLines = wrapTextSafely(doc, customerName, CONTENT_WIDTH);
+
+    doc.text(customerLines, MARGIN, customerY, {
+      maxWidth: CONTENT_WIDTH,
+    });
   }
 
   doc.setFontSize(10);
   doc.setTextColor(...muted);
-  doc.text(formatDate(new Date()), MARGIN, customerName ? 132 : 122);
 
-  doc.setFontSize(10);
-  doc.text("Osebna analiza doma, življenjskega sloga in oblikovalskih prioritet.", MARGIN, 238, {
+  doc.text(formatDate(new Date()), MARGIN, customerY + (customerName ? 12 : 0));
+
+  const coverDescription = "Osebna analiza doma, življenjskega sloga in oblikovalskih prioritet.";
+
+  const coverDescriptionLines = wrapTextSafely(doc, coverDescription, CONTENT_WIDTH);
+
+  doc.text(coverDescriptionLines, MARGIN, 238, {
     maxWidth: CONTENT_WIDTH,
   });
 
+  // --------------------------------------------------
   // Vsebina
+  // --------------------------------------------------
+
   doc.addPage();
 
   let y = MARGIN;
@@ -107,10 +135,13 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
     doc.setFontSize(19);
     doc.setTextColor(...ink);
 
-    const lines = doc.splitTextToSize(title, CONTENT_WIDTH) as string[];
+    const titleLines = wrapTextSafely(doc, title, CONTENT_WIDTH);
 
-    doc.text(lines, MARGIN, y);
-    y += lines.length * 8 + 7;
+    doc.text(titleLines, MARGIN, y, {
+      maxWidth: CONTENT_WIDTH,
+    });
+
+    y += titleLines.length * 8 + 7;
   };
 
   const addParagraph = (
@@ -118,33 +149,47 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
     options?: {
       color?: readonly [number, number, number];
       size?: number;
+      leftIndent?: number;
     },
   ) => {
     if (!text?.trim()) return;
+
+    const leftIndent = options?.leftIndent ?? 0;
+    const x = MARGIN + leftIndent;
+    const availableWidth = CONTENT_WIDTH - leftIndent;
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(options?.size ?? 10.5);
     doc.setTextColor(...(options?.color ?? muted));
 
-    const paragraphs = text
+    const normalizedText = text
       .replace(/\r\n/g, "\n")
+      .replace(/\r/g, "\n")
+      .replace(/[ \t]+/g, " ")
+      .trim();
+
+    const paragraphs = normalizedText
       .split(/\n+/)
-      .map((part) => part.trim())
+      .map((paragraph) => paragraph.trim())
       .filter(Boolean);
 
     for (const paragraph of paragraphs) {
-      const lines = doc.splitTextToSize(paragraph, CONTENT_WIDTH) as string[];
+      const wrappedLines = wrapTextSafely(doc, paragraph, availableWidth);
 
-      for (const currentLine of lines) {
+      for (const currentLine of wrappedLines) {
         ensureSpace(6);
-        doc.text(currentLine, MARGIN, y);
+
+        doc.text(currentLine, x, y, {
+          maxWidth: availableWidth,
+        });
+
         y += 6;
       }
 
-      y += 3;
+      y += 4;
     }
 
-    y += 3;
+    y += 2;
   };
 
   const addDivider = () => {
@@ -159,41 +204,72 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
     y += 10;
   };
 
+  // --------------------------------------------------
+  // 01
+  // --------------------------------------------------
+
   addHeading("01", "Dobrodošli v vašem Home DNA™");
+
   addParagraph(report.intro);
   addDivider();
 
+  // --------------------------------------------------
+  // 02
+  // --------------------------------------------------
+
   addHeading("02", "Vaš življenjski slog");
+
   addParagraph(report.lifestyle);
   addDivider();
 
+  // --------------------------------------------------
+  // 03
+  // --------------------------------------------------
+
   addHeading("03", "Vaš slog");
+
   addParagraph(report.style);
   addDivider();
 
+  // --------------------------------------------------
+  // 04
+  // --------------------------------------------------
+
   addHeading("04", "Zakaj bo ta dom deloval za vas");
+
   addParagraph(report.why);
   addDivider();
+
+  // --------------------------------------------------
+  // 05
+  // --------------------------------------------------
 
   if (report.rooms.length > 0) {
     addHeading("05", "Priporočila za izbrane prostore");
 
     report.rooms.forEach((room, index) => {
-      ensureSpace(28);
+      ensureSpace(34);
 
       if (index > 0) {
         doc.setDrawColor(...line);
         doc.setLineWidth(0.2);
+
         doc.line(MARGIN, y, PAGE_WIDTH - MARGIN, y);
+
         y += 9;
       }
 
       doc.setFont("helvetica", "bold");
       doc.setFontSize(13);
       doc.setTextColor(...ink);
-      doc.text(room.label, MARGIN, y);
 
-      y += 8;
+      const roomTitleLines = wrapTextSafely(doc, room.label, CONTENT_WIDTH);
+
+      doc.text(roomTitleLines, MARGIN, y, {
+        maxWidth: CONTENT_WIDTH,
+      });
+
+      y += roomTitleLines.length * 7 + 3;
 
       addParagraph(room.text);
     });
@@ -201,16 +277,28 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
     addDivider();
   }
 
+  // --------------------------------------------------
+  // 06
+  // --------------------------------------------------
+
   addHeading("06", "Okvirna investicija");
-  ensureSpace(28);
+
+  ensureSpace(30);
+
+  const investmentColumnWidth = CONTENT_WIDTH / 2 - 6;
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   doc.setTextColor(...muted);
   doc.setCharSpace(1);
 
-  doc.text("OCENJENA INVESTICIJA", MARGIN, y);
-  doc.text("RAVEN IZVEDBE", MARGIN + CONTENT_WIDTH / 2, y);
+  doc.text("OCENJENA INVESTICIJA", MARGIN, y, {
+    maxWidth: investmentColumnWidth,
+  });
+
+  doc.text("RAVEN IZVEDBE", MARGIN + CONTENT_WIDTH / 2 + 6, y, {
+    maxWidth: investmentColumnWidth,
+  });
 
   doc.setCharSpace(0);
   y += 9;
@@ -219,50 +307,88 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
   doc.setFontSize(15);
   doc.setTextColor(...ink);
 
-  doc.text(data.investmentRange || "Po posvetu", MARGIN, y);
+  const investmentLines = wrapTextSafely(doc, data.investmentRange || "Po posvetu", investmentColumnWidth);
 
-  doc.text(data.executionLevel || "Premium", MARGIN + CONTENT_WIDTH / 2, y);
+  const executionLevelLines = wrapTextSafely(doc, data.executionLevel || "Premium", investmentColumnWidth);
 
-  y += 13;
+  doc.text(investmentLines, MARGIN, y, {
+    maxWidth: investmentColumnWidth,
+  });
+
+  doc.text(executionLevelLines, MARGIN + CONTENT_WIDTH / 2 + 6, y, {
+    maxWidth: investmentColumnWidth,
+  });
+
+  y += Math.max(investmentLines.length, executionLevelLines.length) * 7 + 7;
 
   addParagraph(report.investment);
   addDivider();
 
+  // --------------------------------------------------
+  // 07
+  // --------------------------------------------------
+
   addHeading("07", "Naslednji koraki");
 
   report.nextSteps.forEach((step, index) => {
-    ensureSpace(30);
+    ensureSpace(34);
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8);
     doc.setTextColor(...muted);
+
     doc.text(String(index + 1).padStart(2, "0"), MARGIN, y);
+
+    const stepContentX = MARGIN + 13;
+    const stepContentWidth = CONTENT_WIDTH - 13;
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(12);
     doc.setTextColor(...ink);
-    doc.text(step.title, MARGIN + 13, y);
 
-    y += 7;
+    const stepTitleLines = wrapTextSafely(doc, step.title, stepContentWidth);
 
-    const lines = doc.splitTextToSize(step.text, CONTENT_WIDTH - 13) as string[];
+    doc.text(stepTitleLines, stepContentX, y, {
+      maxWidth: stepContentWidth,
+    });
+
+    y += stepTitleLines.length * 6 + 3;
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10.5);
     doc.setTextColor(...muted);
 
-    for (const currentLine of lines) {
+    const stepTextLines = wrapTextSafely(doc, step.text, stepContentWidth);
+
+    for (const currentLine of stepTextLines) {
       ensureSpace(6);
-      doc.text(currentLine, MARGIN + 13, y);
+
+      doc.text(currentLine, stepContentX, y, {
+        maxWidth: stepContentWidth,
+      });
+
       y += 6;
     }
 
     y += 5;
+
+    ensureSpace(4);
+
+    doc.setDrawColor(...line);
+    doc.setLineWidth(0.2);
+
+    doc.line(MARGIN, y, PAGE_WIDTH - MARGIN, y);
+
+    y += 10;
   });
 
   addParagraph(report.closing, {
     color: ink,
   });
+
+  // --------------------------------------------------
+  // Noge strani
+  // --------------------------------------------------
 
   addFooters(doc);
 
@@ -275,7 +401,99 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
   return blob;
 }
 
-function addFooters(doc: InstanceType<(typeof import("jspdf"))["jsPDF"]>) {
+function wrapTextSafely(doc: PdfDocument, text: string, maxWidth: number): string[] {
+  const normalizedText = text
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n")
+    .replace(/[ \t]+/g, " ")
+    .trim();
+
+  if (!normalizedText) {
+    return [];
+  }
+
+  const initialLines = doc.splitTextToSize(normalizedText, maxWidth) as string[];
+
+  const result: string[] = [];
+
+  for (const initialLine of initialLines) {
+    const lineText = String(initialLine).trim();
+
+    if (!lineText) {
+      continue;
+    }
+
+    if (doc.getTextWidth(lineText) <= maxWidth) {
+      result.push(lineText);
+      continue;
+    }
+
+    const words = lineText.split(/\s+/);
+    let currentLine = "";
+
+    for (const word of words) {
+      const proposedLine = currentLine ? `${currentLine} ${word}` : word;
+
+      if (doc.getTextWidth(proposedLine) <= maxWidth) {
+        currentLine = proposedLine;
+        continue;
+      }
+
+      if (currentLine) {
+        result.push(currentLine);
+        currentLine = "";
+      }
+
+      if (doc.getTextWidth(word) <= maxWidth) {
+        currentLine = word;
+        continue;
+      }
+
+      const brokenWordParts = breakLongWord(doc, word, maxWidth);
+
+      result.push(...brokenWordParts.slice(0, -1));
+
+      currentLine = brokenWordParts.at(-1) ?? "";
+    }
+
+    if (currentLine) {
+      result.push(currentLine);
+    }
+  }
+
+  return result;
+}
+
+function breakLongWord(doc: PdfDocument, word: string, maxWidth: number): string[] {
+  const parts: string[] = [];
+  let remaining = word;
+
+  while (remaining.length > 0 && doc.getTextWidth(remaining) > maxWidth) {
+    let cutPosition = remaining.length;
+
+    while (cutPosition > 1 && doc.getTextWidth(`${remaining.slice(0, cutPosition)}-`) > maxWidth) {
+      cutPosition -= 1;
+    }
+
+    if (cutPosition <= 1) {
+      cutPosition = 1;
+    }
+
+    const part = remaining.slice(0, cutPosition) + (cutPosition < remaining.length ? "-" : "");
+
+    parts.push(part);
+
+    remaining = remaining.slice(cutPosition).trimStart();
+  }
+
+  if (remaining) {
+    parts.push(remaining);
+  }
+
+  return parts;
+}
+
+function addFooters(doc: PdfDocument) {
   const totalPages = doc.getNumberOfPages();
 
   for (let page = 2; page <= totalPages; page += 1) {
@@ -283,6 +501,7 @@ function addFooters(doc: InstanceType<(typeof import("jspdf"))["jsPDF"]>) {
 
     doc.setDrawColor(...line);
     doc.setLineWidth(0.2);
+
     doc.line(MARGIN, PAGE_HEIGHT - 18, PAGE_WIDTH - MARGIN, PAGE_HEIGHT - 18);
 
     doc.setFont("helvetica", "normal");
@@ -291,9 +510,13 @@ function addFooters(doc: InstanceType<(typeof import("jspdf"))["jsPDF"]>) {
 
     doc.text("Wolf Studio", MARGIN, PAGE_HEIGHT - 11);
 
-    doc.text("Home DNA™", PAGE_WIDTH / 2, PAGE_HEIGHT - 11, { align: "center" });
+    doc.text("Home DNA™", PAGE_WIDTH / 2, PAGE_HEIGHT - 11, {
+      align: "center",
+    });
 
-    doc.text(String(page - 1).padStart(2, "0"), PAGE_WIDTH - MARGIN, PAGE_HEIGHT - 11, { align: "right" });
+    doc.text(String(page - 1).padStart(2, "0"), PAGE_WIDTH - MARGIN, PAGE_HEIGHT - 11, {
+      align: "right",
+    });
   }
 }
 
@@ -311,6 +534,7 @@ export function downloadBlob(blob: Blob, filename: string) {
   }
 
   const objectUrl = URL.createObjectURL(blob);
+
   const anchor = document.createElement("a");
 
   anchor.href = objectUrl;
