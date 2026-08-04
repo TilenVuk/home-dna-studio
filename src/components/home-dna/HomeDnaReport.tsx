@@ -27,12 +27,20 @@ export function HomeDnaReport({ state }: { state: HomeDnaState }) {
 
     const input = buildReportInput(state);
 
+    console.log("[HomeDnaReport] request", JSON.stringify(input).slice(0, 500));
+
     generate({ data: input })
       .then((result) => {
+        console.log(
+          "[HomeDnaReport] resolved",
+          typeof result,
+          result === null ? "null" : Object.keys(result ?? {}).join(","),
+          JSON.stringify(result).slice(0, 800),
+        );
         setReport(result);
       })
       .catch((err) => {
-        console.error(err);
+        console.error("[HomeDnaReport] rejected", err);
 
         setError("Poročila trenutno ni bilo mogoče pripraviti.");
       });
