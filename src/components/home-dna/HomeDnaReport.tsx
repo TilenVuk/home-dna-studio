@@ -32,7 +32,7 @@ export function HomeDnaReport({ state }: { state: HomeDnaState }) {
         setReport(result);
       })
       .catch((err) => {
-        console.error(err);
+        console.error("[HomeDnaReport] generation failed", err);
 
         setError("Poročila trenutno ni bilo mogoče pripraviti.");
       });
