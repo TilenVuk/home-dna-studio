@@ -10,7 +10,7 @@ import stageNewBuild from "@/assets/stage-new-build.jpg";
 import stageFullRenovation from "@/assets/stage-full-renovation.jpg";
 import stagePartialRenovation from "@/assets/stage-partial-renovation.jpg";
 import styleWarmModern from "@/assets/style-warm-modern.jpg";
-import styleMinimal from "@/assets/style-minimal.jpg";
+import styleMinimal from "@/assets/style-minimal.jpg.asset.json";
 import styleScandinavian from "@/assets/style-scandinavian.jpg";
 import styleJapandi from "@/assets/style-japandi.jpg";
 import styleNatural from "@/assets/style-natural.jpg";
