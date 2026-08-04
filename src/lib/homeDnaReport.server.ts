@@ -1,4 +1,4 @@
-import { generateText, NoObjectGeneratedError, Output } from "ai";
+import { generateText, NoObjectGeneratedError, NoOutputGeneratedError, Output } from "ai";
 import { z } from "zod";
 import type { HomeDnaReportData, ReportImageId, RoomKey } from "@/components/home-dna/homeDnaTypes";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
@@ -83,16 +83,22 @@ export async function createHomeDnaReport(data: ReportRequest, apiKey: string): 
   ].join("\n");
 
   try {
-    const { output } = await generateText({
+    const result = await generateText({
       model: gateway("google/gemini-3.6-flash"),
       output: Output.object({ schema: ReportSchema }),
       system: SYSTEM,
       prompt,
-      maxOutputTokens: 4_000,
+      maxOutputTokens: 8_000,
+      maxRetries: 0,
     });
 
-    return normalizeReport(output, data);
+    return normalizeReport(result.output, data);
   } catch (error) {
+    if (NoOutputGeneratedError.isInstance(error)) {
+      console.error("HomeDnaReport: model returned no structured output; using safe report fallback");
+      return createFallbackReport(data);
+    }
+
     if (!NoObjectGeneratedError.isInstance(error)) throw error;
 
     const recovered = recoverReport(error.text, data);
@@ -103,7 +109,7 @@ export async function createHomeDnaReport(data: ReportRequest, apiKey: string): 
       textLength: error.text?.length ?? 0,
       cause: error.cause instanceof Error ? error.cause.message : String(error.cause ?? "unknown"),
     });
-    throw new Error("Poročila trenutno ni bilo mogoče pripraviti.");
+    return createFallbackReport(data);
   }
 }
 
@@ -219,4 +225,45 @@ function parseJsonObject(text?: string): unknown {
   } catch {
     return null;
   }
+}
+
+function createFallbackReport(data: ReportRequest): HomeDnaReportData {
+  const roomFallbacks = data.rooms.map((room) => {
+    const candidates = data.imageCandidates.rooms.find((candidate) => candidate.key === room.key)?.images ?? [];
+
+    return {
+      key: room.key as RoomKey,
+      label: room.label,
+      text: "Prostor bomo zasnovali okoli vaših vsakodnevnih navad, z jasno razporeditvijo, premišljenim shranjevanjem in materiali, ki ostajajo prijetni za uporabo skozi čas.",
+      imageId: pickImageId(undefined, candidates, "hero-interior"),
+    };
+  });
+
+  return {
+    intro:
+      "Vaš dom razumemo kot celoto, ki mora podpirati ritem družine, poenostaviti vsakdan in ustvariti mirno osnovo za prihodnja leta.",
+    lifestyle:
+      "Pri načrtovanju bomo izhajali iz vaših rutin, prioritet in prihodnjih potreb. Vsaka rešitev bo imela jasen namen: manj vsakodnevnega nereda, več preglednosti in prostor, ki se naravno prilagaja načinu vašega življenja.",
+    style:
+      "Oblikovalsko smer bomo gradili z umirjenimi razmerji, trajnostnimi materiali in usklajeno barvno paleto. Rezultat bo oseben, arhitekturno čist in dovolj brezčasen, da bo ostal aktualen tudi ob spremembah vašega doma.",
+    why:
+      "Dom bo deloval zato, ker posameznih kosov ne bomo obravnavali ločeno. Povezali bomo gibanje skozi prostore, shranjevanje, druženje in vsakodnevne obveznosti v enoten sistem. Tako bo pohištvo sledilo vašim navadam, prostori pa bodo ostali pregledni, prijetni in pripravljeni na spremembe, ki jih prinaša življenje.",
+    images: {
+      coverImageId: pickImageId(undefined, data.imageCandidates.cover, "hero-interior"),
+      lifestyleImageId: pickImageId(undefined, data.imageCandidates.lifestyle, "lifestyle-people"),
+      styleImageIds: normalizeStyleImages(undefined, data.imageCandidates.style),
+    },
+    rooms: roomFallbacks,
+    investment:
+      "Ocena je okvirna. Končno ponudbo bomo pripravili po osebnem posvetu, natančnih izmerah in potrditvi materialov.",
+    nextSteps: [
+      { title: "Posvet", text: "Skupaj preverimo prioritete, slogovno smer in obseg projekta." },
+      { title: "Izmere", text: "Na lokaciji natančno preverimo prostor, priključke in vse ključne mere." },
+      {
+        title: "Končni oblikovalski predlog",
+        text: "Pripravimo usklajen predlog rešitev, materialov in naslednjih odločitev.",
+      },
+    ],
+    closing: "Vaš dom bomo oblikovali okoli načina, kako v njem zares živite.",
+  };
 }
