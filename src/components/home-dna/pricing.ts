@@ -67,6 +67,26 @@ export const defaultLengths = {
   homeOffice: 2.5,
 };
 
+/**
+ * Total kitchen run along walls, in centimetres.
+ * The island is deliberately excluded because LED and glass quantities follow
+ * only the selected wall-mounted kitchen length.
+ */
+export function kitchenWallLengthCm(kitchen: KitchenState): number {
+  const layout = kitchen.layout ?? "linear";
+  const walls =
+    layout === "linear"
+      ? [kitchen.wallA]
+      : layout === "l-shape"
+        ? [kitchen.wallA, kitchen.wallB]
+        : layout === "u-shape"
+          ? [kitchen.wallA, kitchen.wallB, kitchen.wallC]
+          : [kitchen.wallA, kitchen.wallB];
+  const measuredLength = walls.reduce<number>((total, wall) => total + (wall && wall > 0 ? wall : 0), 0);
+
+  return measuredLength > 0 ? measuredLength : defaultLengths.kitchen * 100;
+}
+
 const roomLabels: Record<RoomKey, string> = {
   "complete-home": "Celoten dom",
   kitchen: "Kuhinja",
@@ -80,15 +100,8 @@ const roomLabels: Record<RoomKey, string> = {
 
 function kitchenPrice(rooms: RoomsState, level: ExecutionLevel): number {
   const k: KitchenState = rooms.kitchen ?? {};
-  const walls = [cmToM(k.wallA), cmToM(k.wallB), cmToM(k.wallC)].filter(
-    (v): v is number => v !== undefined,
-  );
   const layout = k.layout ?? "linear";
-  const wallCount = layout === "linear" ? 1 : layout === "l-shape" ? 2 : layout === "u-shape" ? 3 : 2;
-  const length =
-    walls.length > 0
-      ? walls.slice(0, Math.max(wallCount, walls.length)).reduce((a, b) => a + b, 0)
-      : defaultLengths.kitchen;
+  const length = kitchenWallLengthCm(k) / 100;
 
   let total = length * kitchenBase[level] * layoutCoefficient[layout];
 
@@ -99,8 +112,8 @@ function kitchenPrice(rooms: RoomsState, level: ExecutionLevel): number {
   }
 
   if (k.worktop) total += length * worktopSurcharge[k.worktop];
-  if (k.hasLed) total += (cmToM(k.ledLength) ?? length) * LED_PER_M;
-  if (k.hasGlassFronts) total += (cmToM(k.glassFrontLength) ?? 0) * GLASS_PER_M;
+  if (k.hasLed) total += length * LED_PER_M;
+  if (k.hasGlassFronts) total += length * GLASS_PER_M;
 
   return total;
 }
