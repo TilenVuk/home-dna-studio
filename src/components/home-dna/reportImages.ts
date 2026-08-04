@@ -10,7 +10,7 @@ import stageNewBuild from "@/assets/stage-new-build.jpg";
 import stageFullRenovation from "@/assets/stage-full-renovation.jpg";
 import stagePartialRenovation from "@/assets/stage-partial-renovation.jpg";
 import styleWarmModern from "@/assets/style-warm-modern.jpg";
-import styleMinimal from "@/assets/style-minimal.jpg";
+import styleMinimal from "@/assets/style-minimal.jpg.asset.json";
 import styleScandinavian from "@/assets/style-scandinavian.jpg";
 import styleJapandi from "@/assets/style-japandi.jpg";
 import styleNatural from "@/assets/style-natural.jpg";
@@ -95,7 +95,7 @@ export const REPORT_IMAGES: Record<ReportImageId, ReportImageAsset> = {
   "stage-full-renovation": asset("stage-full-renovation", stageFullRenovation, "Celovita prenova"),
   "stage-partial-renovation": asset("stage-partial-renovation", stagePartialRenovation, "Delna prenova"),
   "style-warm-modern": asset("style-warm-modern", styleWarmModern, "Toplo modern slog"),
-  "style-minimal": asset("style-minimal", styleMinimal, "Sodobno minimalističen slog"),
+  "style-minimal": asset("style-minimal", styleMinimal.url, "Sodobno minimalističen slog"),
   "style-scandinavian": asset("style-scandinavian", styleScandinavian, "Skandinavski slog"),
   "style-japandi": asset("style-japandi", styleJapandi, "Japandi slog"),
   "style-natural": asset("style-natural", styleNatural, "Naravno sodoben slog"),
