@@ -27,7 +27,8 @@ import projectLiving from "@/assets/project-living.jpg";
 import projectEntry from "@/assets/project-hall.jpg";
 import projectUtility from "@/assets/project-utility.jpg";
 import projectBathroom from "@/assets/project-bathroom.jpg";
-import projectOffice from "@/assets/project-office.jpg";
+import projectBedroom from "@/assets/project-bedroom.jpg";
+import projectChildRoom from "@/assets/project-child-room.jpg";
 import kitchenLayoutLinear from "@/assets/kitchen-layout-linear.jpg";
 import kitchenLayoutL from "@/assets/kitchen-layout-l.jpg";
 import kitchenLayoutU from "@/assets/kitchen-layout-u.jpg";
@@ -48,7 +49,8 @@ import reportLivingFamily from "@/assets/report-living-family.jpg";
 import reportEntryFamily from "@/assets/report-entry-family.jpg";
 import reportUtilityOrganised from "@/assets/report-utility-organised.jpg";
 import reportBathroomCalm from "@/assets/report-bathroom-calm.jpg";
-import reportOfficeFocus from "@/assets/report-office-focus.jpg";
+import reportBedroomCalm from "@/assets/report-bedroom-calm.jpg";
+import reportChildRoomFlexible from "@/assets/report-child-room-flexible.jpg";
 import type {
   HomeDnaReportData,
   HomeDnaState,
@@ -91,11 +93,7 @@ export const REPORT_IMAGES: Record<ReportImageId, ReportImageAsset> = {
   "property-holiday": asset("property-holiday", propertyHoliday, "Umirjen počitniški dom"),
   "stage-new-build": asset("stage-new-build", stageNewBuild, "Vizija novogradnje"),
   "stage-full-renovation": asset("stage-full-renovation", stageFullRenovation, "Celovita prenova"),
-  "stage-partial-renovation": asset(
-    "stage-partial-renovation",
-    stagePartialRenovation,
-    "Delna prenova",
-  ),
+  "stage-partial-renovation": asset("stage-partial-renovation", stagePartialRenovation, "Delna prenova"),
   "style-warm-modern": asset("style-warm-modern", styleWarmModern, "Toplo modern slog"),
   "style-minimal": asset("style-minimal", styleMinimal, "Sodobno minimalističen slog"),
   "style-scandinavian": asset("style-scandinavian", styleScandinavian, "Skandinavski slog"),
@@ -114,37 +112,22 @@ export const REPORT_IMAGES: Record<ReportImageId, ReportImageAsset> = {
   "project-entry": asset("project-entry", projectEntry, "Predsoba po meri"),
   "project-utility": asset("project-utility", projectUtility, "Funkcionalen utility"),
   "project-bathroom": asset("project-bathroom", projectBathroom, "Kopalniško pohištvo po meri"),
-  "project-office": asset("project-office", projectOffice, "Domača pisarna po meri"),
+  "project-bedroom": asset("project-bedroom", projectBedroom, "Spalnica po meri"),
+  "project-child-room": asset("project-child-room", projectChildRoom, "Otroška soba po meri"),
   "kitchen-layout-linear": asset("kitchen-layout-linear", kitchenLayoutLinear, "Ravna kuhinja"),
   "kitchen-layout-l": asset("kitchen-layout-l", kitchenLayoutL, "Kuhinja v obliki L"),
   "kitchen-layout-u": asset("kitchen-layout-u", kitchenLayoutU, "Kuhinja v obliki U"),
   "kitchen-layout-island": asset("kitchen-layout-island", kitchenLayoutIsland, "Kuhinja z otokom"),
   "worktop-laminate": asset("worktop-laminate", worktopLaminate, "Klasičen laminatni pult"),
-  "worktop-premium-laminate": asset(
-    "worktop-premium-laminate",
-    worktopPremiumLaminate,
-    "Premium laminat ali kompakt",
-  ),
+  "worktop-premium-laminate": asset("worktop-premium-laminate", worktopPremiumLaminate, "Premium laminat ali kompakt"),
   "worktop-quartz": asset("worktop-quartz", worktopQuartz, "Quartz delovna površina"),
   "worktop-stone": asset("worktop-stone", worktopStone, "Delovna površina iz naravnega kamna"),
   "wardrobe-hinged": asset("wardrobe-hinged", wardrobeHinged, "Garderoba s krilnimi vrati"),
   "wardrobe-sliding": asset("wardrobe-sliding", wardrobeSliding, "Garderoba z drsnimi vrati"),
   "wardrobe-open": asset("wardrobe-open", wardrobeOpen, "Odprta garderoba"),
-  "investment-essential": asset(
-    "investment-essential",
-    investmentEssential,
-    "Osnovna raven izvedbe",
-  ),
-  "investment-considered": asset(
-    "investment-considered",
-    investmentConsidered,
-    "Premium raven izvedbe",
-  ),
-  "investment-signature": asset(
-    "investment-signature",
-    investmentSignature,
-    "Signature raven izvedbe",
-  ),
+  "investment-essential": asset("investment-essential", investmentEssential, "Osnovna raven izvedbe"),
+  "investment-considered": asset("investment-considered", investmentConsidered, "Premium raven izvedbe"),
+  "investment-signature": asset("investment-signature", investmentSignature, "Signature raven izvedbe"),
   "report-kitchen-social": asset(
     "report-kitchen-social",
     reportKitchenSocial,
@@ -170,15 +153,12 @@ export const REPORT_IMAGES: Record<ReportImageId, ReportImageAsset> = {
     reportUtilityOrganised,
     "Organiziran utility s pralnim stolpom in omaro za čiščenje",
   ),
-  "report-bathroom-calm": asset(
-    "report-bathroom-calm",
-    reportBathroomCalm,
-    "Umirjena kopalnica z veliko shranjevanja",
-  ),
-  "report-office-focus": asset(
-    "report-office-focus",
-    reportOfficeFocus,
-    "Domača pisarna za dve osebi",
+  "report-bathroom-calm": asset("report-bathroom-calm", reportBathroomCalm, "Umirjena kopalnica z veliko shranjevanja"),
+  "report-bedroom-calm": asset("report-bedroom-calm", reportBedroomCalm, "Umirjena spalnica z vgradnim pohištvom"),
+  "report-child-room-flexible": asset(
+    "report-child-room-flexible",
+    reportChildRoomFlexible,
+    "Prilagodljiva otroška soba z delovnim kotičkom",
   ),
 };
 
@@ -239,7 +219,8 @@ const roomLabels: Record<Exclude<RoomKey, "complete-home">, string> = {
   "entry-hall": "Predsoba",
   "utility-room": "Utility",
   bathroom: "Kopalnica",
-  "home-office": "Domača pisarna",
+  bedroom: "Spalnica",
+  "children-room": "Otroške sobe",
 };
 
 function uniqueIds(ids: Array<ReportImageId | undefined>): ReportImageId[] {
@@ -254,18 +235,14 @@ function roomImageIds(key: Exclude<RoomKey, "complete-home">, state: HomeDnaStat
   switch (key) {
     case "kitchen":
       return uniqueIds([
-        state.rooms.kitchen?.layout
-          ? kitchenLayoutImageByValue[state.rooms.kitchen.layout]
-          : undefined,
+        state.rooms.kitchen?.layout ? kitchenLayoutImageByValue[state.rooms.kitchen.layout] : undefined,
         state.rooms.kitchen?.worktop ? worktopImageByValue[state.rooms.kitchen.worktop] : undefined,
         "report-kitchen-social",
         "project-kitchen",
       ]);
     case "wardrobe":
       return uniqueIds([
-        state.rooms.wardrobe?.doorType
-          ? wardrobeImageByValue[state.rooms.wardrobe.doorType]
-          : undefined,
+        state.rooms.wardrobe?.doorType ? wardrobeImageByValue[state.rooms.wardrobe.doorType] : undefined,
         "report-wardrobe-organised",
         "project-wardrobe",
       ]);
@@ -277,22 +254,18 @@ function roomImageIds(key: Exclude<RoomKey, "complete-home">, state: HomeDnaStat
       return ["report-utility-organised", "project-utility"] as ReportImageId[];
     case "bathroom":
       return ["report-bathroom-calm", "project-bathroom"] as ReportImageId[];
-    case "home-office":
-      return ["report-office-focus", "project-office"] as ReportImageId[];
+    case "bedroom":
+      return ["report-bedroom-calm", "project-bedroom"] as ReportImageId[];
+    case "children-room":
+      return ["report-child-room-flexible", "project-child-room"] as ReportImageId[];
   }
 }
 
 export function buildReportImageCandidates(state: HomeDnaState): ReportImageCandidates {
   const selectedStyles = state.style.selectedStyles.map((value) => styleImageByValue[value]);
-  const colourImage = state.style.colourDirection
-    ? colourImageByValue[state.style.colourDirection]
-    : undefined;
-  const propertyImage = state.home.propertyType
-    ? propertyImageByValue[state.home.propertyType]
-    : undefined;
-  const stageImage = state.home.projectStage
-    ? stageImageByValue[state.home.projectStage]
-    : undefined;
+  const colourImage = state.style.colourDirection ? colourImageByValue[state.style.colourDirection] : undefined;
+  const propertyImage = state.home.propertyType ? propertyImageByValue[state.home.propertyType] : undefined;
+  const stageImage = state.home.projectStage ? stageImageByValue[state.home.projectStage] : undefined;
 
   const selectedRooms = state.selectedRooms.filter(
     (key): key is Exclude<RoomKey, "complete-home"> => key !== "complete-home",
@@ -304,25 +277,22 @@ export function buildReportImageCandidates(state: HomeDnaState): ReportImageCand
     style: choices([...selectedStyles, colourImage, "detail-material", "style-intro"]),
     rooms: selectedRooms.map((key) => ({
       key,
-      label: roomLabels[key],
+      label:
+        key === "children-room"
+          ? `${roomLabels[key]} (${state.home.childrenCount ?? 1}${state.home.childrenCountPlus ? "+" : ""})`
+          : roomLabels[key],
       images: choices(roomImageIds(key, state)),
     })),
   };
 }
 
-function pickAllowed(
-  requestedId: ReportImageId | undefined,
-  allowed: ReportImageChoice[],
-): ReportImageAsset {
+function pickAllowed(requestedId: ReportImageId | undefined, allowed: ReportImageChoice[]): ReportImageAsset {
   const allowedIds = new Set(allowed.map((item) => item.id));
   const selectedId = requestedId && allowedIds.has(requestedId) ? requestedId : allowed[0]?.id;
   return REPORT_IMAGES[selectedId ?? "hero-interior"];
 }
 
-export function resolveReportImages(
-  state: HomeDnaState,
-  report: HomeDnaReportData,
-): ResolvedReportImages {
+export function resolveReportImages(state: HomeDnaState, report: HomeDnaReportData): ResolvedReportImages {
   const candidates = buildReportImageCandidates(state);
   const requestedStyleIds = report.images?.styleImageIds ?? [];
   const allowedStyleIds = new Set(candidates.style.map((item) => item.id));
