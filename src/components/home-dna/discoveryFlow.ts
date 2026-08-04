@@ -62,10 +62,24 @@ function homeScreens(state: HomeDnaState): ScreenDef[] {
       headline: "Ali bodo v domu živeli otroci?",
       options: childrenOptions.map((o) => ({ value: o.value, label: o.label })),
       value: home.children,
-      apply: (s, value) => ({
-        ...s,
-        home: { ...s.home, children: value as ChildrenAnswer },
-      }),
+      apply: (s, value) => {
+        const children = value as ChildrenAnswer;
+        if (children === "yes") return { ...s, home: { ...s.home, children } };
+
+        const nextHome = { ...s.home, children };
+        delete nextHome.childrenCount;
+        delete nextHome.childrenCountPlus;
+
+        const nextRooms = { ...s.rooms };
+        delete nextRooms.childrenRoom;
+
+        return {
+          ...s,
+          home: nextHome,
+          rooms: nextRooms,
+          selectedRooms: s.selectedRooms.filter((room) => room !== "children-room"),
+        };
+      },
     },
   ];
 
@@ -75,10 +89,19 @@ function homeScreens(state: HomeDnaState): ScreenDef[] {
       key: "children-count",
       headline: "Koliko otrok bo uporabljalo dom?",
       options: childrenCountOptions.map((o) => ({ value: o, label: o })),
-      value: home.childrenCount === undefined ? undefined : String(home.childrenCount),
+      value:
+        home.childrenCount === undefined
+          ? undefined
+          : home.childrenCountPlus
+            ? `${home.childrenCount}+`
+            : String(home.childrenCount),
       apply: (s, value) => ({
         ...s,
-        home: { ...s.home, childrenCount: Number(value.replace("+", "")) },
+        home: {
+          ...s.home,
+          childrenCount: Number(value.replace("+", "")),
+          childrenCountPlus: value.endsWith("+"),
+        },
       }),
     });
   }
