@@ -11,7 +11,7 @@ export const brand = {
 
 export const hero = {
   headline: "Ne začnemo pri pohištvu. Začnemo pri ljudeh.",
-  sub: "Wolf Studio oblikuje domove okoli načina, kako živite — z metodologijo Home DNA™, s katero razumemo vsakdan, preden karkoli narišemo.",
+  sub: "Wolf Studio oblikuje pohištvo domov okoli načina, kako živite — z metodologijo Home DNA™, s katero razumemo vsakdan, preden karkoli narišemo.",
   primaryCta: "Odkrijte svoj Home DNA™",
   secondaryCta: "Poglejte, kako ljudje živijo",
 };
