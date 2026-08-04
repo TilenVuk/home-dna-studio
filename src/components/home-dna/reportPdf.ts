@@ -1,21 +1,19 @@
 import { jsPDF } from "jspdf";
-import type { HomeDnaReport } from "@/lib/homeDnaReport.functions";
-import { PDF_FONT_BOLD_BASE64, PDF_FONT_REGULAR_BASE64 } from "./pdfFonts";
-import type { RoomKey } from "./homeDnaTypes";
+import pdfFontRegularUrl from "@/assets/fonts/DejaVuSans.ttf?url";
+import pdfFontBoldUrl from "@/assets/fonts/DejaVuSans-Bold.ttf?url";
+import type { HomeDnaReportData, ReportImageId } from "./homeDnaTypes";
+import type { ReportImageAsset, ResolvedReportImages } from "./reportImages";
 
 const PAGE_WIDTH = 210;
 const PAGE_HEIGHT = 297;
-
 const MARGIN_LEFT = 24;
 const MARGIN_RIGHT = 24;
 const MARGIN_TOP = 24;
 const FOOTER_HEIGHT = 25;
 const TEXT_SAFETY_MARGIN = 3;
-
 const CONTENT_WIDTH = PAGE_WIDTH - MARGIN_LEFT - MARGIN_RIGHT - TEXT_SAFETY_MARGIN;
 const CONTENT_RIGHT = MARGIN_LEFT + CONTENT_WIDTH;
 const CONTENT_BOTTOM = PAGE_HEIGHT - FOOTER_HEIGHT;
-
 const BODY_FONT = "DejaVuSans";
 const DISPLAY_FONT = "DejaVuSans";
 
@@ -24,17 +22,25 @@ const COLORS = {
   muted: [105, 102, 96] as const,
   line: [220, 216, 209] as const,
   cover: [243, 240, 234] as const,
+  white: [255, 255, 255] as const,
 };
 
 type PdfDocument = jsPDF;
 type FontStyle = "normal" | "bold";
 
+interface LoadedPdfImage {
+  id: ReportImageId;
+  dataUrl: string;
+  width: number;
+  height: number;
+}
+
 export interface ReportPdfData {
-  report: HomeDnaReport;
+  report: HomeDnaReportData;
+  images: ResolvedReportImages;
   customerName: string;
   investmentRange: string;
   executionLevel: string;
-  roomKeyByLabel: Record<string, RoomKey>;
 }
 
 export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
@@ -46,11 +52,9 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
     putOnlyUsedFonts: true,
   });
 
-  registerPdfFonts(doc);
+  const [loadedImages] = await Promise.all([loadReportImages(data.images), registerPdfFonts(doc)]);
 
-  const { report } = data;
-
-  addCoverPage(doc, data);
+  addCoverPage(doc, data, loadedImages.get(data.images.cover.id));
   doc.addPage();
 
   let y = MARGIN_TOP;
@@ -61,29 +65,23 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
   };
 
   const ensureSpace = (requiredHeight: number) => {
-    if (y + requiredHeight > CONTENT_BOTTOM) {
-      startNewPage();
-    }
+    if (y + requiredHeight > CONTENT_BOTTOM) startNewPage();
   };
 
   const addSectionHeading = (index: string, title: string) => {
     setFont(doc, DISPLAY_FONT, "bold", 19, COLORS.ink);
     const titleLines = wrapText(doc, title, CONTENT_WIDTH);
-    const requiredHeight = 9 + titleLines.length * 8 + 10;
-
-    ensureSpace(requiredHeight);
+    ensureSpace(9 + titleLines.length * 8 + 9);
 
     setFont(doc, BODY_FONT, "normal", 8, COLORS.muted);
     doc.text(index, MARGIN_LEFT, y);
     y += 9;
 
     setFont(doc, DISPLAY_FONT, "bold", 19, COLORS.ink);
-
     for (const line of titleLines) {
       doc.text(line, MARGIN_LEFT, y);
       y += 8;
     }
-
     y += 7;
   };
 
@@ -94,11 +92,10 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
       size?: number;
       leftIndent?: number;
       width?: number;
+      gapAfter?: number;
     },
   ) => {
-    if (!text?.trim()) {
-      return;
-    }
+    if (!text?.trim()) return;
 
     const leftIndent = options?.leftIndent ?? 0;
     const x = MARGIN_LEFT + leftIndent;
@@ -106,7 +103,6 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
     const availableWidth = Math.max(20, Math.min(requestedWidth, CONTENT_RIGHT - x));
 
     setFont(doc, BODY_FONT, "normal", options?.size ?? 10.5, options?.color ?? COLORS.muted);
-
     const paragraphs = normalizeText(text)
       .split(/\n+/)
       .map((paragraph) => paragraph.trim())
@@ -114,54 +110,83 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
 
     for (const paragraph of paragraphs) {
       const lines = wrapText(doc, paragraph, availableWidth);
-
       for (const line of lines) {
         ensureSpace(6);
         doc.text(line, x, y);
         y += 6;
       }
-
-      y += 4;
+      y += 3;
     }
 
-    y += 2;
+    y += options?.gapAfter ?? 3;
   };
 
   const addDivider = () => {
-    ensureSpace(14);
-    y += 4;
-
+    ensureSpace(13);
+    y += 3;
     doc.setDrawColor(...COLORS.line);
     doc.setLineWidth(0.2);
     doc.line(MARGIN_LEFT, y, CONTENT_RIGHT, y);
-
     y += 10;
   };
 
+  const addFullWidthImage = (asset: ReportImageAsset, height: number, gapAfter = 9) => {
+    const image = loadedImages.get(asset.id);
+    if (!image) return;
+    ensureSpace(height + gapAfter);
+    drawImageCover(doc, image, MARGIN_LEFT, y, CONTENT_WIDTH, height);
+    y += height + gapAfter;
+  };
+
+  const addImagePair = (assets: ReportImageAsset[], height: number) => {
+    const available = assets
+      .map((asset) => loadedImages.get(asset.id))
+      .filter((image): image is LoadedPdfImage => Boolean(image));
+    if (!available.length) return;
+
+    ensureSpace(height + 9);
+    if (available.length === 1) {
+      drawImageCover(doc, available[0]!, MARGIN_LEFT, y, CONTENT_WIDTH, height);
+    } else {
+      const gap = 6;
+      const width = (CONTENT_WIDTH - gap) / 2;
+      drawImageCover(doc, available[0]!, MARGIN_LEFT, y, width, height);
+      drawImageCover(doc, available[1]!, MARGIN_LEFT + width + gap, y, width, height);
+    }
+    y += height + 9;
+  };
+
   addSectionHeading("01", "Dobrodošli v vašem Home DNA™");
-  addParagraph(report.intro);
-  addDivider();
+  addParagraph(data.report.intro, { color: COLORS.ink });
+  addFullWidthImage(data.images.lifestyle, 70);
 
+  ensureSpace(70);
   addSectionHeading("02", "Vaš življenjski slog");
-  addParagraph(report.lifestyle);
+  addParagraph(data.report.lifestyle);
   addDivider();
 
+  ensureSpace(130);
   addSectionHeading("03", "Vaš slog");
-  addParagraph(report.style);
-  addDivider();
+  addImagePair(data.images.style, 58);
+  addParagraph(data.report.style);
 
+  ensureSpace(80);
   addSectionHeading("04", "Zakaj bo ta dom deloval za vas");
-  addParagraph(report.why);
+  addParagraph(data.report.why);
   addDivider();
 
-  if (report.rooms.length > 0) {
+  if (data.report.rooms.length > 0) {
+    ensureSpace(140);
     addSectionHeading("05", "Priporočila za izbrane prostore");
 
-    report.rooms.forEach((room, index) => {
-      setFont(doc, DISPLAY_FONT, "bold", 13, COLORS.ink);
-      const roomTitleLines = wrapText(doc, room.label, CONTENT_WIDTH);
-      const requiredHeight = roomTitleLines.length * 7 + 20;
+    data.report.rooms.forEach((room, index) => {
+      const roomImage = data.images.rooms[room.key];
+      const loadedRoomImage = roomImage ? loadedImages.get(roomImage.id) : undefined;
 
+      setFont(doc, BODY_FONT, "normal", 10.2, COLORS.muted);
+      const roomTextLines = wrapText(doc, room.text, CONTENT_WIDTH);
+      const imageHeight = loadedRoomImage ? 58 : 0;
+      const requiredHeight = 10 + imageHeight + (loadedRoomImage ? 8 : 0) + roomTextLines.length * 6 + 13;
       ensureSpace(requiredHeight);
 
       if (index > 0) {
@@ -172,168 +197,223 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
       }
 
       setFont(doc, DISPLAY_FONT, "bold", 13, COLORS.ink);
+      doc.text(room.label, MARGIN_LEFT, y);
+      y += 8;
 
-      for (const line of roomTitleLines) {
-        doc.text(line, MARGIN_LEFT, y);
-        y += 7;
+      if (loadedRoomImage) {
+        drawImageCover(doc, loadedRoomImage, MARGIN_LEFT, y, CONTENT_WIDTH, imageHeight);
+        y += imageHeight + 8;
       }
 
-      y += 3;
-      addParagraph(room.text);
+      setFont(doc, BODY_FONT, "normal", 10.2, COLORS.muted);
+      for (const line of roomTextLines) {
+        doc.text(line, MARGIN_LEFT, y);
+        y += 6;
+      }
+      y += 10;
     });
-
-    addDivider();
   }
 
+  ensureSpace(130);
   addSectionHeading("06", "Okvirna investicija");
+  const investmentImage = loadedImages.get(data.images.investment.id);
+  const investmentImageWidth = investmentImage ? 70 : 0;
+  const investmentGap = investmentImage ? 10 : 0;
+  const investmentMetaX = MARGIN_LEFT + investmentImageWidth + investmentGap;
+  const investmentMetaWidth = CONTENT_RIGHT - investmentMetaX;
+  const investmentBlockHeight = 52;
 
-  const columnGap = 12;
-  const columnWidth = (CONTENT_WIDTH - columnGap) / 2;
-  const rightColumnX = MARGIN_LEFT + columnWidth + columnGap;
-
-  setFont(doc, DISPLAY_FONT, "bold", 15, COLORS.ink);
-  const investmentLines = wrapText(doc, data.investmentRange || "Po posvetu", columnWidth);
-  const executionLevelLines = wrapText(doc, data.executionLevel || "Premium", columnWidth);
-  const investmentBlockHeight = 9 + Math.max(investmentLines.length, executionLevelLines.length) * 7 + 10;
-
-  ensureSpace(investmentBlockHeight);
+  ensureSpace(investmentBlockHeight + 8);
+  if (investmentImage) {
+    drawImageCover(doc, investmentImage, MARGIN_LEFT, y, investmentImageWidth, investmentBlockHeight);
+  }
 
   setFont(doc, BODY_FONT, "normal", 8, COLORS.muted);
-  doc.text("OCENJENA INVESTICIJA", MARGIN_LEFT, y);
-  doc.text("RAVEN IZVEDBE", rightColumnX, y);
-  y += 9;
+  doc.text("OCENJENA INVESTICIJA", investmentMetaX, y + 4);
+  setFont(doc, DISPLAY_FONT, "bold", 14, COLORS.ink);
+  const investmentLines = wrapText(doc, data.investmentRange || "Po posvetu", investmentMetaWidth);
+  investmentLines.slice(0, 2).forEach((line, index) => doc.text(line, investmentMetaX, y + 13 + index * 6.5));
 
-  setFont(doc, DISPLAY_FONT, "bold", 15, COLORS.ink);
-  const investmentStartY = y;
+  setFont(doc, BODY_FONT, "normal", 8, COLORS.muted);
+  doc.text("RAVEN IZVEDBE", investmentMetaX, y + 34);
+  setFont(doc, DISPLAY_FONT, "bold", 14, COLORS.ink);
+  doc.text(wrapText(doc, data.executionLevel || "Premium", investmentMetaWidth).slice(0, 2), investmentMetaX, y + 43);
 
-  investmentLines.forEach((line, index) => {
-    doc.text(line, MARGIN_LEFT, investmentStartY + index * 7);
-  });
+  y += investmentBlockHeight + 8;
 
-  executionLevelLines.forEach((line, index) => {
-    doc.text(line, rightColumnX, investmentStartY + index * 7);
-  });
-
-  y += Math.max(investmentLines.length, executionLevelLines.length) * 7 + 7;
-
-  addParagraph(report.investment);
+  addParagraph(data.report.investment);
   addDivider();
 
+  ensureSpace(145);
   addSectionHeading("07", "Naslednji koraki");
-
-  report.nextSteps.forEach((step, index) => {
-    const stepNumberWidth = 13;
-    const stepX = MARGIN_LEFT + stepNumberWidth;
-    const stepWidth = CONTENT_WIDTH - stepNumberWidth;
+  data.report.nextSteps.forEach((step, index) => {
+    const numberWidth = 13;
+    const stepX = MARGIN_LEFT + numberWidth;
+    const stepWidth = CONTENT_WIDTH - numberWidth;
 
     setFont(doc, DISPLAY_FONT, "bold", 12, COLORS.ink);
     const titleLines = wrapText(doc, step.title, stepWidth);
-
-    setFont(doc, BODY_FONT, "normal", 10.5, COLORS.muted);
-    const stepLines = wrapText(doc, step.text, stepWidth);
-    const requiredHeight = titleLines.length * 6 + stepLines.length * 6 + 22;
-
-    ensureSpace(requiredHeight);
+    setFont(doc, BODY_FONT, "normal", 10.2, COLORS.muted);
+    const textLines = wrapText(doc, step.text, stepWidth);
+    ensureSpace(titleLines.length * 6 + textLines.length * 6 + 18);
 
     setFont(doc, BODY_FONT, "normal", 8, COLORS.muted);
     doc.text(String(index + 1).padStart(2, "0"), MARGIN_LEFT, y);
 
     setFont(doc, DISPLAY_FONT, "bold", 12, COLORS.ink);
-
     for (const line of titleLines) {
       doc.text(line, stepX, y);
       y += 6;
     }
+    y += 2;
 
-    y += 3;
-    setFont(doc, BODY_FONT, "normal", 10.5, COLORS.muted);
-
-    for (const line of stepLines) {
+    setFont(doc, BODY_FONT, "normal", 10.2, COLORS.muted);
+    for (const line of textLines) {
       doc.text(line, stepX, y);
       y += 6;
     }
-
     y += 6;
+
     doc.setDrawColor(...COLORS.line);
     doc.setLineWidth(0.2);
     doc.line(MARGIN_LEFT, y, CONTENT_RIGHT, y);
-    y += 10;
+    y += 9;
   });
 
-  addParagraph(report.closing, {
-    color: COLORS.ink,
-  });
-
+  addParagraph(data.report.closing, { color: COLORS.ink, gapAfter: 0 });
   addFooters(doc);
 
   const blob = doc.output("blob");
-
-  if (!(blob instanceof Blob) || blob.size === 0) {
-    throw new Error("Ustvarjeni PDF je prazen.");
-  }
-
+  if (!(blob instanceof Blob) || blob.size === 0) throw new Error("Ustvarjeni PDF je prazen.");
   return blob;
 }
 
-function registerPdfFonts(doc: PdfDocument) {
-  doc.addFileToVFS("DejaVuSans-Pdf.ttf", PDF_FONT_REGULAR_BASE64);
-  doc.addFont("DejaVuSans-Pdf.ttf", BODY_FONT, "normal");
+async function registerPdfFonts(doc: PdfDocument) {
+  const [regularFont, boldFont] = await Promise.all([
+    loadAssetAsBase64(pdfFontRegularUrl, "Pisave za PDF ni bilo mogoče naložiti"),
+    loadAssetAsBase64(pdfFontBoldUrl, "Pisave za PDF ni bilo mogoče naložiti"),
+  ]);
 
-  doc.addFileToVFS("DejaVuSans-Pdf-Bold.ttf", PDF_FONT_BOLD_BASE64);
-  doc.addFont("DejaVuSans-Pdf-Bold.ttf", DISPLAY_FONT, "bold");
+  doc.addFileToVFS("DejaVuSans.ttf", regularFont);
+  doc.addFont("DejaVuSans.ttf", BODY_FONT, "normal");
+  doc.addFileToVFS("DejaVuSans-Bold.ttf", boldFont);
+  doc.addFont("DejaVuSans-Bold.ttf", DISPLAY_FONT, "bold");
 }
 
-/*
- * Pisavi sta v datoteki pdfFonts.ts shranjeni kot base64. Tako generiranje
- * PDF-ja ni odvisno od omrežja, Lovable asset URL-jev ali fetch zahtevkov.
- */
+async function loadReportImages(images: ResolvedReportImages): Promise<Map<ReportImageId, LoadedPdfImage>> {
+  const assets = [
+    images.cover,
+    images.lifestyle,
+    ...images.style,
+    ...Object.values(images.rooms),
+    images.investment,
+  ].filter((asset): asset is ReportImageAsset => Boolean(asset));
+  const uniqueAssets = Array.from(new Map(assets.map((asset) => [asset.id, asset])).values());
 
-function addCoverPage(doc: PdfDocument, data: ReportPdfData) {
+  const loaded = await Promise.all(
+    uniqueAssets.map(async (asset) => {
+      try {
+        return await loadPdfImage(asset);
+      } catch (error) {
+        console.warn(`Home DNA PDF: slike ${asset.id} ni bilo mogoče naložiti.`, error);
+        return null;
+      }
+    }),
+  );
+
+  return new Map(
+    loaded.filter((image): image is LoadedPdfImage => Boolean(image)).map((image) => [image.id, image] as const),
+  );
+}
+
+async function loadPdfImage(asset: ReportImageAsset): Promise<LoadedPdfImage> {
+  const response = await fetch(asset.src);
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+  const dataUrl = await blobToDataUrl(await response.blob());
+  const dimensions = await readImageDimensions(dataUrl);
+  return { id: asset.id, dataUrl, ...dimensions };
+}
+
+function blobToDataUrl(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(reader.error ?? new Error("Slike ni bilo mogoče prebrati."));
+    reader.readAsDataURL(blob);
+  });
+}
+
+function readImageDimensions(src: string): Promise<{ width: number; height: number }> {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve({ width: image.naturalWidth, height: image.naturalHeight });
+    image.onerror = () => reject(new Error("Dimenzij slike ni bilo mogoče prebrati."));
+    image.src = src;
+  });
+}
+
+async function loadAssetAsBase64(assetUrl: string, message: string): Promise<string> {
+  const response = await fetch(assetUrl);
+  if (!response.ok) throw new Error(`${message} (${response.status}).`);
+  return arrayBufferToBase64(await response.arrayBuffer());
+}
+
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  const chunkSize = 0x8000;
+  let binary = "";
+  for (let offset = 0; offset < bytes.length; offset += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(offset, offset + chunkSize));
+  }
+  return window.btoa(binary);
+}
+
+function drawImageCover(doc: PdfDocument, image: LoadedPdfImage, x: number, y: number, width: number, height: number) {
+  const scale = Math.max(width / image.width, height / image.height);
+  const drawWidth = image.width * scale;
+  const drawHeight = image.height * scale;
+  const drawX = x + (width - drawWidth) / 2;
+  const drawY = y + (height - drawHeight) / 2;
+
+  doc.saveGraphicsState();
+  doc.rect(x, y, width, height, null);
+  doc.clip();
+  doc.discardPath();
+  doc.addImage(image.dataUrl, "JPEG", drawX, drawY, drawWidth, drawHeight, image.id, "FAST");
+  doc.restoreGraphicsState();
+}
+
+function addCoverPage(doc: PdfDocument, data: ReportPdfData, coverImage?: LoadedPdfImage) {
   doc.setFillColor(...COLORS.cover);
   doc.rect(0, 0, PAGE_WIDTH, PAGE_HEIGHT, "F");
 
-  setFont(doc, BODY_FONT, "normal", 9, COLORS.muted);
-  doc.text("WOLF STUDIO", MARGIN_LEFT, 48);
+  if (coverImage) drawImageCover(doc, coverImage, 0, 0, PAGE_WIDTH, 184);
 
-  setFont(doc, DISPLAY_FONT, "bold", 32, COLORS.ink);
-  const titleLines = wrapText(doc, "Home DNA™ Report", CONTENT_WIDTH);
-  let titleY = 88;
+  doc.setFillColor(...COLORS.cover);
+  doc.rect(0, 184, PAGE_WIDTH, PAGE_HEIGHT - 184, "F");
 
+  setFont(doc, BODY_FONT, "normal", 8.5, COLORS.muted);
+  doc.text("WOLF STUDIO  ·  HOME DNA™", MARGIN_LEFT, 204);
+
+  setFont(doc, DISPLAY_FONT, "bold", 27, COLORS.ink);
+  const titleLines = wrapText(doc, "Vaš osebni Home DNA™ Report", CONTENT_WIDTH);
+  let titleY = 222;
   for (const line of titleLines) {
     doc.text(line, MARGIN_LEFT, titleY);
-    titleY += 12;
+    titleY += 10;
   }
 
   doc.setDrawColor(...COLORS.line);
   doc.setLineWidth(0.3);
-  doc.line(MARGIN_LEFT, titleY + 2, CONTENT_RIGHT, titleY + 2);
+  doc.line(MARGIN_LEFT, titleY + 1, CONTENT_RIGHT, titleY + 1);
 
-  const customerY = titleY + 20;
   const customerName = data.customerName.trim();
+  setFont(doc, BODY_FONT, "normal", 10.5, COLORS.ink);
+  if (customerName) doc.text(wrapText(doc, customerName, CONTENT_WIDTH), MARGIN_LEFT, titleY + 13);
 
-  setFont(doc, BODY_FONT, "normal", 12, COLORS.ink);
-
-  if (customerName) {
-    const customerLines = wrapText(doc, customerName, CONTENT_WIDTH);
-    let currentY = customerY;
-
-    for (const line of customerLines) {
-      doc.text(line, MARGIN_LEFT, currentY);
-      currentY += 7;
-    }
-  }
-
-  setFont(doc, BODY_FONT, "normal", 10, COLORS.muted);
-  doc.text(formatDate(new Date()), MARGIN_LEFT, customerY + (customerName ? 12 : 0));
-
-  const description = "Osebna analiza doma, življenjskega sloga in oblikovalskih prioritet.";
-  const descriptionLines = wrapText(doc, description, CONTENT_WIDTH);
-  let descriptionY = 238;
-
-  for (const line of descriptionLines) {
-    doc.text(line, MARGIN_LEFT, descriptionY);
-    descriptionY += 6;
-  }
+  setFont(doc, BODY_FONT, "normal", 9, COLORS.muted);
+  doc.text(formatDate(new Date()), MARGIN_LEFT, titleY + (customerName ? 25 : 14));
 }
 
 function setFont(
@@ -359,10 +439,7 @@ function normalizeText(text: string): string {
 
 function wrapText(doc: PdfDocument, text: string, maxWidth: number): string[] {
   const normalizedText = normalizeText(text);
-
-  if (!normalizedText) {
-    return [];
-  }
+  if (!normalizedText) return [];
 
   const safeWidth = Math.max(20, maxWidth - 1.5);
   const result: string[] = [];
@@ -373,7 +450,6 @@ function wrapText(doc: PdfDocument, text: string, maxWidth: number): string[] {
 
     for (const word of words) {
       const candidate = line ? `${line} ${word}` : word;
-
       if (doc.getTextWidth(candidate) <= safeWidth) {
         line = candidate;
         continue;
@@ -394,9 +470,7 @@ function wrapText(doc: PdfDocument, text: string, maxWidth: number): string[] {
       line = fragments.at(-1) ?? "";
     }
 
-    if (line) {
-      result.push(line);
-    }
+    if (line) result.push(line);
   }
 
   return result;
@@ -408,7 +482,6 @@ function splitLongWord(doc: PdfDocument, word: string, maxWidth: number): string
 
   for (const character of Array.from(word)) {
     const candidate = fragment + character;
-
     if (fragment && doc.getTextWidth(candidate) > maxWidth) {
       result.push(fragment);
       fragment = character;
@@ -417,16 +490,12 @@ function splitLongWord(doc: PdfDocument, word: string, maxWidth: number): string
     }
   }
 
-  if (fragment) {
-    result.push(fragment);
-  }
-
+  if (fragment) result.push(fragment);
   return result;
 }
 
 function addFooters(doc: PdfDocument) {
   const totalPages = doc.getNumberOfPages();
-
   for (let page = 2; page <= totalPages; page += 1) {
     doc.setPage(page);
     doc.setDrawColor(...COLORS.line);
@@ -435,9 +504,7 @@ function addFooters(doc: PdfDocument) {
 
     setFont(doc, BODY_FONT, "normal", 8, COLORS.muted);
     doc.text("Wolf Studio", MARGIN_LEFT, PAGE_HEIGHT - 11);
-    doc.text("Home DNA™", PAGE_WIDTH / 2, PAGE_HEIGHT - 11, {
-      align: "center",
-    });
+    doc.text("Home DNA™", PAGE_WIDTH / 2, PAGE_HEIGHT - 11, { align: "center" });
     doc.text(String(page - 1).padStart(2, "0"), CONTENT_RIGHT, PAGE_HEIGHT - 11, {
       align: "right",
     });
@@ -459,16 +526,12 @@ export function downloadBlob(blob: Blob, filename: string) {
 
   const objectUrl = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
-
   anchor.href = objectUrl;
   anchor.download = filename;
   anchor.style.display = "none";
-
   document.body.appendChild(anchor);
   anchor.click();
   anchor.remove();
 
-  window.setTimeout(() => {
-    URL.revokeObjectURL(objectUrl);
-  }, 2_000);
+  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 2_000);
 }
