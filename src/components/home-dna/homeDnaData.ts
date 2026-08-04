@@ -5,7 +5,8 @@ import projectLiving from "@/assets/project-living.jpg";
 import projectHall from "@/assets/project-hall.jpg";
 import projectUtility from "@/assets/project-utility.jpg";
 import projectBathroom from "@/assets/project-bathroom.jpg";
-import projectOffice from "@/assets/project-office.jpg";
+import projectBedroom from "@/assets/project-bedroom.jpg";
+import projectChildRoom from "@/assets/project-child-room.jpg";
 import stageNewBuild from "@/assets/stage-new-build.jpg";
 import stageFullRenovation from "@/assets/stage-full-renovation.jpg";
 import stagePartialRenovation from "@/assets/stage-partial-renovation.jpg";
@@ -24,16 +25,10 @@ import colourLight from "@/assets/colour-light.jpg";
 import colourEarthy from "@/assets/colour-earthy.jpg";
 import colourNeutral from "@/assets/colour-neutral.jpg";
 import colourDark from "@/assets/colour-dark.jpg";
-import type {
-  PetKey,
-  ProjectStage,
-  PropertyType,
-  RoomKey,
-  RoomOption,
-  VisualOption,
-} from "./homeDnaTypes";
+import type { PetKey, ProjectStage, PropertyType, RoomKey, RoomOption, VisualOption } from "./homeDnaTypes";
 
 export const completeHomeKey: RoomKey = "complete-home";
+export const childrenRoomKey: RoomKey = "children-room";
 
 export const individualRoomKeys: RoomKey[] = [
   "kitchen",
@@ -42,8 +37,13 @@ export const individualRoomKeys: RoomKey[] = [
   "entry-hall",
   "utility-room",
   "bathroom",
-  "home-office",
+  "bedroom",
+  "children-room",
 ];
+
+export function availableIndividualRoomKeys(childrenCount?: number): RoomKey[] {
+  return individualRoomKeys.filter((key) => key !== childrenRoomKey || Boolean(childrenCount));
+}
 
 export const roomOptions: RoomOption[] = [
   {
@@ -89,12 +89,22 @@ export const roomOptions: RoomOption[] = [
     image: projectBathroom,
   },
   {
-    key: "home-office",
-    title: "Domača pisarna",
-    description: "Delovno okolje, ki podpira osredotočenost in red.",
-    image: projectOffice,
+    key: "bedroom",
+    title: "Spalnica",
+    description: "Umirjena spalnica s pohištvom, prilagojenim vašim navadam in prostoru.",
+    image: projectBedroom,
+  },
+  {
+    key: "children-room",
+    title: "Otroške sobe",
+    description: "Prilagodljive sobe, ki rastejo skupaj z otroki.",
+    image: projectChildRoom,
   },
 ];
+
+export function availableRoomOptions(childrenCount?: number): RoomOption[] {
+  return roomOptions.filter((room) => room.key !== childrenRoomKey || Boolean(childrenCount));
+}
 
 export const welcomeCopy = {
   eyebrow: "Home DNA™",
