@@ -1,11 +1,4 @@
-import type {
-  ContactState,
-  DiscoveryScreen,
-  HomeDnaState,
-  RoomKey,
-  RoomsState,
-  VisualOption,
-} from "./homeDnaTypes";
+import type { ContactState, DiscoveryScreen, HomeDnaState, RoomKey, RoomsState, VisualOption } from "./homeDnaTypes";
 import { yesNoOptions } from "./discoveryData";
 
 export type ScreenDef =
@@ -18,6 +11,7 @@ export type ScreenDef =
       body: string;
       cta: string;
       image: string;
+      prominentEyebrow?: boolean;
     }
   | {
       kind: "choice";
@@ -143,13 +137,10 @@ export function pruneRooms(state: HomeDnaState): HomeDnaState {
   const rooms: RoomsState = {};
   if (hasRoom(state, "kitchen") && state.rooms.kitchen) rooms.kitchen = state.rooms.kitchen;
   if (hasRoom(state, "wardrobe") && state.rooms.wardrobe) rooms.wardrobe = state.rooms.wardrobe;
-  if (hasRoom(state, "living-room") && state.rooms.livingRoom)
-    rooms.livingRoom = state.rooms.livingRoom;
+  if (hasRoom(state, "living-room") && state.rooms.livingRoom) rooms.livingRoom = state.rooms.livingRoom;
   if (hasRoom(state, "entry-hall") && state.rooms.entryHall) rooms.entryHall = state.rooms.entryHall;
-  if (hasRoom(state, "utility-room") && state.rooms.utilityRoom)
-    rooms.utilityRoom = state.rooms.utilityRoom;
+  if (hasRoom(state, "utility-room") && state.rooms.utilityRoom) rooms.utilityRoom = state.rooms.utilityRoom;
   if (hasRoom(state, "bathroom") && state.rooms.bathroom) rooms.bathroom = state.rooms.bathroom;
-  if (hasRoom(state, "home-office") && state.rooms.homeOffice)
-    rooms.homeOffice = state.rooms.homeOffice;
+  if (hasRoom(state, "home-office") && state.rooms.homeOffice) rooms.homeOffice = state.rooms.homeOffice;
   return { ...state, rooms };
 }
