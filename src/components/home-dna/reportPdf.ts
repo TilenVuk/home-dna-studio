@@ -1,5 +1,8 @@
 import { jsPDF } from "jspdf";
 import type { HomeDnaReport } from "@/lib/homeDnaReport.functions";
+import interTightRegularAsset from "@/assets/fonts/InterTight-Regular.ttf.asset.json";
+import schibstedMediumAsset from "@/assets/fonts/SchibstedGrotesk-Medium.ttf.asset.json";
+import schibstedRegularAsset from "@/assets/fonts/SchibstedGrotesk-Regular.ttf.asset.json";
 import type { RoomKey } from "./homeDnaTypes";
 
 const PAGE_WIDTH = 210;
@@ -9,18 +12,14 @@ const MARGIN_LEFT = 24;
 const MARGIN_RIGHT = 24;
 const MARGIN_TOP = 24;
 const FOOTER_HEIGHT = 25;
-
-/*
- * Dodaten notranji varnostni rob prepreči, da bi zaradi
- * netočnih font metrik besedilo seglo čez desni rob.
- */
-const TEXT_SAFETY_MARGIN = 6;
+const TEXT_SAFETY_MARGIN = 3;
 
 const CONTENT_WIDTH = PAGE_WIDTH - MARGIN_LEFT - MARGIN_RIGHT - TEXT_SAFETY_MARGIN;
-
 const CONTENT_RIGHT = MARGIN_LEFT + CONTENT_WIDTH;
-
 const CONTENT_BOTTOM = PAGE_HEIGHT - FOOTER_HEIGHT;
+
+const BODY_FONT = "InterTight";
+const DISPLAY_FONT = "SchibstedGrotesk";
 
 const COLORS = {
   ink: [26, 26, 24] as const,
@@ -30,6 +29,11 @@ const COLORS = {
 };
 
 type PdfDocument = jsPDF;
+type FontStyle = "normal" | "bold";
+
+interface FontAsset {
+  url: string;
+}
 
 export interface ReportPdfData {
   report: HomeDnaReport;
@@ -45,12 +49,14 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
     format: "a4",
     orientation: "portrait",
     compress: true,
+    putOnlyUsedFonts: true,
   });
+
+  await registerPdfFonts(doc);
 
   const { report } = data;
 
   addCoverPage(doc, data);
-
   doc.addPage();
 
   let y = MARGIN_TOP;
@@ -67,29 +73,20 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
   };
 
   const addSectionHeading = (index: string, title: string) => {
+    setFont(doc, DISPLAY_FONT, "bold", 19, COLORS.ink);
     const titleLines = wrapText(doc, title, CONTENT_WIDTH);
-
     const requiredHeight = 9 + titleLines.length * 8 + 10;
 
     ensureSpace(requiredHeight);
 
-    doc.setCharSpace(0);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
-    doc.setTextColor(...COLORS.muted);
-
+    setFont(doc, BODY_FONT, "normal", 8, COLORS.muted);
     doc.text(index, MARGIN_LEFT, y);
-
     y += 9;
 
-    doc.setCharSpace(0);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(19);
-    doc.setTextColor(...COLORS.ink);
+    setFont(doc, DISPLAY_FONT, "bold", 19, COLORS.ink);
 
     for (const line of titleLines) {
       doc.text(line, MARGIN_LEFT, y);
-
       y += 8;
     }
 
@@ -110,17 +107,11 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
     }
 
     const leftIndent = options?.leftIndent ?? 0;
-
     const x = MARGIN_LEFT + leftIndent;
-
     const requestedWidth = options?.width ?? CONTENT_WIDTH - leftIndent;
+    const availableWidth = Math.max(20, Math.min(requestedWidth, CONTENT_RIGHT - x));
 
-    const availableWidth = Math.min(requestedWidth, CONTENT_RIGHT - x);
-
-    doc.setCharSpace(0);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(options?.size ?? 10.5);
-    doc.setTextColor(...(options?.color ?? COLORS.muted));
+    setFont(doc, BODY_FONT, "normal", options?.size ?? 10.5, options?.color ?? COLORS.muted);
 
     const paragraphs = normalizeText(text)
       .split(/\n+/)
@@ -132,14 +123,7 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
 
       for (const line of lines) {
         ensureSpace(6);
-
-        /*
-         * Vrstico izpišemo kot navaden string.
-         * Ne uporabljamo maxWidth, ker je bila
-         * vrstica že prej pravilno prelomljena.
-         */
         doc.text(line, x, y);
-
         y += 6;
       }
 
@@ -151,43 +135,37 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
 
   const addDivider = () => {
     ensureSpace(14);
-
     y += 4;
 
     doc.setDrawColor(...COLORS.line);
     doc.setLineWidth(0.2);
-
     doc.line(MARGIN_LEFT, y, CONTENT_RIGHT, y);
 
     y += 10;
   };
 
-  addSectionHeading("01", "Dobrodošli v vašem Home DNA™");
-
+  addSectionHeading("01", "DobrodoÅ¡li v vaÅ¡em Home DNAâ„¢");
   addParagraph(report.intro);
   addDivider();
 
-  addSectionHeading("02", "Vaš življenjski slog");
-
+  addSectionHeading("02", "VaÅ¡ Å¾ivljenjski slog");
   addParagraph(report.lifestyle);
   addDivider();
 
-  addSectionHeading("03", "Vaš slog");
-
+  addSectionHeading("03", "VaÅ¡ slog");
   addParagraph(report.style);
   addDivider();
 
   addSectionHeading("04", "Zakaj bo ta dom deloval za vas");
-
   addParagraph(report.why);
   addDivider();
 
   if (report.rooms.length > 0) {
-    addSectionHeading("05", "Priporočila za izbrane prostore");
+    addSectionHeading("05", "PriporoÄila za izbrane prostore");
 
     report.rooms.forEach((room, index) => {
+      setFont(doc, DISPLAY_FONT, "bold", 13, COLORS.ink);
       const roomTitleLines = wrapText(doc, room.label, CONTENT_WIDTH);
-
       const requiredHeight = roomTitleLines.length * 7 + 20;
 
       ensureSpace(requiredHeight);
@@ -195,25 +173,18 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
       if (index > 0) {
         doc.setDrawColor(...COLORS.line);
         doc.setLineWidth(0.2);
-
         doc.line(MARGIN_LEFT, y, CONTENT_RIGHT, y);
-
         y += 9;
       }
 
-      doc.setCharSpace(0);
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(13);
-      doc.setTextColor(...COLORS.ink);
+      setFont(doc, DISPLAY_FONT, "bold", 13, COLORS.ink);
 
       for (const line of roomTitleLines) {
         doc.text(line, MARGIN_LEFT, y);
-
         y += 7;
       }
 
       y += 3;
-
       addParagraph(room.text);
     });
 
@@ -223,35 +194,22 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
   addSectionHeading("06", "Okvirna investicija");
 
   const columnGap = 12;
-
   const columnWidth = (CONTENT_WIDTH - columnGap) / 2;
-
   const rightColumnX = MARGIN_LEFT + columnWidth + columnGap;
 
+  setFont(doc, DISPLAY_FONT, "bold", 15, COLORS.ink);
   const investmentLines = wrapText(doc, data.investmentRange || "Po posvetu", columnWidth);
-
   const executionLevelLines = wrapText(doc, data.executionLevel || "Premium", columnWidth);
-
   const investmentBlockHeight = 9 + Math.max(investmentLines.length, executionLevelLines.length) * 7 + 10;
 
   ensureSpace(investmentBlockHeight);
 
-  doc.setCharSpace(0);
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(8);
-  doc.setTextColor(...COLORS.muted);
-
+  setFont(doc, BODY_FONT, "normal", 8, COLORS.muted);
   doc.text("OCENJENA INVESTICIJA", MARGIN_LEFT, y);
-
   doc.text("RAVEN IZVEDBE", rightColumnX, y);
-
   y += 9;
 
-  doc.setCharSpace(0);
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(15);
-  doc.setTextColor(...COLORS.ink);
-
+  setFont(doc, DISPLAY_FONT, "bold", 15, COLORS.ink);
   const investmentStartY = y;
 
   investmentLines.forEach((line, index) => {
@@ -271,30 +229,22 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
 
   report.nextSteps.forEach((step, index) => {
     const stepNumberWidth = 13;
-
     const stepX = MARGIN_LEFT + stepNumberWidth;
-
     const stepWidth = CONTENT_WIDTH - stepNumberWidth;
 
+    setFont(doc, DISPLAY_FONT, "bold", 12, COLORS.ink);
     const titleLines = wrapText(doc, step.title, stepWidth);
 
+    setFont(doc, BODY_FONT, "normal", 10.5, COLORS.muted);
     const stepLines = wrapText(doc, step.text, stepWidth);
-
     const requiredHeight = titleLines.length * 6 + stepLines.length * 6 + 22;
 
     ensureSpace(requiredHeight);
 
-    doc.setCharSpace(0);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
-    doc.setTextColor(...COLORS.muted);
-
+    setFont(doc, BODY_FONT, "normal", 8, COLORS.muted);
     doc.text(String(index + 1).padStart(2, "0"), MARGIN_LEFT, y);
 
-    doc.setCharSpace(0);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(12);
-    doc.setTextColor(...COLORS.ink);
+    setFont(doc, DISPLAY_FONT, "bold", 12, COLORS.ink);
 
     for (const line of titleLines) {
       doc.text(line, stepX, y);
@@ -302,11 +252,7 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
     }
 
     y += 3;
-
-    doc.setCharSpace(0);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(10.5);
-    doc.setTextColor(...COLORS.muted);
+    setFont(doc, BODY_FONT, "normal", 10.5, COLORS.muted);
 
     for (const line of stepLines) {
       doc.text(line, stepX, y);
@@ -314,12 +260,9 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
     }
 
     y += 6;
-
     doc.setDrawColor(...COLORS.line);
     doc.setLineWidth(0.2);
-
     doc.line(MARGIN_LEFT, y, CONTENT_RIGHT, y);
-
     y += 10;
   });
 
@@ -338,76 +281,105 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
   return blob;
 }
 
+async function registerPdfFonts(doc: PdfDocument) {
+  const [bodyRegular, displayRegular, displayMedium] = await Promise.all([
+    loadFontAsset(interTightRegularAsset),
+    loadFontAsset(schibstedRegularAsset),
+    loadFontAsset(schibstedMediumAsset),
+  ]);
+
+  doc.addFileToVFS("InterTight-Regular.ttf", bodyRegular);
+  doc.addFont("InterTight-Regular.ttf", BODY_FONT, "normal");
+
+  doc.addFileToVFS("SchibstedGrotesk-Regular.ttf", displayRegular);
+  doc.addFont("SchibstedGrotesk-Regular.ttf", DISPLAY_FONT, "normal");
+
+  doc.addFileToVFS("SchibstedGrotesk-Medium.ttf", displayMedium);
+  doc.addFont("SchibstedGrotesk-Medium.ttf", DISPLAY_FONT, "bold");
+}
+
+async function loadFontAsset(asset: FontAsset): Promise<string> {
+  const response = await fetch(asset.url);
+
+  if (!response.ok) {
+    throw new Error(`Pisave za PDF ni bilo mogoÄe naloÅ¾iti (${response.status}).`);
+  }
+
+  return arrayBufferToBase64(await response.arrayBuffer());
+}
+
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  const chunkSize = 0x8000;
+  let binary = "";
+
+  for (let offset = 0; offset < bytes.length; offset += chunkSize) {
+    const chunk = bytes.subarray(offset, offset + chunkSize);
+    binary += String.fromCharCode(...chunk);
+  }
+
+  return window.btoa(binary);
+}
+
 function addCoverPage(doc: PdfDocument, data: ReportPdfData) {
   doc.setFillColor(...COLORS.cover);
-
   doc.rect(0, 0, PAGE_WIDTH, PAGE_HEIGHT, "F");
 
-  doc.setCharSpace(0);
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(9);
-  doc.setTextColor(...COLORS.muted);
-
+  setFont(doc, BODY_FONT, "normal", 9, COLORS.muted);
   doc.text("WOLF STUDIO", MARGIN_LEFT, 48);
 
-  doc.setCharSpace(0);
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(32);
-  doc.setTextColor(...COLORS.ink);
-
-  const titleLines = wrapText(doc, "Home DNA™ Report", CONTENT_WIDTH);
-
+  setFont(doc, DISPLAY_FONT, "bold", 32, COLORS.ink);
+  const titleLines = wrapText(doc, "Home DNAâ„¢ Report", CONTENT_WIDTH);
   let titleY = 88;
 
   for (const line of titleLines) {
     doc.text(line, MARGIN_LEFT, titleY);
-
     titleY += 12;
   }
 
   doc.setDrawColor(...COLORS.line);
   doc.setLineWidth(0.3);
-
   doc.line(MARGIN_LEFT, titleY + 2, CONTENT_RIGHT, titleY + 2);
 
   const customerY = titleY + 20;
-
   const customerName = data.customerName.trim();
 
-  doc.setCharSpace(0);
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(12);
-  doc.setTextColor(...COLORS.ink);
+  setFont(doc, BODY_FONT, "normal", 12, COLORS.ink);
 
   if (customerName) {
     const customerLines = wrapText(doc, customerName, CONTENT_WIDTH);
-
     let currentY = customerY;
 
     for (const line of customerLines) {
       doc.text(line, MARGIN_LEFT, currentY);
-
       currentY += 7;
     }
   }
 
-  doc.setCharSpace(0);
-  doc.setFontSize(10);
-  doc.setTextColor(...COLORS.muted);
-
+  setFont(doc, BODY_FONT, "normal", 10, COLORS.muted);
   doc.text(formatDate(new Date()), MARGIN_LEFT, customerY + (customerName ? 12 : 0));
 
-  const description = "Osebna analiza doma, življenjskega sloga in oblikovalskih prioritet.";
-
+  const description = "Osebna analiza doma, Å¾ivljenjskega sloga in oblikovalskih prioritet.";
   const descriptionLines = wrapText(doc, description, CONTENT_WIDTH);
-
   let descriptionY = 238;
 
   for (const line of descriptionLines) {
     doc.text(line, MARGIN_LEFT, descriptionY);
-
     descriptionY += 6;
   }
+}
+
+function setFont(
+  doc: PdfDocument,
+  family: string,
+  style: FontStyle,
+  size: number,
+  color: readonly [number, number, number],
+) {
+  doc.setCharSpace(0);
+  doc.setFont(family, style);
+  doc.setFontSize(size);
+  doc.setTextColor(...color);
 }
 
 function normalizeText(text: string): string {
@@ -415,7 +387,6 @@ function normalizeText(text: string): string {
     .replace(/\r\n/g, "\n")
     .replace(/\r/g, "\n")
     .replace(/[ \t]+/g, " ")
-    .replace(/(\S{30})(?=\S)/g, "$1 ")
     .trim();
 }
 
@@ -426,22 +397,64 @@ function wrapText(doc: PdfDocument, text: string, maxWidth: number): string[] {
     return [];
   }
 
-  doc.setCharSpace(0);
+  const safeWidth = Math.max(20, maxWidth - 1.5);
+  const result: string[] = [];
 
-  /*
-   * Uporabimo nekoliko manjšo širino, kot je
-   * dejansko na voljo. Tako kompenziramo
-   * morebitno netočnost metrik pisave v jsPDF.
-   */
-  const safeWidth = Math.max(20, maxWidth - 2);
+  for (const paragraph of normalizedText.split("\n")) {
+    const words = paragraph.trim().split(/\s+/).filter(Boolean);
+    let line = "";
 
-  const result = doc.splitTextToSize(normalizedText, safeWidth);
+    for (const word of words) {
+      const candidate = line ? `${line} ${word}` : word;
 
-  if (Array.isArray(result)) {
-    return result.map((line) => String(line).trimEnd());
+      if (doc.getTextWidth(candidate) <= safeWidth) {
+        line = candidate;
+        continue;
+      }
+
+      if (line) {
+        result.push(line);
+        line = "";
+      }
+
+      if (doc.getTextWidth(word) <= safeWidth) {
+        line = word;
+        continue;
+      }
+
+      const fragments = splitLongWord(doc, word, safeWidth);
+      result.push(...fragments.slice(0, -1));
+      line = fragments.at(-1) ?? "";
+    }
+
+    if (line) {
+      result.push(line);
+    }
   }
 
-  return [String(result)];
+  return result;
+}
+
+function splitLongWord(doc: PdfDocument, word: string, maxWidth: number): string[] {
+  const result: string[] = [];
+  let fragment = "";
+
+  for (const character of Array.from(word)) {
+    const candidate = fragment + character;
+
+    if (fragment && doc.getTextWidth(candidate) > maxWidth) {
+      result.push(fragment);
+      fragment = character;
+    } else {
+      fragment = candidate;
+    }
+  }
+
+  if (fragment) {
+    result.push(fragment);
+  }
+
+  return result;
 }
 
 function addFooters(doc: PdfDocument) {
@@ -449,23 +462,15 @@ function addFooters(doc: PdfDocument) {
 
   for (let page = 2; page <= totalPages; page += 1) {
     doc.setPage(page);
-
     doc.setDrawColor(...COLORS.line);
     doc.setLineWidth(0.2);
-
     doc.line(MARGIN_LEFT, PAGE_HEIGHT - 18, CONTENT_RIGHT, PAGE_HEIGHT - 18);
 
-    doc.setCharSpace(0);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
-    doc.setTextColor(...COLORS.muted);
-
+    setFont(doc, BODY_FONT, "normal", 8, COLORS.muted);
     doc.text("Wolf Studio", MARGIN_LEFT, PAGE_HEIGHT - 11);
-
-    doc.text("Home DNA™", PAGE_WIDTH / 2, PAGE_HEIGHT - 11, {
+    doc.text("Home DNAâ„¢", PAGE_WIDTH / 2, PAGE_HEIGHT - 11, {
       align: "center",
     });
-
     doc.text(String(page - 1).padStart(2, "0"), CONTENT_RIGHT, PAGE_HEIGHT - 11, {
       align: "right",
     });
@@ -482,11 +487,10 @@ function formatDate(date: Date): string {
 
 export function downloadBlob(blob: Blob, filename: string) {
   if (!(blob instanceof Blob) || blob.size === 0) {
-    throw new Error("Datoteke ni mogoče prenesti, ker je prazna.");
+    throw new Error("Datoteke ni mogoÄe prenesti, ker je prazna.");
   }
 
   const objectUrl = URL.createObjectURL(blob);
-
   const anchor = document.createElement("a");
 
   anchor.href = objectUrl;
