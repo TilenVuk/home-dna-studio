@@ -324,9 +324,9 @@ async function loadPdfImage(asset: ReportImageAsset): Promise<LoadedPdfImage> {
   const response = await fetch(asset.src);
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-  const dataUrl = await blobToDataUrl(await response.blob());
-  const dimensions = await readImageDimensions(dataUrl);
-  return { id: asset.id, dataUrl, ...dimensions };
+  const sourceUrl = await blobToDataUrl(await response.blob());
+  const optimized = await optimizePdfImage(sourceUrl);
+  return { id: asset.id, ...optimized };
 }
 
 function blobToDataUrl(blob: Blob): Promise<string> {
@@ -338,29 +338,30 @@ function blobToDataUrl(blob: Blob): Promise<string> {
   });
 }
 
-function readImageDimensions(src: string): Promise<{ width: number; height: number }> {
+function optimizePdfImage(src: string): Promise<{ dataUrl: string; width: number; height: number }> {
   return new Promise((resolve, reject) => {
     const image = new Image();
-    image.onload = () => resolve({ width: image.naturalWidth, height: image.naturalHeight });
+    image.onload = () => {
+      const maximumDimension = 1_600;
+      const scale = Math.min(1, maximumDimension / Math.max(image.naturalWidth, image.naturalHeight));
+      const width = Math.max(1, Math.round(image.naturalWidth * scale));
+      const height = Math.max(1, Math.round(image.naturalHeight * scale));
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+
+      const context = canvas.getContext("2d");
+      if (!context) {
+        reject(new Error("Slike ni bilo mogoče pripraviti za PDF."));
+        return;
+      }
+
+      context.drawImage(image, 0, 0, width, height);
+      resolve({ dataUrl: canvas.toDataURL("image/jpeg", 0.82), width, height });
+    };
     image.onerror = () => reject(new Error("Dimenzij slike ni bilo mogoče prebrati."));
     image.src = src;
   });
-}
-
-async function loadAssetAsBase64(assetUrl: string, message: string): Promise<string> {
-  const response = await fetch(assetUrl);
-  if (!response.ok) throw new Error(`${message} (${response.status}).`);
-  return arrayBufferToBase64(await response.arrayBuffer());
-}
-
-function arrayBufferToBase64(buffer: ArrayBuffer): string {
-  const bytes = new Uint8Array(buffer);
-  const chunkSize = 0x8000;
-  let binary = "";
-  for (let offset = 0; offset < bytes.length; offset += chunkSize) {
-    binary += String.fromCharCode(...bytes.subarray(offset, offset + chunkSize));
-  }
-  return window.btoa(binary);
 }
 
 function drawImageCover(doc: PdfDocument, image: LoadedPdfImage, x: number, y: number, width: number, height: number) {

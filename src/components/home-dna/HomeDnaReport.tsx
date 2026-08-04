@@ -73,7 +73,7 @@ export function HomeDnaReport({ state }: { state: HomeDnaState }) {
       });
 
       const timeout = new Promise<never>((_, reject) => {
-        window.setTimeout(() => reject(new Error("PDF timeout")), 60_000);
+        window.setTimeout(() => reject(new Error("PDF timeout")), 120_000);
       });
 
       const blob = await Promise.race([pdfPromise, timeout]);
