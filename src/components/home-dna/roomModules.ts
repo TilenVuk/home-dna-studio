@@ -14,8 +14,53 @@ import {
   wardrobeStorageOptions,
   worktopOptions,
 } from "./discoveryData";
-import { boolChoice, priorityLevels, setRoom, type ScreenDef } from "./screenDef";
+import { priorityLevels, setRoom, type ScreenDef } from "./screenDef";
 import type { HomeDnaState, Priority, RoomKey } from "./homeDnaTypes";
+
+const noKitchenFeatures = "Brez dodatkov";
+const kitchenLedFeature = "Delovna LED osvetlitev";
+const kitchenGlassFeature = "Steklene fronte";
+
+const noWardrobeFeatures = "Brez dodatkov";
+const wardrobeLedFeature = "Integrirana LED osvetlitev";
+const wardrobeMirrorFeature = "Ogledalo";
+
+const noLivingFeatures = "Brez dodatkov";
+const livingCableFeature = "Skrita napeljava kablov";
+const livingLedFeature = "Integrirana LED osvetlitev";
+
+const noEntryFeatures = "Brez dodatkov";
+const entryLongCoatsFeature = "Prostor za dolge plašče";
+const entryUmbrellaFeature = "Mesto za dežnike";
+const entryBenchFeature = "Klop za obuvanje";
+const entryMirrorFeature = "Ogledalo";
+
+const noUtilityAppliances = "Brez pralnega in sušilnega stroja";
+const utilityWashingFeature = "Pralni stroj";
+const utilityDryerFeature = "Sušilni stroj";
+const noUtilityStorage = "Brez dodatnega shranjevanja";
+const utilityCleaningFeature = "Čistila";
+const utilityIroningFeature = "Likalna deska";
+const utilityVacuumFeature = "Sesalnik";
+const utilityPantryFeature = "Živila";
+
+const noBathroomFeatures = "Brez dodatkov";
+const bathroomTallFeature = "Visoka omara";
+const bathroomLaundryFeature = "Prostor za perilo";
+const bathroomMirrorFeature = "Ogledalna omarica";
+const bathroomCleaningFeature = "Shranjevanje za čistila";
+
+const noOfficeFeatures = "Brez dodatkov";
+const officePrinterFeature = "Mesto za tiskalnik";
+const officeDocumentsFeature = "Shranjevanje za dokumente";
+const officeBooksFeature = "Prostor za knjige";
+const officeCablesFeature = "Skrita napeljava kablov";
+
+function selectedFeatures(entries: Array<[label: string, value: boolean | undefined]>, noneLabel: string): string[] {
+  const selected = entries.filter(([, value]) => value === true).map(([label]) => label);
+  if (selected.length > 0) return selected;
+  return entries.every(([, value]) => value !== undefined) ? [noneLabel] : [];
+}
 
 /* ---------------- kitchen ---------------- */
 
@@ -30,6 +75,7 @@ function kitchenScreens(state: HomeDnaState): ScreenDef[] {
       body: "Potrebujemo le približno postavitev, dolžine in nekaj ključnih odločitev.",
       cta: "Začnimo s kuhinjo",
       image: projectKitchen,
+      prominentEyebrow: true,
     },
     {
       kind: "visual",
@@ -144,8 +190,7 @@ function kitchenScreens(state: HomeDnaState): ScreenDef[] {
         { value: "3", label: "3" },
         { value: "4+", label: "4+" },
       ],
-      value:
-        k.tallUnits === undefined ? undefined : k.tallUnitsPlus ? "4+" : String(k.tallUnits),
+      value: k.tallUnits === undefined ? undefined : k.tallUnitsPlus ? "4+" : String(k.tallUnits),
       apply: (s, v) =>
         setRoom(s, "kitchen", {
           tallUnits: v === "4+" ? 4 : Number(v),
@@ -168,12 +213,31 @@ function kitchenScreens(state: HomeDnaState): ScreenDef[] {
           pantry: v !== "none",
         }),
     },
-    boolChoice(
-      "kitchen-led",
-      "Želite delovno osvetlitev pod zgornjimi elementi?",
-      k.hasLed,
-      (s, v) => setRoom(s, "kitchen", v ? { hasLed: true } : { hasLed: false, ledLength: 0 }),
-    ),
+    {
+      kind: "multi",
+      key: "kitchen-features",
+      headline: "Katere dodatke želite v kuhinji?",
+      support: "Izberite vse želene dodatke ali možnost brez dodatkov.",
+      options: [kitchenLedFeature, kitchenGlassFeature, noKitchenFeatures],
+      exclusive: noKitchenFeatures,
+      selected: selectedFeatures(
+        [
+          [kitchenLedFeature, k.hasLed],
+          [kitchenGlassFeature, k.hasGlassFronts],
+        ],
+        noKitchenFeatures,
+      ),
+      apply: (s, features) => {
+        const hasLed = features.includes(kitchenLedFeature);
+        const hasGlassFronts = features.includes(kitchenGlassFeature);
+        return setRoom(s, "kitchen", {
+          hasLed,
+          hasGlassFronts,
+          ...(!hasLed ? { ledLength: 0 } : {}),
+          ...(!hasGlassFronts ? { glassFrontLength: 0 } : {}),
+        });
+      },
+    },
   );
 
   if (k.hasLed) {
@@ -189,16 +253,6 @@ function kitchenScreens(state: HomeDnaState): ScreenDef[] {
       apply: (s, v) => setRoom(s, "kitchen", { ledLength: Math.round(v * 100) }),
     });
   }
-
-  screens.push(
-    boolChoice("kitchen-glass", "Želite del omaric s steklenimi vrati?", k.hasGlassFronts, (s, v) =>
-      setRoom(
-        s,
-        "kitchen",
-        v ? { hasGlassFronts: true } : { hasGlassFronts: false, glassFrontLength: 0 },
-      ),
-    ),
-  );
 
   if (k.hasGlassFronts) {
     screens.push({
@@ -230,6 +284,7 @@ function wardrobeScreens(state: HomeDnaState): ScreenDef[] {
       body: "Notranja razporeditev se mora prilagoditi vašim oblačilom, obutvi in vsakodnevnim navadam.",
       cta: "Načrtujmo notranjost",
       image: projectCloset,
+      prominentEyebrow: true,
     },
     {
       kind: "multi",
@@ -322,8 +377,7 @@ function wardrobeScreens(state: HomeDnaState): ScreenDef[] {
         { value: "60+", label: "Več kot 60 cm" },
       ],
       value: w.depth === undefined ? undefined : w.depthPlus ? "60+" : String(w.depth),
-      apply: (s, v) =>
-        setRoom(s, "wardrobe", { depth: v === "60+" ? 60 : Number(v), depthPlus: v === "60+" }),
+      apply: (s, v) => setRoom(s, "wardrobe", { depth: v === "60+" ? 60 : Number(v), depthPlus: v === "60+" }),
     },
     {
       kind: "visual",
@@ -333,12 +387,26 @@ function wardrobeScreens(state: HomeDnaState): ScreenDef[] {
       value: w.doorType,
       apply: (s, v) => setRoom(s, "wardrobe", { doorType: v as NonNullable<typeof w.doorType> }),
     },
-    boolChoice("wardrobe-led", "Želite integrirano LED osvetlitev?", w.led, (s, v) =>
-      setRoom(s, "wardrobe", { led: v }),
-    ),
-    boolChoice("wardrobe-mirror", "Želite ogledalo kot del omare?", w.mirror, (s, v) =>
-      setRoom(s, "wardrobe", { mirror: v }),
-    ),
+    {
+      kind: "multi",
+      key: "wardrobe-features",
+      headline: "Katere dodatke želite v garderobi?",
+      support: "Izberite vse želene dodatke ali možnost brez dodatkov.",
+      options: [wardrobeLedFeature, wardrobeMirrorFeature, noWardrobeFeatures],
+      exclusive: noWardrobeFeatures,
+      selected: selectedFeatures(
+        [
+          [wardrobeLedFeature, w.led],
+          [wardrobeMirrorFeature, w.mirror],
+        ],
+        noWardrobeFeatures,
+      ),
+      apply: (s, features) =>
+        setRoom(s, "wardrobe", {
+          led: features.includes(wardrobeLedFeature),
+          mirror: features.includes(wardrobeMirrorFeature),
+        }),
+    },
   );
 
   return screens;
@@ -357,6 +425,7 @@ function livingRoomScreens(state: HomeDnaState): ScreenDef[] {
       body: "Zanima nas razpoložljiva stena in način, kako prostor dejansko uporabljate.",
       cta: "Nadaljujmo",
       image: projectLiving,
+      prominentEyebrow: true,
     },
     {
       kind: "number",
@@ -421,15 +490,26 @@ function livingRoomScreens(state: HomeDnaState): ScreenDef[] {
       value: l.books,
       apply: (s, books) => setRoom(s, "livingRoom", { books }),
     },
-    boolChoice(
-      "living-cables",
-      "Želite skrito napeljavo kablov?",
-      l.cableManagement,
-      (s, v) => setRoom(s, "livingRoom", { cableManagement: v }),
-    ),
-    boolChoice("living-led", "Želite integrirano LED osvetlitev?", l.led, (s, v) =>
-      setRoom(s, "livingRoom", { led: v }),
-    ),
+    {
+      kind: "multi",
+      key: "living-features",
+      headline: "Katere dodatke želite v dnevni sobi?",
+      support: "Izberite vse želene dodatke ali možnost brez dodatkov.",
+      options: [livingCableFeature, livingLedFeature, noLivingFeatures],
+      exclusive: noLivingFeatures,
+      selected: selectedFeatures(
+        [
+          [livingCableFeature, l.cableManagement],
+          [livingLedFeature, l.led],
+        ],
+        noLivingFeatures,
+      ),
+      apply: (s, features) =>
+        setRoom(s, "livingRoom", {
+          cableManagement: features.includes(livingCableFeature),
+          led: features.includes(livingLedFeature),
+        }),
+    },
   ];
 }
 
@@ -446,6 +526,7 @@ function entryHallScreens(state: HomeDnaState): ScreenDef[] {
       body: "Zanima nas razpoložljiva širina in koliko stvari mora predsoba dnevno sprejeti.",
       cta: "Nadaljujmo",
       image: projectHall,
+      prominentEyebrow: true,
     },
     {
       kind: "number",
@@ -485,9 +566,6 @@ function entryHallScreens(state: HomeDnaState): ScreenDef[] {
       value: e.jackets,
       apply: (s, jackets) => setRoom(s, "entryHall", { jackets }),
     },
-    boolChoice("entry-long-coats", "Ali potrebujete prostor za dolge plašče?", e.longCoats, (s, v) =>
-      setRoom(s, "entryHall", { longCoats: v }),
-    ),
     {
       kind: "choice",
       key: "entry-bags",
@@ -500,15 +578,30 @@ function entryHallScreens(state: HomeDnaState): ScreenDef[] {
       value: e.bags,
       apply: (s, bags) => setRoom(s, "entryHall", { bags }),
     },
-    boolChoice("entry-umbrella", "Želite mesto za dežnike?", e.umbrellaStorage, (s, v) =>
-      setRoom(s, "entryHall", { umbrellaStorage: v }),
-    ),
-    boolChoice("entry-bench", "Želite klop za obuvanje?", e.bench, (s, v) =>
-      setRoom(s, "entryHall", { bench: v }),
-    ),
-    boolChoice("entry-mirror", "Želite ogledalo v predsobi?", e.mirror, (s, v) =>
-      setRoom(s, "entryHall", { mirror: v }),
-    ),
+    {
+      kind: "multi",
+      key: "entry-features",
+      headline: "Kaj še potrebuje vaša predsoba?",
+      support: "Izberite vse želene rešitve ali možnost brez dodatkov.",
+      options: [entryLongCoatsFeature, entryUmbrellaFeature, entryBenchFeature, entryMirrorFeature, noEntryFeatures],
+      exclusive: noEntryFeatures,
+      selected: selectedFeatures(
+        [
+          [entryLongCoatsFeature, e.longCoats],
+          [entryUmbrellaFeature, e.umbrellaStorage],
+          [entryBenchFeature, e.bench],
+          [entryMirrorFeature, e.mirror],
+        ],
+        noEntryFeatures,
+      ),
+      apply: (s, features) =>
+        setRoom(s, "entryHall", {
+          longCoats: features.includes(entryLongCoatsFeature),
+          umbrellaStorage: features.includes(entryUmbrellaFeature),
+          bench: features.includes(entryBenchFeature),
+          mirror: features.includes(entryMirrorFeature),
+        }),
+    },
   ];
 }
 
@@ -525,6 +618,7 @@ function utilityScreens(state: HomeDnaState): ScreenDef[] {
       body: "Zanima nas razpoložljiva stena in oprema, ki jo mora prostor sprejeti.",
       cta: "Nadaljujmo",
       image: projectUtility,
+      prominentEyebrow: true,
     },
     {
       kind: "number",
@@ -538,46 +632,76 @@ function utilityScreens(state: HomeDnaState): ScreenDef[] {
       value: u.width,
       apply: (s, v) => setRoom(s, "utilityRoom", { width: v }),
     },
-    boolChoice("utility-washing", "Bo v prostoru pralni stroj?", u.washingMachine, (s, v) =>
-      setRoom(
-        s,
-        "utilityRoom",
-        v ? { washingMachine: true } : { washingMachine: false, stackedAppliances: false },
+    {
+      kind: "multi",
+      key: "utility-appliances",
+      headline: "Kateri aparati bodo v prostoru?",
+      support: "Izberite vse aparate ali možnost brez pralnega in sušilnega stroja.",
+      options: [utilityWashingFeature, utilityDryerFeature, noUtilityAppliances],
+      exclusive: noUtilityAppliances,
+      selected: selectedFeatures(
+        [
+          [utilityWashingFeature, u.washingMachine],
+          [utilityDryerFeature, u.dryer],
+        ],
+        noUtilityAppliances,
       ),
-    ),
-    boolChoice("utility-dryer", "Bo v prostoru sušilni stroj?", u.dryer, (s, v) =>
-      setRoom(s, "utilityRoom", v ? { dryer: true } : { dryer: false, stackedAppliances: false }),
-    ),
+      apply: (s, features) => {
+        const washingMachine = features.includes(utilityWashingFeature);
+        const dryer = features.includes(utilityDryerFeature);
+        return setRoom(s, "utilityRoom", {
+          washingMachine,
+          dryer,
+          ...(!(washingMachine && dryer) ? { stackedAppliances: false } : {}),
+        });
+      },
+    },
   ];
 
   if (u.washingMachine && u.dryer) {
-    screens.push(
-      boolChoice(
-        "utility-stacked",
-        "Naj bosta stroja postavljena drug na drugega?",
-        u.stackedAppliances,
-        (s, v) => setRoom(s, "utilityRoom", { stackedAppliances: v }),
-      ),
-    );
+    screens.push({
+      kind: "choice",
+      key: "utility-stacked",
+      headline: "Naj bosta stroja postavljena drug na drugega?",
+      options: [
+        { value: "yes", label: "Da" },
+        { value: "no", label: "Ne" },
+      ],
+      value: u.stackedAppliances === undefined ? undefined : u.stackedAppliances ? "yes" : "no",
+      apply: (s, value) => setRoom(s, "utilityRoom", { stackedAppliances: value === "yes" }),
+    });
   }
 
-  screens.push(
-    boolChoice(
-      "utility-cleaning",
-      "Želite shranjevanje za čistila?",
-      u.cleaningStorage,
-      (s, v) => setRoom(s, "utilityRoom", { cleaningStorage: v }),
+  screens.push({
+    kind: "multi",
+    key: "utility-storage",
+    headline: "Kaj mora prostor še shranjevati?",
+    support: "Izberite vse želene kategorije ali možnost brez dodatnega shranjevanja.",
+    options: [
+      utilityCleaningFeature,
+      utilityIroningFeature,
+      utilityVacuumFeature,
+      utilityPantryFeature,
+      noUtilityStorage,
+    ],
+    exclusive: noUtilityStorage,
+    selected: selectedFeatures(
+      [
+        [utilityCleaningFeature, u.cleaningStorage],
+        [utilityIroningFeature, u.ironingBoard],
+        [utilityVacuumFeature, u.vacuumStorage],
+        [utilityPantryFeature, u.pantryStorage],
+      ],
+      noUtilityStorage,
     ),
-    boolChoice("utility-ironing", "Želite mesto za likalno desko?", u.ironingBoard, (s, v) =>
-      setRoom(s, "utilityRoom", { ironingBoard: v }),
-    ),
-    boolChoice("utility-vacuum", "Želite mesto za sesalnik?", u.vacuumStorage, (s, v) =>
-      setRoom(s, "utilityRoom", { vacuumStorage: v }),
-    ),
-    boolChoice("utility-pantry", "Želite dodatno shrambo za živila?", u.pantryStorage, (s, v) =>
-      setRoom(s, "utilityRoom", { pantryStorage: v }),
-    ),
-  );
+    apply: (s, features) =>
+      setRoom(s, "utilityRoom", {
+        cleaningStorage: features.includes(utilityCleaningFeature),
+        ironingBoard: features.includes(utilityIroningFeature),
+        vacuumStorage: features.includes(utilityVacuumFeature),
+        pantryStorage: features.includes(utilityPantryFeature),
+      }),
+  });
 
   return screens;
 }
@@ -595,6 +719,7 @@ function bathroomScreens(state: HomeDnaState): ScreenDef[] {
       body: "Zanima nas stena, namenjena pohištvu, in način vsakodnevne uporabe.",
       cta: "Nadaljujmo",
       image: projectBathroom,
+      prominentEyebrow: true,
     },
     {
       kind: "number",
@@ -618,20 +743,40 @@ function bathroomScreens(state: HomeDnaState): ScreenDef[] {
       ],
       value: b.singleOrDoubleSink,
       apply: (s, v) =>
-        setRoom(s, "bathroom", { singleOrDoubleSink: v as NonNullable<typeof b.singleOrDoubleSink> }),
+        setRoom(s, "bathroom", {
+          singleOrDoubleSink: v as NonNullable<typeof b.singleOrDoubleSink>,
+        }),
     },
-    boolChoice("bathroom-tall", "Želite visoko omaro za shranjevanje?", b.tallStorage, (s, v) =>
-      setRoom(s, "bathroom", { tallStorage: v }),
-    ),
-    boolChoice("bathroom-laundry", "Želite prostor za perilo?", b.laundryStorage, (s, v) =>
-      setRoom(s, "bathroom", { laundryStorage: v }),
-    ),
-    boolChoice("bathroom-mirror-cabinet", "Želite ogledalno omarico?", b.mirrorCabinet, (s, v) =>
-      setRoom(s, "bathroom", { mirrorCabinet: v }),
-    ),
-    boolChoice("bathroom-cleaning", "Želite shranjevanje za čistila?", b.cleaningStorage, (s, v) =>
-      setRoom(s, "bathroom", { cleaningStorage: v }),
-    ),
+    {
+      kind: "multi",
+      key: "bathroom-features",
+      headline: "Katere rešitve potrebujete v kopalnici?",
+      support: "Izberite vse želene rešitve ali možnost brez dodatkov.",
+      options: [
+        bathroomTallFeature,
+        bathroomLaundryFeature,
+        bathroomMirrorFeature,
+        bathroomCleaningFeature,
+        noBathroomFeatures,
+      ],
+      exclusive: noBathroomFeatures,
+      selected: selectedFeatures(
+        [
+          [bathroomTallFeature, b.tallStorage],
+          [bathroomLaundryFeature, b.laundryStorage],
+          [bathroomMirrorFeature, b.mirrorCabinet],
+          [bathroomCleaningFeature, b.cleaningStorage],
+        ],
+        noBathroomFeatures,
+      ),
+      apply: (s, features) =>
+        setRoom(s, "bathroom", {
+          tallStorage: features.includes(bathroomTallFeature),
+          laundryStorage: features.includes(bathroomLaundryFeature),
+          mirrorCabinet: features.includes(bathroomMirrorFeature),
+          cleaningStorage: features.includes(bathroomCleaningFeature),
+        }),
+    },
   ];
 }
 
@@ -648,6 +793,7 @@ function officeScreens(state: HomeDnaState): ScreenDef[] {
       body: "Zanima nas, kdo prostor uporablja in kaj mora sprejeti.",
       cta: "Nadaljujmo",
       image: projectOffice,
+      prominentEyebrow: true,
     },
     {
       kind: "choice",
@@ -671,11 +817,7 @@ function officeScreens(state: HomeDnaState): ScreenDef[] {
         { value: "custom", label: "Po meri" },
       ],
       value:
-        o.deskWidth === undefined
-          ? undefined
-          : [120, 160, 200].includes(o.deskWidth)
-            ? String(o.deskWidth)
-            : "custom",
+        o.deskWidth === undefined ? undefined : [120, 160, 200].includes(o.deskWidth) ? String(o.deskWidth) : "custom",
       apply: (s, v) =>
         v === "custom"
           ? setRoom(s, "homeOffice", { deskWidth: 0 })
@@ -710,18 +852,36 @@ function officeScreens(state: HomeDnaState): ScreenDef[] {
       value: o.monitors,
       apply: (s, monitors) => setRoom(s, "homeOffice", { monitors }),
     },
-    boolChoice("office-printer", "Želite mesto za tiskalnik?", o.printerStorage, (s, v) =>
-      setRoom(s, "homeOffice", { printerStorage: v }),
-    ),
-    boolChoice("office-documents", "Želite shranjevanje za dokumente?", o.documentStorage, (s, v) =>
-      setRoom(s, "homeOffice", { documentStorage: v }),
-    ),
-    boolChoice("office-books", "Želite prostor za knjige?", o.books, (s, v) =>
-      setRoom(s, "homeOffice", { books: v }),
-    ),
-    boolChoice("office-cables", "Želite skrito napeljavo kablov?", o.cableManagement, (s, v) =>
-      setRoom(s, "homeOffice", { cableManagement: v }),
-    ),
+    {
+      kind: "multi",
+      key: "office-features",
+      headline: "Kaj še potrebuje domača pisarna?",
+      support: "Izberite vse želene rešitve ali možnost brez dodatkov.",
+      options: [
+        officePrinterFeature,
+        officeDocumentsFeature,
+        officeBooksFeature,
+        officeCablesFeature,
+        noOfficeFeatures,
+      ],
+      exclusive: noOfficeFeatures,
+      selected: selectedFeatures(
+        [
+          [officePrinterFeature, o.printerStorage],
+          [officeDocumentsFeature, o.documentStorage],
+          [officeBooksFeature, o.books],
+          [officeCablesFeature, o.cableManagement],
+        ],
+        noOfficeFeatures,
+      ),
+      apply: (s, features) =>
+        setRoom(s, "homeOffice", {
+          printerStorage: features.includes(officePrinterFeature),
+          documentStorage: features.includes(officeDocumentsFeature),
+          books: features.includes(officeBooksFeature),
+          cableManagement: features.includes(officeCablesFeature),
+        }),
+    },
   );
 
   return screens;
