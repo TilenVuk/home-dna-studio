@@ -13,14 +13,12 @@ import stagePartialRenovation from "@/assets/stage-partial-renovation.jpg";
 import propertyHouse from "@/assets/property-house.jpg";
 import propertyApartment from "@/assets/property-apartment.jpg";
 import propertyHoliday from "@/assets/property-holiday.jpg";
-import styleWarmModern from "@/assets/style-warm-modern.jpg";
 import styleMinimal from "@/assets/style-minimal.jpg";
 import styleScandinavian from "@/assets/style-scandinavian.jpg";
 import styleJapandi from "@/assets/style-japandi.jpg";
 import styleNatural from "@/assets/style-natural.jpg";
 import styleClassic from "@/assets/style-classic.jpg";
 import styleDark from "@/assets/style-dark.jpg";
-import styleRustic from "@/assets/style-rustic.jpg";
 import colourLight from "@/assets/colour-light.jpg";
 import colourEarthy from "@/assets/colour-earthy.jpg";
 import colourNeutral from "@/assets/colour-neutral.jpg";
@@ -182,12 +180,6 @@ export const petOptions: { value: PetKey; label: string }[] = [
 
 export const styleOptions: VisualOption[] = [
   {
-    value: "warm-modern",
-    title: "Toplo moderno",
-    description: "Čiste linije, topli nevtralni odtenki in prijeten lesni videz.",
-    image: styleWarmModern,
-  },
-  {
     value: "contemporary-minimal",
     title: "Sodobno minimalistično",
     description: "Mirne površine, skrito shranjevanje in minimalen vizualni šum.",
@@ -222,12 +214,6 @@ export const styleOptions: VisualOption[] = [
     title: "Temno elegantno",
     description: "Globoki kontrasti, steklo in diskretna osvetlitev.",
     image: styleDark,
-  },
-  {
-    value: "modern-rustic",
-    title: "Moderno rustikalno",
-    description: "Topel značaj naravnih dekorjev v sodobnejši izvedbi.",
-    image: styleRustic,
   },
 ];
 
