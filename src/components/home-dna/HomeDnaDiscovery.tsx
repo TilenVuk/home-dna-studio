@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useLayoutEffect, useMemo, useState } from "react";
 import { HomeDnaLayout } from "./HomeDnaLayout";
 import { ScreenDefRenderer } from "./ScreenDefRenderer";
 import { buildDiscoveryFlow } from "./discoveryFlow";
@@ -16,6 +16,10 @@ export function HomeDnaDiscovery() {
 
   const progress = flow.length > 1 ? (index / (flow.length - 1)) * 100 : 0;
 
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [def?.key]);
+
   const step = useCallback((direction: 1 | -1, mutate?: (state: HomeDnaState) => HomeDnaState) => {
     setState((prev) => {
       const next = mutate ? mutate(prev) : prev;
@@ -27,28 +31,15 @@ export function HomeDnaDiscovery() {
     });
   }, []);
 
-  const advance = useCallback(
-    (mutate?: (state: HomeDnaState) => HomeDnaState) => step(1, mutate),
-    [step],
-  );
+  const advance = useCallback((mutate?: (state: HomeDnaState) => HomeDnaState) => step(1, mutate), [step]);
   const back = useCallback(() => step(-1), [step]);
-  const update = useCallback(
-    (mutate: (state: HomeDnaState) => HomeDnaState) => setState((prev) => mutate(prev)),
-    [],
-  );
+  const update = useCallback((mutate: (state: HomeDnaState) => HomeDnaState) => setState((prev) => mutate(prev)), []);
 
   if (!def) return null;
 
   return (
     <HomeDnaLayout progress={progress}>
-      <ScreenDefRenderer
-        key={def.key}
-        def={def}
-        state={state}
-        onUpdate={update}
-        onAdvance={advance}
-        onBack={back}
-      />
+      <ScreenDefRenderer key={def.key} def={def} state={state} onUpdate={update} onAdvance={advance} onBack={back} />
     </HomeDnaLayout>
   );
 }
