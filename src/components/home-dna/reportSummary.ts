@@ -1,6 +1,7 @@
 import { roomOptions, styleOptions, colourDirectionOptions } from "./homeDnaData";
 import { executionLevelOptions } from "./discoveryData";
 import { buildReportImageCandidates } from "./reportImages";
+import { kitchenWallLengthCm } from "./pricing";
 import type { HomeDnaState, ReportImageCandidates, RoomKey } from "./homeDnaTypes";
 
 const projectStageLabels: Record<string, string> = {
@@ -76,9 +77,10 @@ export function buildReportInput(state: HomeDnaState): ReportInput {
 
   const roomDetails = selected
     .map((key) => {
+      const kitchenData = key === "kitchen" ? rooms.kitchen : undefined;
       const data =
         key === "kitchen"
-          ? rooms.kitchen
+          ? kitchenData
           : key === "wardrobe"
             ? rooms.wardrobe
             : key === "living-room"
@@ -91,7 +93,14 @@ export function buildReportInput(state: HomeDnaState): ReportInput {
                     ? rooms.bathroom
                     : rooms.homeOffice;
       if (!data) return null;
-      const entries = Object.entries(data)
+      const reportData = kitchenData
+        ? {
+            ...kitchenData,
+            ...(kitchenData.hasLed ? { ledLength: kitchenWallLengthCm(kitchenData) } : {}),
+            ...(kitchenData.hasGlassFronts ? { glassFrontLength: kitchenWallLengthCm(kitchenData) } : {}),
+          }
+        : data;
+      const entries = Object.entries(reportData)
         .filter(([, v]) => v !== undefined && v !== null && v !== "" && v !== false)
         .map(([k, v]) => `${k}=${Array.isArray(v) ? v.join("/") : String(v)}`);
       return entries.length ? `${roomLabel(key)}: ${entries.join(", ")}` : null;
