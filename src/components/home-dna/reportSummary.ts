@@ -1,6 +1,7 @@
 import { roomOptions, styleOptions, colourDirectionOptions } from "./homeDnaData";
 import { executionLevelOptions } from "./discoveryData";
-import type { HomeDnaState, RoomKey } from "./homeDnaTypes";
+import { buildReportImageCandidates } from "./reportImages";
+import type { HomeDnaState, ReportImageCandidates, RoomKey } from "./homeDnaTypes";
 
 const projectStageLabels: Record<string, string> = {
   "new-build": "Novogradnja",
@@ -20,14 +21,11 @@ const childrenLabels: Record<string, string> = {
   yes: "Otroci",
 };
 
-export const roomLabel = (key: RoomKey) =>
-  roomOptions.find((r) => r.key === key)?.title ?? key;
+export const roomLabel = (key: RoomKey) => roomOptions.find((r) => r.key === key)?.title ?? key;
 
-const styleLabel = (value: string) =>
-  styleOptions.find((s) => s.value === value)?.title ?? value;
+const styleLabel = (value: string) => styleOptions.find((s) => s.value === value)?.title ?? value;
 
-const colourLabel = (value: string) =>
-  colourDirectionOptions.find((c) => c.value === value)?.title ?? value;
+const colourLabel = (value: string) => colourDirectionOptions.find((c) => c.value === value)?.title ?? value;
 
 export const executionLevelLabel = (value: string) =>
   executionLevelOptions.find((o) => o.value === value)?.title ?? value;
@@ -42,6 +40,7 @@ export interface ReportInput {
   rooms: { key: string; label: string }[];
   investmentLine: string;
   executionLevel: string;
+  imageCandidates: ReportImageCandidates;
 }
 
 export function buildReportInput(state: HomeDnaState): ReportInput {
@@ -112,5 +111,6 @@ export function buildReportInput(state: HomeDnaState): ReportInput {
     rooms: selected.map((key) => ({ key, label: roomLabel(key) })),
     investmentLine: est ? `${est.min} – ${est.max} EUR` : "Ocena bo pripravljena po posvetu",
     executionLevel: level,
+    imageCandidates: buildReportImageCandidates(state),
   };
 }
