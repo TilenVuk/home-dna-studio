@@ -31,7 +31,8 @@ export interface ReportPdfData {
   roomKeyByLabel: Record<string, RoomKey>;
 }
 
-  const { jsPDF } = await import("jspdf");
+export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
+
 
   const doc = new jsPDF({
     unit: "mm",
