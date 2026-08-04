@@ -183,7 +183,7 @@ export const styleOptions: VisualOption[] = [
     value: "contemporary-minimal",
     title: "Sodobno minimalistično",
     description: "Mirne površine, skrito shranjevanje in minimalen vizualni šum.",
-    image: styleMinimal,
+    image: styleMinimal.url,
   },
   {
     value: "scandinavian",
