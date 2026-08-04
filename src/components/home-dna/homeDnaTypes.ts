@@ -174,6 +174,100 @@ export interface HomeDnaState {
   contact: ContactState;
 }
 
+export type ReportImageId =
+  | "hero-interior"
+  | "lifestyle-intro"
+  | "lifestyle-people"
+  | "style-intro"
+  | "detail-material"
+  | "property-house"
+  | "property-apartment"
+  | "property-holiday"
+  | "stage-new-build"
+  | "stage-full-renovation"
+  | "stage-partial-renovation"
+  | "style-warm-modern"
+  | "style-minimal"
+  | "style-scandinavian"
+  | "style-japandi"
+  | "style-natural"
+  | "style-classic"
+  | "style-dark"
+  | "style-rustic"
+  | "colour-light"
+  | "colour-earthy"
+  | "colour-neutral"
+  | "colour-dark"
+  | "project-kitchen"
+  | "project-wardrobe"
+  | "project-living"
+  | "project-entry"
+  | "project-utility"
+  | "project-bathroom"
+  | "project-office"
+  | "kitchen-layout-linear"
+  | "kitchen-layout-l"
+  | "kitchen-layout-u"
+  | "kitchen-layout-island"
+  | "worktop-laminate"
+  | "worktop-premium-laminate"
+  | "worktop-quartz"
+  | "worktop-stone"
+  | "wardrobe-hinged"
+  | "wardrobe-sliding"
+  | "wardrobe-open"
+  | "investment-essential"
+  | "investment-considered"
+  | "investment-signature"
+  | "report-kitchen-social"
+  | "report-wardrobe-organised"
+  | "report-living-family"
+  | "report-entry-family"
+  | "report-utility-organised"
+  | "report-bathroom-calm"
+  | "report-office-focus";
+
+export interface ReportImageChoice {
+  id: ReportImageId;
+  label: string;
+}
+
+export interface ReportImageCandidates {
+  cover: ReportImageChoice[];
+  lifestyle: ReportImageChoice[];
+  style: ReportImageChoice[];
+  rooms: Array<{
+    key: RoomKey;
+    label: string;
+    images: ReportImageChoice[];
+  }>;
+}
+
+export interface HomeDnaReportImages {
+  coverImageId: ReportImageId;
+  lifestyleImageId: ReportImageId;
+  styleImageIds: ReportImageId[];
+}
+
+export interface HomeDnaReportRoom {
+  key: RoomKey;
+  label: string;
+  text: string;
+  imageId: ReportImageId;
+}
+
+export interface HomeDnaReportData {
+  intro: string;
+  lifestyle: string;
+  style: string;
+  why: string;
+  images: HomeDnaReportImages;
+  rooms: HomeDnaReportRoom[];
+  investment: string;
+  nextSteps: Array<{ title: string; text: string }>;
+  closing: string;
+}
+
 export interface RoomOption {
   key: RoomKey;
   title: string;
