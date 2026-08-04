@@ -69,6 +69,8 @@ export function HomeDnaReport({ state }: { state: HomeDnaState }) {
 
   const investmentRange = est ? `${formatEuro(est.min)} – ${formatEuro(est.max)}` : "Po posvetu";
 
+  const readyReport = report;
+
   async function handleDownload() {
     if (pdfBusy) return;
 
@@ -79,7 +81,7 @@ export function HomeDnaReport({ state }: { state: HomeDnaState }) {
       const roomKeyByLabel = Object.fromEntries(reportRooms(state).map((key) => [roomLabel(key), key] as const));
 
       const pdfPromise = generateHomeDnaPdf({
-        report,
+        report: readyReport,
         customerName: state.contact.name ?? "",
         investmentRange,
         executionLevel,
