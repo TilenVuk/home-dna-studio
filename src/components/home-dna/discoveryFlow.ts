@@ -1,6 +1,3 @@
-import heroInterior from "@/assets/hero-interior.jpg";
-import styleIntroImage from "@/assets/style-intro.jpg";
-import lifestylePeople from "@/assets/lifestyle-people.jpg";
 import {
   challengeOptions,
   futureNeedsOptions,
@@ -20,7 +17,7 @@ import {
   projectStageOptions,
   propertyTypeOptions,
 } from "./homeDnaData";
-import { roomIntroImages, roomModuleBuilders, roomModuleOrder } from "./roomModules";
+import { roomModuleBuilders, roomModuleOrder } from "./roomModules";
 import { hasRoom, type ScreenDef } from "./screenDef";
 import { calculateInvestment } from "./pricing";
 import type {
@@ -44,26 +41,12 @@ function homeScreens(state: HomeDnaState): ScreenDef[] {
   const home = state.home;
   const screens: ScreenDef[] = [
     {
-      kind: "editorial",
-      key: "about-intro",
-      eyebrow: "O vašem domu",
-      headline: "Najprej spoznajmo ljudi, ki bodo v domu živeli.",
-      body: "Nekaj kratkih vprašanj o vašem gospodinjstvu nam pove, koliko prostora, shranjevanja in vzdržljivosti mora dom prenesti.",
-      cta: "Začnimo",
-      image: heroInterior,
-    },
-    {
       kind: "choice",
       key: "household-size",
       headline: "Koliko ljudi bo uporabljalo ta dom?",
       support: "Dom mora delovati za vsakogar, ki v njem živi.",
       options: householdSizeOptions.map((o) => ({ value: o, label: o })),
-      value:
-        home.householdSize === undefined
-          ? undefined
-          : home.householdSizePlus
-            ? "5+"
-            : String(home.householdSize),
+      value: home.householdSize === undefined ? undefined : home.householdSizePlus ? "5+" : String(home.householdSize),
       apply: (s, value) => ({
         ...s,
         home: {
@@ -127,8 +110,7 @@ function homeScreens(state: HomeDnaState): ScreenDef[] {
       kind: "visual",
       key: "project-stage",
       headline: "V kateri fazi je vaš projekt?",
-      support:
-        "Kontekst projekta nam pomaga pripraviti priporočila, primerna za vaš prostor in časovni okvir.",
+      support: "Kontekst projekta nam pomaga pripraviti priporočila, primerna za vaš prostor in časovni okvir.",
       options: projectStageOptions,
       value: home.projectStage,
       apply: (s, v) => ({ ...s, home: { ...s.home, projectStage: v as ProjectStage } }),
@@ -157,15 +139,6 @@ function homeScreens(state: HomeDnaState): ScreenDef[] {
 function styleScreens(state: HomeDnaState): ScreenDef[] {
   const style = state.style;
   return [
-    {
-      kind: "editorial",
-      key: "style-intro",
-      eyebrow: "Vaš slog",
-      headline: "Dom naj odraža ljudi, ki bodo v njem živeli.",
-      body: "Ne iščemo kratkotrajnega trenda. Iščemo oblikovalski jezik, v katerem si lahko predstavljate živeti še vrsto let.",
-      cta: "Odkrijmo vaš slog",
-      image: styleIntroImage,
-    },
     {
       kind: "styles",
       key: "style-selection",
@@ -209,15 +182,6 @@ function styleScreens(state: HomeDnaState): ScreenDef[] {
 function lifestyleScreens(state: HomeDnaState): ScreenDef[] {
   const life = state.lifestyle;
   const screens: ScreenDef[] = [
-    {
-      kind: "editorial",
-      key: "lifestyle-intro",
-      eyebrow: "Vaš način življenja",
-      headline: "Dober dom podpira vsakdan, ne le videza.",
-      body: "Zdaj želimo razumeti, kaj vam je pomembno, kaj vas v trenutnem domu ovira in kako naj prostor deluje v prihodnje.",
-      cta: "Nadaljujmo",
-      image: lifestylePeople,
-    },
     {
       kind: "multi",
       key: "lifestyle",
@@ -306,28 +270,12 @@ function closingScreens(state: HomeDnaState): ScreenDef[] {
 
 export function buildDiscoveryFlow(state: HomeDnaState): ScreenDef[] {
   const activeRooms = roomModuleOrder.filter((room) => hasRoom(state, room));
-  const firstRoom = activeRooms[0];
-
-  const roomIntro: ScreenDef[] = activeRooms.length
-    ? [
-        {
-          kind: "editorial",
-          key: "rooms-intro",
-          eyebrow: "Vaši prostori",
-          headline: "Zdaj bomo vsak izbrani prostor prilagodili vašim dejanskim potrebam.",
-          body: "Zanimajo nas približne mere in način uporabe. Natančne meritve bomo izvedli kasneje.",
-          cta: "Začnimo",
-          image: (firstRoom && roomIntroImages[firstRoom]) ?? heroInterior,
-        },
-      ]
-    : [];
 
   return [
     { kind: "welcome", key: "welcome" },
     ...homeScreens(state),
     ...styleScreens(state),
     ...lifestyleScreens(state),
-    ...roomIntro,
     ...activeRooms.flatMap((room) => roomModuleBuilders[room]?.(state) ?? []),
     ...closingScreens(state),
   ];
