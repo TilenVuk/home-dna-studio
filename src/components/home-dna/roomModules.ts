@@ -4,7 +4,8 @@ import projectLiving from "@/assets/project-living.jpg";
 import projectHall from "@/assets/project-hall.jpg";
 import projectUtility from "@/assets/project-utility.jpg";
 import projectBathroom from "@/assets/project-bathroom.jpg";
-import projectOffice from "@/assets/project-office.jpg";
+import projectBedroom from "@/assets/project-bedroom.jpg";
+import projectChildRoom from "@/assets/project-child-room.jpg";
 import {
   kitchenLayoutOptions,
   wardrobeDoorOptions,
@@ -50,16 +51,33 @@ const bathroomLaundryFeature = "Prostor za perilo";
 const bathroomMirrorFeature = "Ogledalna omarica";
 const bathroomCleaningFeature = "Shranjevanje za čistila";
 
-const noOfficeFeatures = "Brez dodatkov";
-const officePrinterFeature = "Mesto za tiskalnik";
-const officeDocumentsFeature = "Shranjevanje za dokumente";
-const officeBooksFeature = "Prostor za knjige";
-const officeCablesFeature = "Skrita napeljava kablov";
+const bedroomWardrobe = "Vgradna garderobna omara";
+const bedroomBedFrame = "Postelja z vzglavjem";
+const bedroomBedsideTables = "Nočni omarici";
+const bedroomDressingTable = "Toaletna mizica ali konzola";
+const bedroomTvWall = "TV-stena";
+const noBedroomFeatures = "Brez dodatkov";
+const bedroomLedFeature = "Integrirana LED osvetlitev";
+const bedroomMirrorFeature = "Ogledalo";
+const bedroomUpholsteredFeature = "Tapecirano vzglavje";
+
+const childWardrobe = "Vgradna omara";
+const childBedStorage = "Postelja s shranjevanjem";
+const childDesk = "Pisalna miza";
+const childOpenStorage = "Odprte police ali regali";
+const noChildRoomFeatures = "Brez dodatkov";
+const childAdaptableFeature = "Pohištvo, prilagodljivo starosti";
+const childLedFeature = "Integrirana LED osvetlitev";
+const childDisplayFeature = "Magnetna ali razstavna stena";
 
 function selectedFeatures(entries: Array<[label: string, value: boolean | undefined]>, noneLabel: string): string[] {
   const selected = entries.filter(([, value]) => value === true).map(([label]) => label);
   if (selected.length > 0) return selected;
   return entries.every(([, value]) => value !== undefined) ? [noneLabel] : [];
+}
+
+function selectedBooleanOptions(entries: Array<[label: string, value: boolean | undefined]>): string[] {
+  return entries.filter(([, value]) => value === true).map(([label]) => label);
 }
 
 /* ---------------- kitchen ---------------- */
@@ -181,24 +199,6 @@ function kitchenScreens(state: HomeDnaState): ScreenDef[] {
     },
     {
       kind: "choice",
-      key: "kitchen-tall-units",
-      headline: "Koliko visokih omar približno potrebujete?",
-      options: [
-        { value: "0", label: "Nobene" },
-        { value: "1", label: "1" },
-        { value: "2", label: "2" },
-        { value: "3", label: "3" },
-        { value: "4+", label: "4+" },
-      ],
-      value: k.tallUnits === undefined ? undefined : k.tallUnitsPlus ? "4+" : String(k.tallUnits),
-      apply: (s, v) =>
-        setRoom(s, "kitchen", {
-          tallUnits: v === "4+" ? 4 : Number(v),
-          tallUnitsPlus: v === "4+",
-        }),
-    },
-    {
-      kind: "choice",
       key: "kitchen-pantry",
       headline: "Želite namensko rešitev za shrambo?",
       options: [
@@ -239,33 +239,6 @@ function kitchenScreens(state: HomeDnaState): ScreenDef[] {
       },
     },
   );
-
-  if (k.hasLed) {
-    screens.push({
-      kind: "number",
-      key: "kitchen-led-length",
-      headline: "Približno koliko metrov LED osvetlitve?",
-      support: "Zadostuje ocena tekočih metrov pod zgornjimi elementi.",
-      unit: "m",
-      min: 0.5,
-      max: 20,
-      value: k.ledLength ? k.ledLength / 100 : undefined,
-      apply: (s, v) => setRoom(s, "kitchen", { ledLength: Math.round(v * 100) }),
-    });
-  }
-
-  if (k.hasGlassFronts) {
-    screens.push({
-      kind: "number",
-      key: "kitchen-glass-length",
-      headline: "Približno koliko metrov steklenih front?",
-      unit: "m",
-      min: 0.5,
-      max: 10,
-      value: k.glassFrontLength ? k.glassFrontLength / 100 : undefined,
-      apply: (s, v) => setRoom(s, "kitchen", { glassFrontLength: Math.round(v * 100) }),
-    });
-  }
 
   return screens;
 }
@@ -780,111 +753,172 @@ function bathroomScreens(state: HomeDnaState): ScreenDef[] {
   ];
 }
 
-/* ---------------- home office ---------------- */
+/* ---------------- bedroom ---------------- */
 
-function officeScreens(state: HomeDnaState): ScreenDef[] {
-  const o = state.rooms.homeOffice ?? {};
+function bedroomScreens(state: HomeDnaState): ScreenDef[] {
+  const b = state.rooms.bedroom ?? {};
   const screens: ScreenDef[] = [
     {
       kind: "editorial",
-      key: "office-intro",
-      eyebrow: "Domača pisarna",
-      headline: "Delovno okolje mora podpirati osredotočenost in ostati urejeno po koncu dneva.",
-      body: "Zanima nas, kdo prostor uporablja in kaj mora sprejeti.",
-      cta: "Nadaljujmo",
-      image: projectOffice,
+      key: "bedroom-intro",
+      eyebrow: "Spalnica",
+      headline: "Spalnica naj združi umirjenost, shranjevanje in udobje brez vizualnega nemira.",
+      body: "Zanima nas, katere elemente želite izdelati po meri in koliko prostora jim lahko namenite.",
+      cta: "Načrtujmo spalnico",
+      image: projectBedroom,
       prominentEyebrow: true,
     },
     {
-      kind: "choice",
-      key: "office-users",
-      headline: "Koliko ljudi bo uporabljalo delovni prostor?",
-      options: [
-        { value: "1", label: "1" },
-        { value: "2", label: "2" },
-      ],
-      value: o.users === undefined ? undefined : String(o.users),
-      apply: (s, v) => setRoom(s, "homeOffice", { users: Number(v) as 1 | 2 }),
+      kind: "multi",
+      key: "bedroom-furniture",
+      headline: "Katere elemente želite vključiti v spalnico?",
+      support: "Izberite vse elemente, ki naj bodo del celostne rešitve po meri.",
+      options: [bedroomWardrobe, bedroomBedFrame, bedroomBedsideTables, bedroomDressingTable, bedroomTvWall],
+      selected: selectedBooleanOptions([
+        [bedroomWardrobe, b.wardrobe],
+        [bedroomBedFrame, b.bedFrame],
+        [bedroomBedsideTables, b.bedsideTables],
+        [bedroomDressingTable, b.dressingTable],
+        [bedroomTvWall, b.tvWall],
+      ]),
+      apply: (s, features) =>
+        setRoom(s, "bedroom", {
+          wardrobe: features.includes(bedroomWardrobe),
+          bedFrame: features.includes(bedroomBedFrame),
+          bedsideTables: features.includes(bedroomBedsideTables),
+          dressingTable: features.includes(bedroomDressingTable),
+          tvWall: features.includes(bedroomTvWall),
+        }),
     },
     {
-      kind: "choice",
-      key: "office-desk-width",
-      headline: "Kako široko delovno mizo želite?",
-      options: [
-        { value: "120", label: "120 cm" },
-        { value: "160", label: "160 cm" },
-        { value: "200", label: "200 cm" },
-        { value: "custom", label: "Po meri" },
-      ],
-      value:
-        o.deskWidth === undefined ? undefined : [120, 160, 200].includes(o.deskWidth) ? String(o.deskWidth) : "custom",
-      apply: (s, v) =>
-        v === "custom"
-          ? setRoom(s, "homeOffice", { deskWidth: 0 })
-          : setRoom(s, "homeOffice", { deskWidth: Number(v) }),
+      kind: "number",
+      key: "bedroom-furniture-width",
+      headline: "Kolikšna je skupna dolžina pohištva po meri?",
+      support: "Seštejte približno dolžino omare, posteljnega sestava in drugih izbranih elementov.",
+      unit: "cm",
+      min: 100,
+      max: 1200,
+      presets: [250, 350, 450, 600],
+      value: b.furnitureWidth,
+      apply: (s, furnitureWidth) => setRoom(s, "bedroom", { furnitureWidth }),
     },
   ];
 
-  const custom = o.deskWidth !== undefined && ![120, 160, 200].includes(o.deskWidth);
-  if (custom) {
+  if (b.bedFrame) {
     screens.push({
-      kind: "number",
-      key: "office-desk-custom",
-      headline: "Kako široka naj bo miza po meri?",
-      unit: "cm",
-      min: 80,
-      max: 400,
-      value: o.deskWidth ? o.deskWidth : undefined,
-      apply: (s, v) => setRoom(s, "homeOffice", { deskWidth: v }),
+      kind: "choice",
+      key: "bedroom-bed-width",
+      headline: "Kako široko posteljo načrtujete?",
+      options: [
+        { value: "140", label: "140 cm" },
+        { value: "160", label: "160 cm" },
+        { value: "180", label: "180 cm" },
+        { value: "200", label: "200 cm" },
+      ],
+      value: b.bedWidth,
+      apply: (s, bedWidth) => setRoom(s, "bedroom", { bedWidth: bedWidth as NonNullable<typeof b.bedWidth> }),
     });
   }
 
-  screens.push(
-    {
-      kind: "choice",
-      key: "office-monitors",
-      headline: "Koliko zaslonov uporabljate?",
-      options: [
-        { value: "1", label: "1" },
-        { value: "2", label: "2" },
-        { value: "3+", label: "3+" },
+  screens.push({
+    kind: "multi",
+    key: "bedroom-features",
+    headline: "Katere dodatke želite v spalnici?",
+    support: "Izberite vse želene dodatke ali možnost brez dodatkov.",
+    options: [bedroomLedFeature, bedroomMirrorFeature, bedroomUpholsteredFeature, noBedroomFeatures],
+    exclusive: noBedroomFeatures,
+    selected: selectedFeatures(
+      [
+        [bedroomLedFeature, b.led],
+        [bedroomMirrorFeature, b.mirror],
+        [bedroomUpholsteredFeature, b.upholsteredHeadboard],
       ],
-      value: o.monitors,
-      apply: (s, monitors) => setRoom(s, "homeOffice", { monitors }),
+      noBedroomFeatures,
+    ),
+    apply: (s, features) =>
+      setRoom(s, "bedroom", {
+        led: features.includes(bedroomLedFeature),
+        mirror: features.includes(bedroomMirrorFeature),
+        upholsteredHeadboard: features.includes(bedroomUpholsteredFeature),
+      }),
+  });
+
+  return screens;
+}
+
+/* ---------------- children's rooms ---------------- */
+
+function childrenRoomScreens(state: HomeDnaState): ScreenDef[] {
+  const c = state.rooms.childrenRoom ?? {};
+  const quantity = state.home.childrenCount ?? 1;
+  const quantityLabel = `${quantity}${state.home.childrenCountPlus ? "+" : ""}`;
+
+  return [
+    {
+      kind: "editorial",
+      key: "children-room-intro",
+      eyebrow: `Otroške sobe · ${quantityLabel}`,
+      headline: `En skupen koncept bomo prilagodili za ${quantityLabel} ${quantity === 1 ? "otroško sobo" : "otroške sobe"}.`,
+      body: "Odgovori veljajo za posamezno sobo, okvirna investicija pa se samodejno pomnoži s številom otrok.",
+      cta: "Načrtujmo otroške sobe",
+      image: projectChildRoom,
+      prominentEyebrow: true,
     },
     {
       kind: "multi",
-      key: "office-features",
-      headline: "Kaj še potrebuje domača pisarna?",
-      support: "Izberite vse želene rešitve ali možnost brez dodatkov.",
-      options: [
-        officePrinterFeature,
-        officeDocumentsFeature,
-        officeBooksFeature,
-        officeCablesFeature,
-        noOfficeFeatures,
-      ],
-      exclusive: noOfficeFeatures,
-      selected: selectedFeatures(
-        [
-          [officePrinterFeature, o.printerStorage],
-          [officeDocumentsFeature, o.documentStorage],
-          [officeBooksFeature, o.books],
-          [officeCablesFeature, o.cableManagement],
-        ],
-        noOfficeFeatures,
-      ),
+      key: "children-room-furniture",
+      headline: "Kaj naj vključuje posamezna otroška soba?",
+      support: "Izberite vse elemente, ki naj bodo del rešitve po meri.",
+      options: [childWardrobe, childBedStorage, childDesk, childOpenStorage],
+      selected: selectedBooleanOptions([
+        [childWardrobe, c.wardrobe],
+        [childBedStorage, c.bedWithStorage],
+        [childDesk, c.desk],
+        [childOpenStorage, c.openStorage],
+      ]),
       apply: (s, features) =>
-        setRoom(s, "homeOffice", {
-          printerStorage: features.includes(officePrinterFeature),
-          documentStorage: features.includes(officeDocumentsFeature),
-          books: features.includes(officeBooksFeature),
-          cableManagement: features.includes(officeCablesFeature),
+        setRoom(s, "childrenRoom", {
+          wardrobe: features.includes(childWardrobe),
+          bedWithStorage: features.includes(childBedStorage),
+          desk: features.includes(childDesk),
+          openStorage: features.includes(childOpenStorage),
         }),
     },
-  );
-
-  return screens;
+    {
+      kind: "number",
+      key: "children-room-furniture-width",
+      headline: "Kolikšna je skupna dolžina pohištva po meri v eni sobi?",
+      support: "Vnesite približno skupno dolžino omare, postelje, mize in shranjevalnih elementov v posamezni sobi.",
+      unit: "cm",
+      min: 100,
+      max: 1000,
+      presets: [250, 300, 400, 500],
+      value: c.furnitureWidth,
+      apply: (s, furnitureWidth) => setRoom(s, "childrenRoom", { furnitureWidth }),
+    },
+    {
+      kind: "multi",
+      key: "children-room-features",
+      headline: "Katere dodatke želite v otroških sobah?",
+      support: "Izbor velja za vsako otroško sobo.",
+      options: [childAdaptableFeature, childLedFeature, childDisplayFeature, noChildRoomFeatures],
+      exclusive: noChildRoomFeatures,
+      selected: selectedFeatures(
+        [
+          [childAdaptableFeature, c.adaptableFurniture],
+          [childLedFeature, c.led],
+          [childDisplayFeature, c.displayBoard],
+        ],
+        noChildRoomFeatures,
+      ),
+      apply: (s, features) =>
+        setRoom(s, "childrenRoom", {
+          adaptableFurniture: features.includes(childAdaptableFeature),
+          led: features.includes(childLedFeature),
+          displayBoard: features.includes(childDisplayFeature),
+        }),
+    },
+  ];
 }
 
 export const roomModuleOrder: RoomKey[] = [
@@ -894,7 +928,8 @@ export const roomModuleOrder: RoomKey[] = [
   "entry-hall",
   "utility-room",
   "bathroom",
-  "home-office",
+  "bedroom",
+  "children-room",
 ];
 
 export const roomModuleBuilders: Record<string, (state: HomeDnaState) => ScreenDef[]> = {
@@ -904,7 +939,8 @@ export const roomModuleBuilders: Record<string, (state: HomeDnaState) => ScreenD
   "entry-hall": entryHallScreens,
   "utility-room": utilityScreens,
   bathroom: bathroomScreens,
-  "home-office": officeScreens,
+  bedroom: bedroomScreens,
+  "children-room": childrenRoomScreens,
 };
 
 export const roomIntroImages: Record<string, string> = {
@@ -914,5 +950,6 @@ export const roomIntroImages: Record<string, string> = {
   "entry-hall": projectHall,
   "utility-room": projectUtility,
   bathroom: projectBathroom,
-  "home-office": projectOffice,
+  bedroom: projectBedroom,
+  "children-room": projectChildRoom,
 };
