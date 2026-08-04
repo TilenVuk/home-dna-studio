@@ -13,7 +13,7 @@ import stagePartialRenovation from "@/assets/stage-partial-renovation.jpg";
 import propertyHouse from "@/assets/property-house.jpg";
 import propertyApartment from "@/assets/property-apartment.jpg";
 import propertyHoliday from "@/assets/property-holiday.jpg";
-import styleMinimal from "@/assets/style-minimal.jpg";
+import styleMinimal from "@/assets/style-minimal.jpg.asset.json";
 import styleScandinavian from "@/assets/style-scandinavian.jpg";
 import styleJapandi from "@/assets/style-japandi.jpg";
 import styleNatural from "@/assets/style-natural.jpg";
