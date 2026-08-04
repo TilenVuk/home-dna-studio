@@ -16,14 +16,11 @@ export function ScreenShell({
   const headingRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
-    headingRef.current?.focus();
+    headingRef.current?.focus({ preventScroll: true });
   }, [screenKey]);
 
   return (
-    <div
-      key={screenKey}
-      className="animate-[hd-enter_260ms_ease-out] motion-reduce:animate-none"
-    >
+    <div key={screenKey} className="animate-[hd-enter_260ms_ease-out] motion-reduce:animate-none">
       {eyebrow && <p className="eyebrow">{eyebrow}</p>}
       <h1
         ref={headingRef}
@@ -32,11 +29,7 @@ export function ScreenShell({
       >
         {headline}
       </h1>
-      {support && (
-        <p className="mt-6 max-w-[58ch] text-base leading-relaxed text-muted-foreground">
-          {support}
-        </p>
-      )}
+      {support && <p className="mt-6 max-w-[58ch] text-base leading-relaxed text-muted-foreground">{support}</p>}
       {children}
     </div>
   );
