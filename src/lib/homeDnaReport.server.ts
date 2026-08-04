@@ -1,5 +1,6 @@
 import { generateText, NoObjectGeneratedError, Output } from "ai";
 import { z } from "zod";
+import type { HomeDnaReportData, ReportImageId, RoomKey } from "@/components/home-dna/homeDnaTypes";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 
 const ReportSchema = z.object({
@@ -7,21 +8,27 @@ const ReportSchema = z.object({
   lifestyle: z.string(),
   style: z.string(),
   why: z.string(),
-  rooms: z.array(z.object({ label: z.string(), text: z.string() })),
+  images: z.object({
+    coverImageId: z.string(),
+    lifestyleImageId: z.string(),
+    styleImageIds: z.array(z.string()).min(1).max(2),
+  }),
+  rooms: z.array(
+    z.object({
+      key: z.string(),
+      label: z.string(),
+      text: z.string(),
+      imageId: z.string(),
+    }),
+  ),
   investment: z.string(),
-  nextSteps: z.array(z.object({ title: z.string(), text: z.string() })),
+  nextSteps: z.array(z.object({ title: z.string(), text: z.string() })).length(3),
   closing: z.string(),
 });
 
-export interface HomeDnaReportData {
-  intro: string;
-  lifestyle: string;
-  style: string;
-  why: string;
-  rooms: Array<{ label: string; text: string }>;
-  investment: string;
-  nextSteps: Array<{ title: string; text: string }>;
-  closing: string;
+interface ImageChoice {
+  id: string;
+  label: string;
 }
 
 interface ReportRequest {
@@ -29,41 +36,50 @@ interface ReportRequest {
   rooms: Array<{ key: string; label: string }>;
   investmentLine: string;
   executionLevel: string;
+  imageCandidates: {
+    cover: ImageChoice[];
+    lifestyle: ImageChoice[];
+    style: ImageChoice[];
+    rooms: Array<{ key: string; label: string; images: ImageChoice[] }>;
+  };
 }
 
 const SYSTEM = [
-  "Ti si izkušen notranji oblikovalec studia WOLF STUDIO in pišeš osebno pripravljeno poročilo Home DNA™ za stranko.",
-  "Pišeš izključno v slovenščini, v prvi osebi množine (mi, vaša ekipa Wolf Studio).",
-  "Ton: premijski, strokoven, topel, oseben in jasen.",
-  "Izogibaj se marketinškim frazam, pretiranemu razkošnemu besedišču in tehničnemu mizarskemu izrazoslovju.",
-  "Nikoli ne omenjaj umetne inteligence, modelov, vprašalnika, obrazca ali podatkov iz obrazca.",
-  "Piši tekoče odstavke brez naštevanja s pomišljaji. Poročilo naj bo jedrnato, berljivo in navdihujoče.",
+  "Pišeš osebno Home DNA™ poročilo za WOLF STUDIO.",
+  "Piši samo slovensko, v prvi osebi množine, strokovno, toplo in jedrnato.",
+  "Ne omenjaj AI-ja, vprašalnika, obrazca ali načina zbiranja podatkov.",
+  "Ne uporabljaj praznih marketinških fraz ali tehničnega mizarskega žargona.",
+  "Vsak odstavek naj poda novo, konkretno vrednost in naj ostane znotraj zahtevane omejitve besed.",
+  "Za slike uporabi izključno dobesedne ID-je iz ponujenega seznama.",
 ].join(" ");
 
-export async function createHomeDnaReport(
-  data: ReportRequest,
-  apiKey: string,
-): Promise<HomeDnaReportData> {
+export async function createHomeDnaReport(data: ReportRequest, apiKey: string): Promise<HomeDnaReportData> {
   const gateway = createLovableAiGatewayProvider(apiKey, undefined, {
     structuredOutputs: true,
   });
 
   const prompt = [
-    "Podatki o projektu stranke:",
+    "PROJEKT",
     data.summary,
-    "",
-    `Okvirna investicija: ${data.investmentLine}`,
+    `Investicija: ${data.investmentLine}`,
     `Raven izvedbe: ${data.executionLevel}`,
     "",
-    "Napiši poročilo z naslednjimi deli:",
-    "intro: 3–5 stavkov osebnega uvoda (za koga je projekt, celotna vizija, kaj ta dom dela poseben).",
-    "lifestyle: povzetek življenjskega sloga (vsakodnevne rutine, prioritete, trenutni izzivi, prihodnje potrebe) in kako naj dom podpira njihov vsakdan. 1–2 odstavka.",
-    "style: opis izbranih slogov, vzdušja in barvne smeri. Če je stranka dodala povezavo z navdihom, omeni, da jo bomo upoštevali pri oblikovanju.",
-    "why: naslov razdelka je 'Zakaj bo ta dom deloval za vas'. Med 80 in 120 besedami poveži življenjski slog, gospodinjstvo, izbrani slog, trenutne izzive, prihodnje potrebe in izbrane prostore v eno osebno zgodbo ter pojasni, kako se te odločitve povezujejo v dom, ki podpira njihov vsakdan. Ne ponavljaj že napisanega iz prejšnjih razdelkov in ne naštevaj odgovorov; piši tekoče in naravno.",
-    `rooms: priporočila SAMO za te prostore, v tem vrstnem redu: ${data.rooms.map((room) => room.label).join(", ")}. Za vsak prostor uporabi točno ta zapis oznake (label) in v 3–5 stavkih pojasni, čemu dati prednost, ključna funkcionalna priporočila in ideje za organizacijo. Ne dodajaj drugih prostorov.`,
-    "investment: kratko pojasnilo, da gre za okvirno oceno in da bo končna ponudba pripravljena po posvetu in izmerah. Ne pojasnjuj izračuna in ne navajaj številk.",
-    "nextSteps: točno trije koraki (Posvet, Izmere, Končni oblikovalski predlog), vsak z naslovom in 1–2 stavkoma.",
-    "closing: en topel zaključni stavek s povabilom, da projekt nadaljujemo skupaj.",
+    "BESEDILO",
+    "intro: največ 45 besed; osebni uvod in osrednja vizija.",
+    "lifestyle: največ 55 besed; vsakdanje rutine, prioritete in prihodnje potrebe.",
+    "style: največ 45 besed; slog, vzdušje, barve in ključni materiali.",
+    "why: največ 65 besed; poveži ljudi, način življenja in prostorske odločitve brez ponavljanja.",
+    `rooms: samo ${data.rooms.map((room) => `${room.key} (${room.label})`).join(", ")}; ohrani vrstni red, key in label; za vsak prostor največ 55 besed oziroma 2–3 konkretne povedi.`,
+    "investment: največ 30 besed; ocena je okvirna, končna ponudba sledi po posvetu in izmerah; brez številk.",
+    "nextSteps: natanko Posvet, Izmere, Končni oblikovalski predlog; opis vsakega največ 18 besed.",
+    "closing: največ 16 besed.",
+    "",
+    "IZBOR SLIK",
+    `Naslovnica: ${formatChoices(data.imageCandidates.cover)}`,
+    `Življenjski slog: ${formatChoices(data.imageCandidates.lifestyle)}`,
+    `Slog (izberi 1 ali 2 različni): ${formatChoices(data.imageCandidates.style)}`,
+    ...data.imageCandidates.rooms.map((room) => `${room.key} (${room.label}): ${formatChoices(room.images)}`),
+    "Izberi sliko, ki najbolje podpira vsebino posameznega razdelka. Ne vračaj URL-jev ali opisov namesto ID-ja.",
   ].join("\n");
 
   try {
@@ -72,13 +88,14 @@ export async function createHomeDnaReport(
       output: Output.object({ schema: ReportSchema }),
       system: SYSTEM,
       prompt,
-      maxOutputTokens: 8000,
+      maxOutputTokens: 4_000,
     });
-    return output;
+
+    return normalizeReport(output, data);
   } catch (error) {
     if (!NoObjectGeneratedError.isInstance(error)) throw error;
 
-    const recovered = recoverReport(error.text, data.rooms);
+    const recovered = recoverReport(error.text, data);
     if (recovered) return recovered;
 
     console.error("HomeDnaReport: invalid structured response", {
@@ -90,91 +107,116 @@ export async function createHomeDnaReport(
   }
 }
 
-function recoverReport(
-  text: string | undefined,
-  requestedRooms: Array<{ label: string }>,
-): HomeDnaReportData | null {
-  const value = parseJsonObject(text);
-  if (!value) return null;
+function formatChoices(choices: ImageChoice[]): string {
+  return choices.map((choice) => `${choice.id} (${choice.label})`).join(", ") || "brez izbire";
+}
 
-  const source = asRecord(value);
-  if (!source) return null;
+function normalizeReport(raw: z.infer<typeof ReportSchema>, data: ReportRequest): HomeDnaReportData {
+  const rawRooms = Array.isArray(raw.rooms) ? raw.rooms : [];
+  const rooms = data.rooms.map((requestedRoom, index) => {
+    const generatedRoom =
+      rawRooms.find((room) => room.key === requestedRoom.key) ??
+      rawRooms.find((room) => room.label === requestedRoom.label) ??
+      rawRooms[index];
+    const candidates = data.imageCandidates.rooms.find((room) => room.key === requestedRoom.key)?.images ?? [];
 
-  const rooms = normalizeRooms(source["rooms"], requestedRooms);
-  const nextSteps = normalizeSteps(source["nextSteps"] ?? source["next_steps"]);
-  const candidate = {
-    intro: asText(source["intro"]),
-    lifestyle: asText(source["lifestyle"]),
-    style: asText(source["style"]),
-    why: asText(source["why"]),
+    return {
+      key: requestedRoom.key as RoomKey,
+      label: requestedRoom.label,
+      text: limitWords(
+        generatedRoom?.text ||
+          "Predlagamo jasno razporeditev, dovolj prilagojenega shranjevanja in rešitve, ki poenostavijo vsakodnevno uporabo prostora.",
+        55,
+      ),
+      imageId: pickImageId(generatedRoom?.imageId, candidates, "hero-interior"),
+    };
+  });
+
+  const styleImageIds = normalizeStyleImages(raw.images?.styleImageIds, data.imageCandidates.style);
+
+  const fallbackSteps = [
+    { title: "Posvet", text: "Skupaj preverimo prioritete, slogovno smer in obseg projekta." },
+    {
+      title: "Izmere",
+      text: "Na lokaciji natančno preverimo prostor, priključke in vse ključne mere.",
+    },
+    {
+      title: "Končni oblikovalski predlog",
+      text: "Pripravimo usklajen predlog rešitev, materialov in naslednjih odločitev.",
+    },
+  ];
+
+  const nextSteps = fallbackSteps.map((fallback, index) => {
+    const generated = raw.nextSteps?.[index];
+    return {
+      title: generated?.title?.trim() || fallback.title,
+      text: limitWords(generated?.text || fallback.text, 18),
+    };
+  });
+
+  return {
+    intro: limitWords(raw.intro, 45),
+    lifestyle: limitWords(raw.lifestyle, 55),
+    style: limitWords(raw.style, 45),
+    why: limitWords(raw.why, 65),
+    images: {
+      coverImageId: pickImageId(raw.images?.coverImageId, data.imageCandidates.cover, "hero-interior"),
+      lifestyleImageId: pickImageId(raw.images?.lifestyleImageId, data.imageCandidates.lifestyle, "lifestyle-people"),
+      styleImageIds,
+    },
     rooms,
-    investment: asText(source["investment"]),
+    investment: limitWords(raw.investment, 30),
     nextSteps,
-    closing: asText(source["closing"]),
+    closing: limitWords(raw.closing, 16),
   };
+}
 
-  const parsed = ReportSchema.safeParse(candidate);
-  return parsed.success && Object.values(candidate).every((item) =>
-    Array.isArray(item) ? item.length > 0 : item.length > 0,
-  )
-    ? parsed.data
-    : null;
+function normalizeStyleImages(requestedIds: string[] | undefined, candidates: ImageChoice[]): ReportImageId[] {
+  const allowedIds = new Set(candidates.map((choice) => choice.id));
+  const selected = [...(requestedIds ?? []), ...candidates.map((choice) => choice.id)].filter(
+    (id, index, ids) => allowedIds.has(id) && ids.indexOf(id) === index,
+  );
+
+  return (selected.length ? selected : ["detail-material"]).slice(0, 2) as ReportImageId[];
+}
+
+function pickImageId(requestedId: string | undefined, choices: ImageChoice[], fallback: ReportImageId): ReportImageId {
+  const selected = choices.some((choice) => choice.id === requestedId) ? requestedId : choices[0]?.id;
+  return (selected || fallback) as ReportImageId;
+}
+
+function limitWords(text: string | undefined, maximum: number): string {
+  const normalized = (text ?? "").replace(/\s+/g, " ").trim();
+  if (!normalized) return "";
+
+  const words = normalized.split(" ");
+  if (words.length <= maximum) return normalized;
+
+  return `${words
+    .slice(0, maximum)
+    .join(" ")
+    .replace(/[,:;.!?–—-]+$/u, "")}…`;
+}
+
+function recoverReport(text: string | undefined, data: ReportRequest): HomeDnaReportData | null {
+  const value = parseJsonObject(text);
+  const parsed = ReportSchema.safeParse(value);
+  return parsed.success ? normalizeReport(parsed.data, data) : null;
 }
 
 function parseJsonObject(text?: string): unknown {
   if (!text) return null;
-  const unfenced = text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
+  const unfenced = text
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/i, "")
+    .trim();
   const start = unfenced.indexOf("{");
   const end = unfenced.lastIndexOf("}");
   if (start === -1 || end <= start) return null;
+
   try {
     return JSON.parse(unfenced.slice(start, end + 1));
   } catch {
     return null;
   }
-}
-
-function asRecord(value: unknown): Record<string, unknown> | null {
-  return value && typeof value === "object" && !Array.isArray(value)
-    ? (value as Record<string, unknown>)
-    : null;
-}
-
-function asText(value: unknown): string {
-  if (typeof value === "string") return value.trim();
-  if (Array.isArray(value)) return value.filter((item) => typeof item === "string").join("\n").trim();
-  return "";
-}
-
-function normalizeRooms(
-  value: unknown,
-  requestedRooms: Array<{ label: string }>,
-): Array<{ label: string; text: string }> {
-  if (Array.isArray(value)) {
-    return value.flatMap((item, index) => {
-      const room = asRecord(item);
-      if (!room) return [];
-      const label = asText(room["label"]) || requestedRooms[index]?.label || "";
-      const text = asText(room["text"] ?? room["description"] ?? room["recommendation"]);
-      return label && text ? [{ label, text }] : [];
-    });
-  }
-  const rooms = asRecord(value);
-  return rooms
-    ? Object.entries(rooms).flatMap(([label, room]) => {
-        const text = asText(room);
-        return text ? [{ label, text }] : [];
-      })
-    : [];
-}
-
-function normalizeSteps(value: unknown): Array<{ title: string; text: string }> {
-  if (!Array.isArray(value)) return [];
-  return value.flatMap((item) => {
-    const step = asRecord(item);
-    if (!step) return [];
-    const title = asText(step["title"]);
-    const text = asText(step["text"] ?? step["description"]);
-    return title && text ? [{ title, text }] : [];
-  });
 }
