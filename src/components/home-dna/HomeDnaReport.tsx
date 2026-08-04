@@ -25,27 +25,17 @@ export function HomeDnaReport({ state }: { state: HomeDnaState }) {
 
     started.current = true;
 
-    let active = true;
-
     const input = buildReportInput(state);
 
     generate({ data: input })
       .then((result) => {
-        if (!active) return;
-
         setReport(result);
       })
       .catch((err) => {
         console.error(err);
 
-        if (!active) return;
-
         setError("Poročila trenutno ni bilo mogoče pripraviti.");
       });
-
-    return () => {
-      active = false;
-    };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
