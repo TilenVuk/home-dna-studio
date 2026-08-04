@@ -24,6 +24,12 @@ const childrenLabels: Record<string, string> = {
 
 export const roomLabel = (key: RoomKey) => roomOptions.find((r) => r.key === key)?.title ?? key;
 
+export function roomLabelForState(key: RoomKey, state: HomeDnaState): string {
+  if (key !== "children-room") return roomLabel(key);
+  const count = state.home.childrenCount ?? 1;
+  return `${roomLabel(key)} (${count}${state.home.childrenCountPlus ? "+" : ""})`;
+}
+
 const styleLabel = (value: string) => styleOptions.find((s) => s.value === value)?.title ?? value;
 
 const colourLabel = (value: string) => colourDirectionOptions.find((c) => c.value === value)?.title ?? value;
@@ -63,9 +69,9 @@ export function buildReportInput(state: HomeDnaState): ReportInput {
     home.householdSize ? `${home.householdSize}${home.householdSizePlus ? "+" : ""}` : undefined,
   );
   push("Otroci", home.children ? childrenLabels[home.children] : undefined);
-  push("Število otrok", home.childrenCount);
+  push("Število otrok", home.childrenCount ? `${home.childrenCount}${home.childrenCountPlus ? "+" : ""}` : undefined);
   push("Hišni ljubljenčki", home.pets.join(", "));
-  push("Izbrani prostori", selected.map(roomLabel).join(", "));
+  push("Izbrani prostori", selected.map((key) => roomLabelForState(key, state)).join(", "));
   push("Slogi", style.selectedStyles.map(styleLabel).join(", "));
   push("Vzdušje", style.atmosphere.join(", "));
   push("Barvna smer", style.colourDirection ? colourLabel(style.colourDirection) : undefined);
@@ -91,7 +97,9 @@ export function buildReportInput(state: HomeDnaState): ReportInput {
                   ? rooms.utilityRoom
                   : key === "bathroom"
                     ? rooms.bathroom
-                    : rooms.homeOffice;
+                    : key === "bedroom"
+                      ? rooms.bedroom
+                      : rooms.childrenRoom;
       if (!data) return null;
       const reportData = kitchenData
         ? {
@@ -103,7 +111,7 @@ export function buildReportInput(state: HomeDnaState): ReportInput {
       const entries = Object.entries(reportData)
         .filter(([, v]) => v !== undefined && v !== null && v !== "" && v !== false)
         .map(([k, v]) => `${k}=${Array.isArray(v) ? v.join("/") : String(v)}`);
-      return entries.length ? `${roomLabel(key)}: ${entries.join(", ")}` : null;
+      return entries.length ? `${roomLabelForState(key, state)}: ${entries.join(", ")}` : null;
     })
     .filter(Boolean) as string[];
 
@@ -117,7 +125,7 @@ export function buildReportInput(state: HomeDnaState): ReportInput {
 
   return {
     summary: lines.join("\n"),
-    rooms: selected.map((key) => ({ key, label: roomLabel(key) })),
+    rooms: selected.map((key) => ({ key, label: roomLabelForState(key, state) })),
     investmentLine: est ? `${est.min} – ${est.max} EUR` : "Ocena bo pripravljena po posvetu",
     executionLevel: level,
     imageCandidates: buildReportImageCandidates(state),
