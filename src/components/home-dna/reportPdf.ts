@@ -1,8 +1,6 @@
 import { jsPDF } from "jspdf";
 import type { HomeDnaReport } from "@/lib/homeDnaReport.functions";
-import interTightRegularAsset from "@/assets/fonts/InterTight-Regular.ttf.asset.json";
-import schibstedMediumAsset from "@/assets/fonts/SchibstedGrotesk-Medium.ttf.asset.json";
-import schibstedRegularAsset from "@/assets/fonts/SchibstedGrotesk-Regular.ttf.asset.json";
+import { PDF_FONT_BOLD_BASE64, PDF_FONT_REGULAR_BASE64 } from "./pdfFonts";
 import type { RoomKey } from "./homeDnaTypes";
 
 const PAGE_WIDTH = 210;
@@ -18,8 +16,8 @@ const CONTENT_WIDTH = PAGE_WIDTH - MARGIN_LEFT - MARGIN_RIGHT - TEXT_SAFETY_MARG
 const CONTENT_RIGHT = MARGIN_LEFT + CONTENT_WIDTH;
 const CONTENT_BOTTOM = PAGE_HEIGHT - FOOTER_HEIGHT;
 
-const BODY_FONT = "InterTight";
-const DISPLAY_FONT = "SchibstedGrotesk";
+const BODY_FONT = "DejaVuSans";
+const DISPLAY_FONT = "DejaVuSans";
 
 const COLORS = {
   ink: [26, 26, 24] as const,
@@ -30,10 +28,6 @@ const COLORS = {
 
 type PdfDocument = jsPDF;
 type FontStyle = "normal" | "bold";
-
-interface FontAsset {
-  url: string;
-}
 
 export interface ReportPdfData {
   report: HomeDnaReport;
@@ -52,7 +46,7 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
     putOnlyUsedFonts: true,
   });
 
-  await registerPdfFonts(doc);
+  registerPdfFonts(doc);
 
   const { report } = data;
 
@@ -144,15 +138,15 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
     y += 10;
   };
 
-  addSectionHeading("01", "Dobrodošli v vašem Home DNA™");
+  addSectionHeading("01", "DobrodoÅ¡li v vaÅ¡em Home DNAâ„¢");
   addParagraph(report.intro);
   addDivider();
 
-  addSectionHeading("02", "Vaš življenjski slog");
+  addSectionHeading("02", "VaÅ¡ Å¾ivljenjski slog");
   addParagraph(report.lifestyle);
   addDivider();
 
-  addSectionHeading("03", "Vaš slog");
+  addSectionHeading("03", "VaÅ¡ slog");
   addParagraph(report.style);
   addDivider();
 
@@ -161,7 +155,7 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
   addDivider();
 
   if (report.rooms.length > 0) {
-    addSectionHeading("05", "Priporočila za izbrane prostore");
+    addSectionHeading("05", "PriporoÄila za izbrane prostore");
 
     report.rooms.forEach((room, index) => {
       setFont(doc, DISPLAY_FONT, "bold", 13, COLORS.ink);
@@ -281,45 +275,18 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
   return blob;
 }
 
-async function registerPdfFonts(doc: PdfDocument) {
-  const [bodyRegular, displayRegular, displayMedium] = await Promise.all([
-    loadFontAsset(interTightRegularAsset),
-    loadFontAsset(schibstedRegularAsset),
-    loadFontAsset(schibstedMediumAsset),
-  ]);
+function registerPdfFonts(doc: PdfDocument) {
+  doc.addFileToVFS("DejaVuSans-Pdf.ttf", PDF_FONT_REGULAR_BASE64);
+  doc.addFont("DejaVuSans-Pdf.ttf", BODY_FONT, "normal");
 
-  doc.addFileToVFS("InterTight-Regular.ttf", bodyRegular);
-  doc.addFont("InterTight-Regular.ttf", BODY_FONT, "normal");
-
-  doc.addFileToVFS("SchibstedGrotesk-Regular.ttf", displayRegular);
-  doc.addFont("SchibstedGrotesk-Regular.ttf", DISPLAY_FONT, "normal");
-
-  doc.addFileToVFS("SchibstedGrotesk-Medium.ttf", displayMedium);
-  doc.addFont("SchibstedGrotesk-Medium.ttf", DISPLAY_FONT, "bold");
+  doc.addFileToVFS("DejaVuSans-Pdf-Bold.ttf", PDF_FONT_BOLD_BASE64);
+  doc.addFont("DejaVuSans-Pdf-Bold.ttf", DISPLAY_FONT, "bold");
 }
 
-async function loadFontAsset(asset: FontAsset): Promise<string> {
-  const response = await fetch(asset.url);
-
-  if (!response.ok) {
-    throw new Error(`Pisave za PDF ni bilo mogoče naložiti (${response.status}).`);
-  }
-
-  return arrayBufferToBase64(await response.arrayBuffer());
-}
-
-function arrayBufferToBase64(buffer: ArrayBuffer): string {
-  const bytes = new Uint8Array(buffer);
-  const chunkSize = 0x8000;
-  let binary = "";
-
-  for (let offset = 0; offset < bytes.length; offset += chunkSize) {
-    const chunk = bytes.subarray(offset, offset + chunkSize);
-    binary += String.fromCharCode(...chunk);
-  }
-
-  return window.btoa(binary);
-}
+/*
+ * Pisavi sta v datoteki pdfFonts.ts shranjeni kot base64. Tako generiranje
+ * PDF-ja ni odvisno od omreÅ¾ja, Lovable asset URL-jev ali fetch zahtevkov.
+ */
 
 function addCoverPage(doc: PdfDocument, data: ReportPdfData) {
   doc.setFillColor(...COLORS.cover);
@@ -329,7 +296,7 @@ function addCoverPage(doc: PdfDocument, data: ReportPdfData) {
   doc.text("WOLF STUDIO", MARGIN_LEFT, 48);
 
   setFont(doc, DISPLAY_FONT, "bold", 32, COLORS.ink);
-  const titleLines = wrapText(doc, "Home DNA™ Report", CONTENT_WIDTH);
+  const titleLines = wrapText(doc, "Home DNAâ„¢ Report", CONTENT_WIDTH);
   let titleY = 88;
 
   for (const line of titleLines) {
@@ -359,7 +326,7 @@ function addCoverPage(doc: PdfDocument, data: ReportPdfData) {
   setFont(doc, BODY_FONT, "normal", 10, COLORS.muted);
   doc.text(formatDate(new Date()), MARGIN_LEFT, customerY + (customerName ? 12 : 0));
 
-  const description = "Osebna analiza doma, življenjskega sloga in oblikovalskih prioritet.";
+  const description = "Osebna analiza doma, Å¾ivljenjskega sloga in oblikovalskih prioritet.";
   const descriptionLines = wrapText(doc, description, CONTENT_WIDTH);
   let descriptionY = 238;
 
@@ -468,7 +435,7 @@ function addFooters(doc: PdfDocument) {
 
     setFont(doc, BODY_FONT, "normal", 8, COLORS.muted);
     doc.text("Wolf Studio", MARGIN_LEFT, PAGE_HEIGHT - 11);
-    doc.text("Home DNA™", PAGE_WIDTH / 2, PAGE_HEIGHT - 11, {
+    doc.text("Home DNAâ„¢", PAGE_WIDTH / 2, PAGE_HEIGHT - 11, {
       align: "center",
     });
     doc.text(String(page - 1).padStart(2, "0"), CONTENT_RIGHT, PAGE_HEIGHT - 11, {
@@ -487,7 +454,7 @@ function formatDate(date: Date): string {
 
 export function downloadBlob(blob: Blob, filename: string) {
   if (!(blob instanceof Blob) || blob.size === 0) {
-    throw new Error("Datoteke ni mogoče prenesti, ker je prazna.");
+    throw new Error("Datoteke ni mogoÄe prenesti, ker je prazna.");
   }
 
   const objectUrl = URL.createObjectURL(blob);
