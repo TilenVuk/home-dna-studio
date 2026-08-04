@@ -6,7 +6,8 @@ export type RoomKey =
   | "entry-hall"
   | "utility-room"
   | "bathroom"
-  | "home-office";
+  | "bedroom"
+  | "children-room";
 
 /** Screen keys are plain strings — the flow is built declaratively in discoveryFlow.ts. */
 export type DiscoveryScreen = string;
@@ -26,6 +27,7 @@ export interface HomeContextState {
   householdSizePlus?: boolean;
   children?: ChildrenAnswer;
   childrenCount?: number;
+  childrenCountPlus?: boolean;
   pets: string[];
 }
 
@@ -55,8 +57,6 @@ export interface KitchenState {
   glassFrontLength?: number;
   pantry?: boolean;
   pantryType?: "none" | "pull-out" | "walk-in";
-  tallUnits?: number;
-  tallUnitsPlus?: boolean;
   hasLed?: boolean;
   hasGlassFronts?: boolean;
 }
@@ -116,14 +116,28 @@ export interface BathroomState {
   cleaningStorage?: boolean;
 }
 
-export interface HomeOfficeState {
-  users?: 1 | 2;
-  deskWidth?: number;
-  monitors?: string;
-  printerStorage?: boolean;
-  documentStorage?: boolean;
-  books?: boolean;
-  cableManagement?: boolean;
+export interface BedroomState {
+  furnitureWidth?: number;
+  wardrobe?: boolean;
+  bedFrame?: boolean;
+  bedsideTables?: boolean;
+  dressingTable?: boolean;
+  tvWall?: boolean;
+  bedWidth?: "140" | "160" | "180" | "200";
+  led?: boolean;
+  mirror?: boolean;
+  upholsteredHeadboard?: boolean;
+}
+
+export interface ChildrenRoomState {
+  furnitureWidth?: number;
+  wardrobe?: boolean;
+  bedWithStorage?: boolean;
+  desk?: boolean;
+  openStorage?: boolean;
+  adaptableFurniture?: boolean;
+  led?: boolean;
+  displayBoard?: boolean;
 }
 
 export interface RoomsState {
@@ -133,7 +147,8 @@ export interface RoomsState {
   entryHall?: EntryHallState;
   utilityRoom?: UtilityRoomState;
   bathroom?: BathroomState;
-  homeOffice?: HomeOfficeState;
+  bedroom?: BedroomState;
+  childrenRoom?: ChildrenRoomState;
 }
 
 export type ExecutionLevel = "basic" | "premium" | "signature";
@@ -204,7 +219,8 @@ export type ReportImageId =
   | "project-entry"
   | "project-utility"
   | "project-bathroom"
-  | "project-office"
+  | "project-bedroom"
+  | "project-child-room"
   | "kitchen-layout-linear"
   | "kitchen-layout-l"
   | "kitchen-layout-u"
@@ -225,7 +241,8 @@ export type ReportImageId =
   | "report-entry-family"
   | "report-utility-organised"
   | "report-bathroom-calm"
-  | "report-office-focus";
+  | "report-bedroom-calm"
+  | "report-child-room-flexible";
 
 export interface ReportImageChoice {
   id: ReportImageId;
