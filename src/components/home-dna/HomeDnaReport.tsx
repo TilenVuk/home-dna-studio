@@ -20,21 +20,16 @@ export function HomeDnaReport({ state }: { state: HomeDnaState }) {
     if (started.current) return;
     started.current = true;
 
-    let active = true;
     const input = buildReportInput(state);
 
     generate({ data: input })
       .then((result) => {
-        if (active) setReport(result);
+        setReport(result);
       })
       .catch((err) => {
         console.error(err);
-        if (active) setError("Poročila trenutno ni bilo mogoče pripraviti.");
+        setError("Poročila trenutno ni bilo mogoče pripraviti.");
       });
-
-    return () => {
-      active = false;
-    };
 
     // Poročilo se ustvari samo enkrat, ko se prikaže zaključni zaslon.
     // eslint-disable-next-line react-hooks/exhaustive-deps
