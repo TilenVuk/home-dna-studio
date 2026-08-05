@@ -18,7 +18,7 @@ export const generateDesignTip = createServerFn({ method: "POST" })
     const { text } = await generateText({
       model: gateway("google/gemini-3.6-flash"),
       system:
-        "You are a senior interior architect at WOLF STUDIO, a Slovenian studio that creates bespoke built-in furniture and complete interior solutions. " +
+        "You are a senior interior architect at NUVELI STUDIO, a Slovenian studio that creates bespoke built-in furniture and complete interior solutions. " +
         "Write one concise, premium design tip (max 2 sentences) in a warm, architectural tone. " +
         "Never mention prices or timelines. Focus on materiality, light, and how the space is used.",
       prompt: `Give a design tip for a ${data.style} ${data.room}.`,

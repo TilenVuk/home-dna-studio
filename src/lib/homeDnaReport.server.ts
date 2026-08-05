@@ -45,7 +45,7 @@ interface ReportRequest {
 }
 
 const SYSTEM = [
-  "Pišeš osebno Home DNA™ poročilo za WOLF STUDIO.",
+  "Pišeš osebno Home DNA™ poročilo za NUVELI STUDIO.",
   "Piši samo slovensko, v prvi osebi množine, strokovno, toplo in jedrnato.",
   "Ne omenjaj AI-ja, vprašalnika, obrazca ali načina zbiranja podatkov.",
   "Ne uporabljaj praznih marketinških fraz ali tehničnega mizarskega žargona.",
@@ -53,7 +53,10 @@ const SYSTEM = [
   "Za slike uporabi izključno dobesedne ID-je iz ponujenega seznama.",
 ].join(" ");
 
-export async function createHomeDnaReport(data: ReportRequest, apiKey: string): Promise<HomeDnaReportData> {
+export async function createHomeDnaReport(
+  data: ReportRequest,
+  apiKey: string,
+): Promise<HomeDnaReportData> {
   const gateway = createLovableAiGatewayProvider(apiKey, undefined, {
     structuredOutputs: true,
   });
@@ -78,7 +81,9 @@ export async function createHomeDnaReport(data: ReportRequest, apiKey: string): 
     `Naslovnica: ${formatChoices(data.imageCandidates.cover)}`,
     `Življenjski slog: ${formatChoices(data.imageCandidates.lifestyle)}`,
     `Slog (izberi 1 ali 2 različni): ${formatChoices(data.imageCandidates.style)}`,
-    ...data.imageCandidates.rooms.map((room) => `${room.key} (${room.label}): ${formatChoices(room.images)}`),
+    ...data.imageCandidates.rooms.map(
+      (room) => `${room.key} (${room.label}): ${formatChoices(room.images)}`,
+    ),
     "Izberi sliko, ki najbolje podpira vsebino posameznega razdelka. Ne vračaj URL-jev ali opisov namesto ID-ja.",
   ].join("\n");
 
@@ -95,7 +100,9 @@ export async function createHomeDnaReport(data: ReportRequest, apiKey: string): 
     return normalizeReport(result.output, data);
   } catch (error) {
     if (NoOutputGeneratedError.isInstance(error)) {
-      console.error("HomeDnaReport: model returned no structured output; using safe report fallback");
+      console.error(
+        "HomeDnaReport: model returned no structured output; using safe report fallback",
+      );
       return createFallbackReport(data);
     }
 
@@ -117,14 +124,18 @@ function formatChoices(choices: ImageChoice[]): string {
   return choices.map((choice) => `${choice.id} (${choice.label})`).join(", ") || "brez izbire";
 }
 
-function normalizeReport(raw: z.infer<typeof ReportSchema>, data: ReportRequest): HomeDnaReportData {
+function normalizeReport(
+  raw: z.infer<typeof ReportSchema>,
+  data: ReportRequest,
+): HomeDnaReportData {
   const rawRooms = Array.isArray(raw.rooms) ? raw.rooms : [];
   const rooms = data.rooms.map((requestedRoom, index) => {
     const generatedRoom =
       rawRooms.find((room) => room.key === requestedRoom.key) ??
       rawRooms.find((room) => room.label === requestedRoom.label) ??
       rawRooms[index];
-    const candidates = data.imageCandidates.rooms.find((room) => room.key === requestedRoom.key)?.images ?? [];
+    const candidates =
+      data.imageCandidates.rooms.find((room) => room.key === requestedRoom.key)?.images ?? [];
 
     return {
       key: requestedRoom.key as RoomKey,
@@ -166,8 +177,16 @@ function normalizeReport(raw: z.infer<typeof ReportSchema>, data: ReportRequest)
     style: limitWords(raw.style, 45),
     why: limitWords(raw.why, 65),
     images: {
-      coverImageId: pickImageId(raw.images?.coverImageId, data.imageCandidates.cover, "hero-interior"),
-      lifestyleImageId: pickImageId(raw.images?.lifestyleImageId, data.imageCandidates.lifestyle, "lifestyle-people"),
+      coverImageId: pickImageId(
+        raw.images?.coverImageId,
+        data.imageCandidates.cover,
+        "hero-interior",
+      ),
+      lifestyleImageId: pickImageId(
+        raw.images?.lifestyleImageId,
+        data.imageCandidates.lifestyle,
+        "lifestyle-people",
+      ),
       styleImageIds,
     },
     rooms,
@@ -177,7 +196,10 @@ function normalizeReport(raw: z.infer<typeof ReportSchema>, data: ReportRequest)
   };
 }
 
-function normalizeStyleImages(requestedIds: string[] | undefined, candidates: ImageChoice[]): ReportImageId[] {
+function normalizeStyleImages(
+  requestedIds: string[] | undefined,
+  candidates: ImageChoice[],
+): ReportImageId[] {
   const allowedIds = new Set(candidates.map((choice) => choice.id));
   const selected = [...(requestedIds ?? []), ...candidates.map((choice) => choice.id)].filter(
     (id, index, ids) => allowedIds.has(id) && ids.indexOf(id) === index,
@@ -186,8 +208,14 @@ function normalizeStyleImages(requestedIds: string[] | undefined, candidates: Im
   return (selected.length ? selected : ["detail-material"]).slice(0, 2) as ReportImageId[];
 }
 
-function pickImageId(requestedId: string | undefined, choices: ImageChoice[], fallback: ReportImageId): ReportImageId {
-  const selected = choices.some((choice) => choice.id === requestedId) ? requestedId : choices[0]?.id;
+function pickImageId(
+  requestedId: string | undefined,
+  choices: ImageChoice[],
+  fallback: ReportImageId,
+): ReportImageId {
+  const selected = choices.some((choice) => choice.id === requestedId)
+    ? requestedId
+    : choices[0]?.id;
   return (selected || fallback) as ReportImageId;
 }
 
@@ -229,7 +257,8 @@ function parseJsonObject(text?: string): unknown {
 
 function createFallbackReport(data: ReportRequest): HomeDnaReportData {
   const roomFallbacks = data.rooms.map((room) => {
-    const candidates = data.imageCandidates.rooms.find((candidate) => candidate.key === room.key)?.images ?? [];
+    const candidates =
+      data.imageCandidates.rooms.find((candidate) => candidate.key === room.key)?.images ?? [];
 
     return {
       key: room.key as RoomKey,
@@ -246,8 +275,7 @@ function createFallbackReport(data: ReportRequest): HomeDnaReportData {
       "Pri načrtovanju bomo izhajali iz vaših rutin, prioritet in prihodnjih potreb. Vsaka rešitev bo imela jasen namen: manj vsakodnevnega nereda, več preglednosti in prostor, ki se naravno prilagaja načinu vašega življenja.",
     style:
       "Oblikovalsko smer bomo gradili z umirjenimi razmerji, trajnostnimi materiali in usklajeno barvno paleto. Rezultat bo oseben, arhitekturno čist in dovolj brezčasen, da bo ostal aktualen tudi ob spremembah vašega doma.",
-    why:
-      "Dom bo deloval zato, ker posameznih kosov ne bomo obravnavali ločeno. Povezali bomo gibanje skozi prostore, shranjevanje, druženje in vsakodnevne obveznosti v enoten sistem. Tako bo pohištvo sledilo vašim navadam, prostori pa bodo ostali pregledni, prijetni in pripravljeni na spremembe, ki jih prinaša življenje.",
+    why: "Dom bo deloval zato, ker posameznih kosov ne bomo obravnavali ločeno. Povezali bomo gibanje skozi prostore, shranjevanje, druženje in vsakodnevne obveznosti v enoten sistem. Tako bo pohištvo sledilo vašim navadam, prostori pa bodo ostali pregledni, prijetni in pripravljeni na spremembe, ki jih prinaša življenje.",
     images: {
       coverImageId: pickImageId(undefined, data.imageCandidates.cover, "hero-interior"),
       lifestyleImageId: pickImageId(undefined, data.imageCandidates.lifestyle, "lifestyle-people"),
@@ -258,7 +286,10 @@ function createFallbackReport(data: ReportRequest): HomeDnaReportData {
       "Ocena je okvirna. Končno ponudbo bomo pripravili po osebnem posvetu, natančnih izmerah in potrditvi materialov.",
     nextSteps: [
       { title: "Posvet", text: "Skupaj preverimo prioritete, slogovno smer in obseg projekta." },
-      { title: "Izmere", text: "Na lokaciji natančno preverimo prostor, priključke in vse ključne mere." },
+      {
+        title: "Izmere",
+        text: "Na lokaciji natančno preverimo prostor, priključke in vse ključne mere.",
+      },
       {
         title: "Končni oblikovalski predlog",
         text: "Pripravimo usklajen predlog rešitev, materialov in naslednjih odločitev.",

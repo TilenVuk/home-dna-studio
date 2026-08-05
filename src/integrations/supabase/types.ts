@@ -14,7 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      consultation_bookings: {
+        Row: {
+          consultation_type: string
+          created_at: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string
+          id: string
+          message: string
+          project_type: string
+          slot_end: string
+          slot_start: string
+          source: string
+          status: string
+        }
+        Insert: {
+          consultation_type: string
+          created_at?: string
+          customer_email: string
+          customer_name: string
+          customer_phone?: string
+          id?: string
+          message?: string
+          project_type?: string
+          slot_end: string
+          slot_start: string
+          source: string
+          status?: string
+        }
+        Update: {
+          consultation_type?: string
+          created_at?: string
+          customer_email?: string
+          customer_name?: string
+          customer_phone?: string
+          id?: string
+          message?: string
+          project_type?: string
+          slot_end?: string
+          slot_start?: string
+          source?: string
+          status?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -5,7 +5,10 @@ export function Footer() {
     <footer className="border-t border-border">
       <div className="mx-auto flex max-w-[1400px] flex-col gap-8 px-6 py-14 md:flex-row md:items-end md:justify-between md:px-10">
         <div>
-          <p className="font-display text-2xl tracking-[-0.04em]">WOLF STUDIO</p>
+          <p className="flex items-baseline gap-2">
+            <span className="font-display text-2xl font-medium tracking-[-0.04em]">NUVELI</span>
+            <span className="eyebrow">Studio</span>
+          </p>
           <p className="mt-2 max-w-[34ch] text-sm text-muted-foreground">
             Domovi, oblikovani okoli načina, kako živite. {brand.address}.
           </p>
@@ -14,10 +17,13 @@ export function Footer() {
           <a href={`mailto:${brand.email}`} className="transition-colors hover:text-foreground">
             {brand.email}
           </a>
-          <a href={`tel:${brand.phone.replace(/\s/g, "")}`} className="transition-colors hover:text-foreground">
+          <a
+            href={`tel:${brand.phone.replace(/\s/g, "")}`}
+            className="transition-colors hover:text-foreground"
+          >
             {brand.phone}
           </a>
-          <p className="eyebrow mt-4">© {new Date().getFullYear()} Wolf Studio</p>
+          <p className="eyebrow mt-4">© {new Date().getFullYear()} Nuveli Studio</p>
         </div>
       </div>
     </footer>

@@ -1,17 +1,17 @@
-// Editable content for the Wolf Studio site.
+// Editable content for the Nuveli Studio site.
 
 export const brand = {
-  name: "Wolf Studio",
+  name: "Nuveli Studio",
   method: "Home DNA™",
   tagline: "Vsak dom ima svoj DNK.",
-  email: "studio@wolfstudio.si",
+  email: "studio@nuvelistudio.com",
   phone: "+386 41 000 000",
   address: "Ljubljana, Slovenija",
 };
 
 export const hero = {
   headline: "Ne začnemo pri pohištvu. Začnemo pri ljudeh.",
-  sub: "Wolf Studio oblikuje pohištvo domov okoli načina, kako živite — z metodologijo Home DNA™, s katero razumemo vsakdan, preden karkoli narišemo.",
+  sub: "Nuveli Studio oblikuje pohištvo domov okoli načina, kako živite — z metodologijo Home DNA™, s katero razumemo vsakdan, preden karkoli narišemo.",
   primaryCta: "Odkrijte svoj Home DNA™",
   secondaryCta: "Poglejte, kako ljudje živijo",
 };
@@ -22,7 +22,10 @@ export const concept = {
   points: [
     { title: "Kako živite", text: "Navade, ki tiho oblikujejo vsako jutro in vsak večer." },
     { title: "S kom živite", text: "Kdo je doma danes in kdo bo jutri." },
-    { title: "Kaj imate", text: "Vse, kar je že del vašega življenja, razumljeno in postavljeno na svoje mesto." },
+    {
+      title: "Kaj imate",
+      text: "Vse, kar je že del vašega življenja, razumljeno in postavljeno na svoje mesto.",
+    },
     { title: "Kam gre življenje", text: "Kako naj vam dom ustreza tudi čez deset let." },
   ],
 };
@@ -57,16 +60,28 @@ export const process = [
 export const services = [
   { title: "Kuhinja", text: "Oblikovana okoli načina, kako vaša družina kuha." },
   { title: "Garderobe", text: "Oblikovane okoli vsega, kar imate." },
-  { title: "Bivalni prostori", text: "Oblikovani okoli tega, kako se družite, počivate in povezujete." },
+  {
+    title: "Bivalni prostori",
+    text: "Oblikovani okoli tega, kako se družite, počivate in povezujete.",
+  },
   { title: "Celoten dom", text: "Ena vizija. En jezik. En dom." },
 ];
 
 export const journey = [
-  { title: "Prvi pogovor", text: "Srečamo se, poslušamo in razumemo, kako izgleda vsakdan v vašem domu." },
-  { title: "Analiza Home DNA™", text: "Navade, stvari in načrti za prihodnost, prevedeni v način življenja." },
+  {
+    title: "Prvi pogovor",
+    text: "Srečamo se, poslušamo in razumemo, kako izgleda vsakdan v vašem domu.",
+  },
+  {
+    title: "Analiza Home DNA™",
+    text: "Navade, stvari in načrti za prihodnost, prevedeni v način življenja.",
+  },
   { title: "Natančne meritve", text: "Obstoječi prostor, razumljen do milimetra natančno." },
   { title: "Oblikovanje", text: "Vaš vsakdan, narisan v prostor, materiale in svetlobo." },
-  { title: "Izvedba", text: "Izdelano s skrbnostjo, v nadzorovanih pogojih, s strani ljudi, ki projekt poznajo." },
+  {
+    title: "Izvedba",
+    text: "Izdelano s skrbnostjo, v nadzorovanih pogojih, s strani ljudi, ki projekt poznajo.",
+  },
   { title: "Predaja", text: "Trenutek, ko vaš dom začne tiho delovati za vas." },
 ];
 

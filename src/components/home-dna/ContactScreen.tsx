@@ -106,8 +106,8 @@ export function ContactScreen({
             className="mt-1 size-4 shrink-0 accent-[currentColor]"
           />
           <span>
-            Strinjam se, da Wolf Studio moje podatke uporabi za pripravo Home DNA™ Reporta in stik v
-            zvezi z mojim projektom. Podatkov ne posredujemo tretjim osebam.
+            Strinjam se, da Nuveli Studio moje podatke uporabi za pripravo Home DNA™ Reporta in stik
+            v zvezi z mojim projektom. Podatkov ne posredujemo tretjim osebam.
           </span>
         </label>
 

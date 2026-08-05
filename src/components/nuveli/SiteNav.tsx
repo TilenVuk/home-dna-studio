@@ -3,11 +3,10 @@ import { Link } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import { brand } from "@/content/site";
 
-
 const links = [
   { label: "Koncept", href: "#concept" },
   { label: "Proces", href: "#process" },
-  
+
   { label: "Storitve", href: "#services" },
   { label: "Projekti", href: "#projects" },
   { label: "Kontakt", href: "#contact" },
@@ -27,12 +26,14 @@ export function SiteNav() {
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
-        scrolled ? "bg-background/85 backdrop-blur-xl border-b border-border" : "border-b border-transparent"
+        scrolled
+          ? "bg-background/85 backdrop-blur-xl border-b border-border"
+          : "border-b border-transparent"
       }`}
     >
       <nav className="mx-auto flex max-w-[1400px] items-center justify-between px-6 py-5 md:px-10">
         <a href="#top" className="flex items-baseline gap-2">
-          <span className="font-display text-lg font-medium tracking-[-0.04em]">WOLF</span>
+          <span className="font-display text-lg font-medium tracking-[-0.04em]">NUVELI</span>
           <span className="eyebrow">Studio</span>
         </a>
 
@@ -52,14 +53,9 @@ export function SiteNav() {
           >
             Odkrijte svoj Home DNA™
           </Link>
-
         </div>
 
-        <button
-          aria-label="Meni"
-          onClick={() => setOpen((v) => !v)}
-          className="lg:hidden"
-        >
+        <button aria-label="Meni" onClick={() => setOpen((v) => !v)} className="lg:hidden">
           {open ? <X size={20} /> : <Menu size={20} />}
         </button>
       </nav>

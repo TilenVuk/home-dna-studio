@@ -4,11 +4,11 @@ You are a senior brand strategist, UX designer and full-stack React developer.
 
 Create a premium website for a Slovenian company called:
 
-WOLF STUDIO
+NUVELI STUDIO
 
 Brand concept:
 
-Wolf Studio is not a traditional carpenter.
+Nuveli Studio is not a traditional carpenter.
 
 We create complete interior solutions for homes.
 
@@ -64,13 +64,13 @@ Avoid:
 
 - cheap furniture store feeling
 
-------------------------------------------------
+---
 
 BRAND IDENTITY
 
 Company:
 
-Wolf Studio
+Nuveli Studio
 
 Methodology:
 
@@ -124,7 +124,7 @@ Large headlines.
 
 Lots of whitespace.
 
-------------------------------------------------
+---
 
 HOMEPAGE STRUCTURE
 
@@ -148,7 +148,7 @@ Secondary CTA:
 
 "View our projects"
 
-------------------------------------------------
+---
 
 SECTION 2 - EXPLAIN THE CONCEPT
 
@@ -174,7 +174,7 @@ We design around:
 
 Every project starts by understanding how you live.
 
-------------------------------------------------
+---
 
 SECTION 3 - HOME DNA™ PROCESS
 
@@ -214,7 +214,7 @@ LIVE
 
 "A home where everything has its place."
 
-------------------------------------------------
+---
 
 SECTION 4 - HOME DNA™ INTERACTIVE ASSESSMENT
 
@@ -238,7 +238,7 @@ Do NOT create a full CAD planner.
 
 Create a guided experience.
 
-------------------------------------------------
+---
 
 HOME DNA QUESTIONS
 
@@ -256,7 +256,7 @@ Options:
 
 - Family with children
 
-------------------------------------------------
+---
 
 PART 2:
 
@@ -276,7 +276,7 @@ Options:
 
 - Living room
 
-------------------------------------------------
+---
 
 PART 3:
 
@@ -354,7 +354,7 @@ Bathroom:
 
 - appliances
 
-------------------------------------------------
+---
 
 PART 4:
 
@@ -372,7 +372,7 @@ Luxury
 
 Industrial
 
-------------------------------------------------
+---
 
 PART 5:
 
@@ -404,7 +404,7 @@ Luxury:
 
 35.000 €+
 
-------------------------------------------------
+---
 
 RESULT PAGE
 
@@ -442,7 +442,7 @@ CTA:
 
 "Request personal consultation"
 
-------------------------------------------------
+---
 
 SECTION 5 - SERVICES
 
@@ -464,7 +464,7 @@ Complete homes
 
 "One vision from empty space to finished home."
 
-------------------------------------------------
+---
 
 SECTION 6 - PROJECT GALLERY
 
@@ -484,7 +484,7 @@ Focus on:
 
 Not only furniture close-ups.
 
-------------------------------------------------
+---
 
 SECTION 7 - CUSTOMER JOURNEY
 
@@ -514,9 +514,9 @@ Production
 
 Installation
 
-------------------------------------------------
+---
 
-SECTION 8 - WHY WOLF STUDIO
+SECTION 8 - WHY NUVELI STUDIO
 
 Create benefits:
 
@@ -536,7 +536,7 @@ Complete solution
 
 One partner from idea to installation.
 
-------------------------------------------------
+---
 
 SECTION 9 - CONTACT
 
@@ -558,7 +558,7 @@ Message
 
 Upload inspiration images
 
-------------------------------------------------
+---
 
 TECHNICAL REQUIREMENTS
 
