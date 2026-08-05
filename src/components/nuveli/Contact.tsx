@@ -1,7 +1,8 @@
 import { useState, type FormEvent } from "react";
-import { Upload, ArrowRight, Check } from "lucide-react";
+import { Upload, ArrowRight } from "lucide-react";
 import { z } from "zod";
 import { brand } from "@/content/site";
+import { BookingCalendar } from "@/components/booking/BookingCalendar";
 import { Reveal } from "./Reveal";
 
 const schema = z.object({
@@ -27,7 +28,7 @@ const fieldClass =
 export function Contact() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [files, setFiles] = useState<string[]>([]);
-  const [sent, setSent] = useState(false);
+  const [submittedContact, setSubmittedContact] = useState<z.infer<typeof schema> | null>(null);
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -42,7 +43,7 @@ export function Contact() {
       return;
     }
     setErrors({});
-    setSent(true);
+    setSubmittedContact(parsed.data);
   };
 
   return (
@@ -53,7 +54,8 @@ export function Contact() {
             <p className="eyebrow">Kontakt</p>
             <h2 className="display-lg mt-6 max-w-[14ch]">Začnimo pri vašem življenju</h2>
             <p className="mt-8 max-w-[38ch] text-sm leading-relaxed text-muted-foreground">
-              Povejte nam, kako živite. Odgovorimo v dveh delovnih dneh in se dogovorimo za osebni pogovor.
+              Povejte nam, kako živite. Odgovorimo v dveh delovnih dneh in se dogovorimo za osebni
+              pogovor.
             </p>
             <div className="mt-10 space-y-1 text-sm">
               <p>{brand.email}</p>
@@ -64,21 +66,32 @@ export function Contact() {
         </div>
 
         <Reveal delay={100} className="lg:col-span-8">
-          {sent ? (
-            <div className="border border-border bg-sand p-12">
-              <Check size={22} className="text-forest" />
-              <h3 className="mt-8 text-2xl">Hvala — vaše povpraševanje smo prejeli.</h3>
-              <p className="mt-3 max-w-[46ch] text-sm text-muted-foreground">
-                Kmalu se vam oglasimo in se dogovorimo za pogovor o vašem domu in o tem, kako v njem živite.
-              </p>
-            </div>
+          {submittedContact ? (
+            <BookingCalendar
+              contact={{
+                name: submittedContact.name,
+                email: submittedContact.email,
+                phone: submittedContact.phone ?? "",
+                projectType: submittedContact.projectType,
+                message: submittedContact.message ?? "",
+              }}
+              source="contact"
+              initialConsultationType="home-visit"
+              heading="Izberite termin za osebni pogovor"
+              description="Vaši kontaktni podatki so pripravljeni. Za dokončanje rezervacije izberite način srečanja, datum in uro."
+            />
           ) : (
             <form onSubmit={onSubmit} noValidate className="grid gap-8 sm:grid-cols-2">
               <Field label="Ime" error={errors["name"]}>
                 <input name="name" className={fieldClass} placeholder="Vaše ime in priimek" />
               </Field>
               <Field label="E-pošta" error={errors["email"]}>
-                <input name="email" type="email" className={fieldClass} placeholder="vi@epošta.si" />
+                <input
+                  name="email"
+                  type="email"
+                  className={fieldClass}
+                  placeholder="vi@epošta.si"
+                />
               </Field>
               <Field label="Telefon" error={errors["phone"]}>
                 <input name="phone" className={fieldClass} placeholder="+386" />
@@ -130,7 +143,7 @@ export function Contact() {
                   type="submit"
                   className="inline-flex items-center gap-2 rounded-full bg-primary px-8 py-4 text-sm text-primary-foreground transition-transform hover:-translate-y-0.5"
                 >
-                  Naročite osebno svetovanje <ArrowRight size={16} />
+                  Nadaljujte na izbiro termina <ArrowRight size={16} />
                 </button>
               </div>
             </form>
@@ -141,7 +154,15 @@ export function Contact() {
   );
 }
 
-function Field({ label, error, children }: { label: string; error?: string | undefined; children: React.ReactNode }) {
+function Field({
+  label,
+  error,
+  children,
+}: {
+  label: string;
+  error?: string | undefined;
+  children: React.ReactNode;
+}) {
   return (
     <div>
       <span className="eyebrow">{label}</span>

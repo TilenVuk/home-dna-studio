@@ -185,7 +185,8 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
       setFont(doc, BODY_FONT, "normal", 10.2, COLORS.muted);
       const roomTextLines = wrapText(doc, room.text, CONTENT_WIDTH);
       const imageHeight = loadedRoomImage ? 58 : 0;
-      const requiredHeight = 10 + imageHeight + (loadedRoomImage ? 8 : 0) + roomTextLines.length * 6 + 13;
+      const requiredHeight =
+        10 + imageHeight + (loadedRoomImage ? 8 : 0) + roomTextLines.length * 6 + 13;
       ensureSpace(requiredHeight);
 
       if (index > 0) {
@@ -224,19 +225,32 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
 
   ensureSpace(investmentBlockHeight + 8);
   if (investmentImage) {
-    drawImageCover(doc, investmentImage, MARGIN_LEFT, y, investmentImageWidth, investmentBlockHeight);
+    drawImageCover(
+      doc,
+      investmentImage,
+      MARGIN_LEFT,
+      y,
+      investmentImageWidth,
+      investmentBlockHeight,
+    );
   }
 
   setFont(doc, BODY_FONT, "normal", 8, COLORS.muted);
   doc.text("OCENJENA INVESTICIJA", investmentMetaX, y + 4);
   setFont(doc, DISPLAY_FONT, "bold", 14, COLORS.ink);
   const investmentLines = wrapText(doc, data.investmentRange || "Po posvetu", investmentMetaWidth);
-  investmentLines.slice(0, 2).forEach((line, index) => doc.text(line, investmentMetaX, y + 13 + index * 6.5));
+  investmentLines
+    .slice(0, 2)
+    .forEach((line, index) => doc.text(line, investmentMetaX, y + 13 + index * 6.5));
 
   setFont(doc, BODY_FONT, "normal", 8, COLORS.muted);
   doc.text("RAVEN IZVEDBE", investmentMetaX, y + 34);
   setFont(doc, DISPLAY_FONT, "bold", 14, COLORS.ink);
-  doc.text(wrapText(doc, data.executionLevel || "Premium", investmentMetaWidth).slice(0, 2), investmentMetaX, y + 43);
+  doc.text(
+    wrapText(doc, data.executionLevel || "Premium", investmentMetaWidth).slice(0, 2),
+    investmentMetaX,
+    y + 43,
+  );
 
   y += investmentBlockHeight + 8;
 
@@ -294,7 +308,9 @@ async function registerPdfFonts(doc: PdfDocument) {
   doc.addFont("DejaVuSans-Bold.ttf", DISPLAY_FONT, "bold");
 }
 
-async function loadReportImages(images: ResolvedReportImages): Promise<Map<ReportImageId, LoadedPdfImage>> {
+async function loadReportImages(
+  images: ResolvedReportImages,
+): Promise<Map<ReportImageId, LoadedPdfImage>> {
   const assets = [
     images.cover,
     images.lifestyle,
@@ -316,7 +332,9 @@ async function loadReportImages(images: ResolvedReportImages): Promise<Map<Repor
   );
 
   return new Map(
-    loaded.filter((image): image is LoadedPdfImage => Boolean(image)).map((image) => [image.id, image] as const),
+    loaded
+      .filter((image): image is LoadedPdfImage => Boolean(image))
+      .map((image) => [image.id, image] as const),
   );
 }
 
@@ -338,12 +356,17 @@ function blobToDataUrl(blob: Blob): Promise<string> {
   });
 }
 
-function optimizePdfImage(src: string): Promise<{ dataUrl: string; width: number; height: number }> {
+function optimizePdfImage(
+  src: string,
+): Promise<{ dataUrl: string; width: number; height: number }> {
   return new Promise((resolve, reject) => {
     const image = new Image();
     image.onload = () => {
       const maximumDimension = 1_600;
-      const scale = Math.min(1, maximumDimension / Math.max(image.naturalWidth, image.naturalHeight));
+      const scale = Math.min(
+        1,
+        maximumDimension / Math.max(image.naturalWidth, image.naturalHeight),
+      );
       const width = Math.max(1, Math.round(image.naturalWidth * scale));
       const height = Math.max(1, Math.round(image.naturalHeight * scale));
       const canvas = document.createElement("canvas");
@@ -364,7 +387,14 @@ function optimizePdfImage(src: string): Promise<{ dataUrl: string; width: number
   });
 }
 
-function drawImageCover(doc: PdfDocument, image: LoadedPdfImage, x: number, y: number, width: number, height: number) {
+function drawImageCover(
+  doc: PdfDocument,
+  image: LoadedPdfImage,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+) {
   const scale = Math.max(width / image.width, height / image.height);
   const drawWidth = image.width * scale;
   const drawHeight = image.height * scale;
@@ -389,7 +419,7 @@ function addCoverPage(doc: PdfDocument, data: ReportPdfData, coverImage?: Loaded
   doc.rect(0, 184, PAGE_WIDTH, PAGE_HEIGHT - 184, "F");
 
   setFont(doc, BODY_FONT, "normal", 8.5, COLORS.muted);
-  doc.text("WOLF STUDIO  ·  HOME DNA™", MARGIN_LEFT, 204);
+  doc.text("NUVELI  ·  HOME DNA™", MARGIN_LEFT, 204);
 
   setFont(doc, DISPLAY_FONT, "bold", 27, COLORS.ink);
   const titleLines = wrapText(doc, "Vaš osebni Home DNA™ Report", CONTENT_WIDTH);
@@ -498,7 +528,7 @@ function addFooters(doc: PdfDocument) {
     doc.line(MARGIN_LEFT, PAGE_HEIGHT - 18, CONTENT_RIGHT, PAGE_HEIGHT - 18);
 
     setFont(doc, BODY_FONT, "normal", 8, COLORS.muted);
-    doc.text("Wolf Studio", MARGIN_LEFT, PAGE_HEIGHT - 11);
+    doc.text("NUVELI", MARGIN_LEFT, PAGE_HEIGHT - 11);
     doc.text("Home DNA™", PAGE_WIDTH / 2, PAGE_HEIGHT - 11, { align: "center" });
     doc.text(String(page - 1).padStart(2, "0"), CONTENT_RIGHT, PAGE_HEIGHT - 11, {
       align: "right",

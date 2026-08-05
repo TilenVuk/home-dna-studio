@@ -17,7 +17,7 @@ export function Hero() {
       <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/25 to-foreground/30" />
 
       <div className="relative mx-auto flex min-h-[100svh] max-w-[1400px] flex-col justify-end px-6 pb-16 pt-32 md:px-10 md:pb-20">
-        <p className="eyebrow text-background/80">Wolf Studio — Home DNA™</p>
+        <p className="eyebrow text-background/80">Nuveli Studio — Home DNA™</p>
         <h1 className="display-xl mt-6 max-w-[16ch] text-background">{hero.headline}</h1>
         <p className="mt-8 max-w-[46ch] text-base leading-relaxed text-background/85 md:text-lg">
           {hero.sub}

@@ -77,9 +77,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Wolf Studio" },
+      { title: "Nuveli Studio" },
       { name: "description", content: "Custom interiors designed around the way you live." },
-      { name: "author", content: "Wolf Studio" },
+      { name: "author", content: "Nuveli Studio" },
     ],
     links: [
       {

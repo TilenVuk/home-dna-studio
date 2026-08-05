@@ -72,7 +72,7 @@ export function HomeDnaReport({ state }: { state: HomeDnaState }) {
       });
 
       const blob = await Promise.race([pdfPromise, timeout]);
-      downloadBlob(blob, "Wolf-Studio-Home-DNA-Report.pdf");
+      downloadBlob(blob, "Nuveli-Studio-Home-DNA-Report.pdf");
     } catch (err) {
       console.error(err);
       setPdfError("PDF-ja trenutno ni bilo mogoče ustvariti.");
@@ -189,7 +189,12 @@ export function HomeDnaReport({ state }: { state: HomeDnaState }) {
 
 function ReportImage({ image, className = "" }: { image: ReportImageAsset; className?: string }) {
   return (
-    <img src={image.src} alt={image.alt} loading="lazy" className={`w-full rounded-2xl object-cover ${className}`} />
+    <img
+      src={image.src}
+      alt={image.alt}
+      loading="lazy"
+      className={`w-full rounded-2xl object-cover ${className}`}
+    />
   );
 }
 
