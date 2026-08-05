@@ -38,7 +38,7 @@ export const Route = createFileRoute("/")({
           description,
           areaServed: "Slovenija",
           address: { "@type": "PostalAddress", addressLocality: "Ljubljana", addressCountry: "SI" },
-          email: "studio@nuvelistudio.com",
+          email: "info@nuvelistudio.com",
           telephone: "+386 41 000 000",
         }),
       },
