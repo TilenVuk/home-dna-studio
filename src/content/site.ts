@@ -4,7 +4,7 @@ export const brand = {
   name: "Nuveli Studio",
   method: "Home DNA™",
   tagline: "Vsak dom ima svoj DNK.",
-  email: "studio@nuvelistudio.com",
+  email: "info@nuvelistudio.com",
   phone: "+386 41 000 000",
   address: "Ljubljana, Slovenija",
 };
