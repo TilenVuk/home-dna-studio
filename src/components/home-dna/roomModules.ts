@@ -21,6 +21,17 @@ import type { HomeDnaState, Priority, RoomKey } from "./homeDnaTypes";
 const noKitchenFeatures = "Brez dodatkov";
 const kitchenLedFeature = "Delovna LED osvetlitev";
 const kitchenGlassFeature = "Steklene fronte";
+const noKitchenAppliances = "Aparati niso del projekta";
+const kitchenApplianceOptions = [
+  "Hladilnik z zamrzovalnikom",
+  "Pomivalni stroj",
+  "Pečica",
+  "Mikrovalovna pečica",
+  "Kavni aparat",
+  "Vinska vitrina",
+  "Napa",
+  noKitchenAppliances,
+];
 
 const noWardrobeFeatures = "Brez dodatkov";
 const wardrobeLedFeature = "Integrirana LED osvetlitev";
@@ -83,7 +94,7 @@ function selectedBooleanOptions(entries: Array<[label: string, value: boolean | 
 /* ---------------- kitchen ---------------- */
 
 function kitchenScreens(state: HomeDnaState): ScreenDef[] {
-  const k = state.rooms.kitchen ?? {};
+  const k = state.rooms.kitchen ?? { appliances: [] };
   const screens: ScreenDef[] = [
     {
       kind: "editorial",
@@ -184,10 +195,34 @@ function kitchenScreens(state: HomeDnaState): ScreenDef[] {
         value: k.islandWidth,
         apply: (s, v) => setRoom(s, "kitchen", { islandWidth: v }),
       },
+      {
+        kind: "choice",
+        key: "kitchen-island-seats",
+        headline: "Koliko sedežev želite ob otoku?",
+        support: "Število sedežev vpliva na dolžino, previs delovne plošče in prehode okoli otoka.",
+        options: [
+          { value: "none", label: "Brez sedišč" },
+          { value: "2", label: "2 sedeža" },
+          { value: "3", label: "3 sedeži" },
+          { value: "4+", label: "4 ali več" },
+        ],
+        value: k.islandSeats,
+        apply: (s, islandSeats) => setRoom(s, "kitchen", { islandSeats }),
+      },
     );
   }
 
   screens.push(
+    {
+      kind: "multi",
+      key: "kitchen-appliances",
+      headline: "Katere aparate mora kuhinja vključiti?",
+      support: "Izberite vse aparate, ki vplivajo na razporeditev omar in priključkov.",
+      options: kitchenApplianceOptions,
+      exclusive: noKitchenAppliances,
+      selected: k.appliances ?? [],
+      apply: (s, appliances) => setRoom(s, "kitchen", { appliances }),
+    },
     {
       kind: "visual",
       key: "kitchen-worktop",
@@ -258,6 +293,19 @@ function wardrobeScreens(state: HomeDnaState): ScreenDef[] {
       cta: "Načrtujmo notranjost",
       image: projectCloset,
       prominentEyebrow: true,
+    },
+    {
+      kind: "choice",
+      key: "wardrobe-users",
+      headline: "Koliko oseb bo uporabljalo to garderobo?",
+      support: "Podatek pomaga pravilno razdeliti notranjost omare in določiti ločene cone.",
+      options: [
+        { value: "1", label: "1 oseba" },
+        { value: "2", label: "2 osebi" },
+        { value: "3+", label: "3 ali več" },
+      ],
+      value: w.users,
+      apply: (s, users) => setRoom(s, "wardrobe", { users }),
     },
     {
       kind: "multi",
@@ -695,6 +743,20 @@ function bathroomScreens(state: HomeDnaState): ScreenDef[] {
       prominentEyebrow: true,
     },
     {
+      kind: "choice",
+      key: "bathroom-users",
+      headline: "Koliko oseb redno uporablja to kopalnico?",
+      support: "To vpliva na količino shranjevanja, širino umivalniškega sestava in organizacijo predalov.",
+      options: [
+        { value: "1", label: "1 oseba" },
+        { value: "2", label: "2 osebi" },
+        { value: "3-4", label: "3–4 osebe" },
+        { value: "5+", label: "5 ali več" },
+      ],
+      value: b.users,
+      apply: (s, users) => setRoom(s, "bathroom", { users }),
+    },
+    {
       kind: "number",
       key: "bathroom-width",
       headline: "Kako široka je stena, namenjena kopalniškemu pohištvu?",
@@ -849,7 +911,7 @@ function bedroomScreens(state: HomeDnaState): ScreenDef[] {
 /* ---------------- children's rooms ---------------- */
 
 function childrenRoomScreens(state: HomeDnaState): ScreenDef[] {
-  const c = state.rooms.childrenRoom ?? {};
+  const c = state.rooms.childrenRoom ?? { ageGroups: [] };
   const quantity = state.home.childrenCount ?? 1;
   const quantityLabel = `${quantity}${state.home.childrenCountPlus ? "+" : ""}`;
 
@@ -863,6 +925,15 @@ function childrenRoomScreens(state: HomeDnaState): ScreenDef[] {
       cta: "Načrtujmo otroške sobe",
       image: projectChildRoom,
       prominentEyebrow: true,
+    },
+    {
+      kind: "multi",
+      key: "children-room-ages",
+      headline: "Katerim starostnim skupinam so sobe namenjene?",
+      support: "Izberite vse ustrezne skupine. Tako lahko predvidimo varnost, višine in kasnejše prilagoditve.",
+      options: ["0–3 leta", "4–6 let", "7–12 let", "13 let ali več"],
+      selected: c.ageGroups ?? [],
+      apply: (s, ageGroups) => setRoom(s, "childrenRoom", { ageGroups }),
     },
     {
       kind: "multi",
