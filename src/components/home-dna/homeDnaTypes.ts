@@ -18,6 +18,9 @@ export type ChildrenAnswer = "none" | "planning" | "yes";
 export type PetKey = "dog" | "cat" | "other" | "none";
 
 export type Priority = "low" | "medium" | "high";
+export type CookingFrequency = "rarely" | "weekly" | "daily";
+export type WorkFromHomeFrequency = "never" | "sometimes" | "frequently";
+export type HostingFrequency = "rarely" | "occasionally" | "often";
 
 export interface HomeContextState {
   projectStage?: ProjectStage;
@@ -40,6 +43,10 @@ export interface StyleState {
 
 export interface LifestyleState {
   priorities: string[];
+  cookingFrequency?: CookingFrequency;
+  workFromHomeFrequency?: WorkFromHomeFrequency;
+  hostingFrequency?: HostingFrequency;
+  hobbies: string[];
   currentChallenges: string[];
   challengeNote?: string;
   futureNeeds: string[];
@@ -52,6 +59,8 @@ export interface KitchenState {
   wallC?: number;
   islandLength?: number;
   islandWidth?: number;
+  islandSeats?: string;
+  appliances?: string[];
   worktop?: "classic-laminate" | "premium-laminate" | "quartz" | "natural-stone";
   ledLength?: number;
   glassFrontLength?: number;
@@ -62,6 +71,7 @@ export interface KitchenState {
 }
 
 export interface WardrobeState {
+  users?: string;
   storageTypes: string[];
   hangingPriority?: Priority;
   foldedPriority?: Priority;
@@ -108,6 +118,7 @@ export interface UtilityRoomState {
 }
 
 export interface BathroomState {
+  users?: string;
   width?: number;
   singleOrDoubleSink?: "single" | "double";
   tallStorage?: boolean;
@@ -130,6 +141,7 @@ export interface BedroomState {
 }
 
 export interface ChildrenRoomState {
+  ageGroups?: string[];
   furnitureWidth?: number;
   wardrobe?: boolean;
   bedWithStorage?: boolean;
@@ -307,6 +319,7 @@ export const initialHomeDnaState: HomeDnaState = {
   style: { selectedStyles: [], atmosphere: [] },
   lifestyle: {
     priorities: [],
+    hobbies: [],
     currentChallenges: [],
     futureNeeds: [],
   },
