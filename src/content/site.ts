@@ -58,13 +58,22 @@ export const process = [
 ];
 
 export const services = [
-  { title: "Kuhinja", text: "Oblikovana okoli načina, kako vaša družina kuha." },
-  { title: "Garderobe", text: "Oblikovane okoli vsega, kar imate." },
+  {
+    title: "Kuhinja",
+    text: "Premišljen potek dela, prava razmerja in vse pri roki, ko to potrebujete.",
+  },
+  {
+    title: "Garderobe",
+    text: "Pregleden sistem shranjevanja, prilagojen vaši garderobi in vsakodnevnemu ritmu.",
+  },
   {
     title: "Bivalni prostori",
-    text: "Oblikovani okoli tega, kako se družite, počivate in povezujete.",
+    text: "Uravnotežen prostor za skupne trenutke, miren oddih in vse vmes.",
   },
-  { title: "Celoten dom", text: "Ena vizija. En jezik. En dom." },
+  {
+    title: "Celoten dom",
+    text: "Materiali, funkcije in detajli, povezani v skladno celoto.",
+  },
 ];
 
 export const journey = [
