@@ -59,11 +59,9 @@ const ReportInput = z.object({
 const SubmissionInput = z.object({
   submissionId: z.string().uuid(),
   contact: ContactInput,
-  answers: z
-    .record(JsonValueSchema)
-    .refine((value) => JSON.stringify(value).length <= MAX_ANSWERS_LENGTH, {
-      message: "Home DNA answers are too large",
-    }),
+  answers: z.record(JsonValueSchema).refine((value) => JSON.stringify(value).length <= MAX_ANSWERS_LENGTH, {
+    message: "Home DNA answers are too large",
+  }),
   summary: z.string().trim().min(1).max(30_000),
   report: ReportInput,
   pdfBase64: z
@@ -91,17 +89,8 @@ export const submitHomeDna = createServerFn({ method: "POST" })
     const { getRequest, getRequestIP } = await import("@tanstack/react-start/server");
     const request = getRequest();
     const origin = request.headers.get("origin");
-    const forwardedHost = request.headers.get("x-forwarded-host")?.split(",")[0]?.trim();
-    const host = forwardedHost || request.headers.get("host");
-
-    if (origin && host) {
-      let originHost = "";
-      try {
-        originHost = new URL(origin).host;
-      } catch {
-        throw new Error("HOME_DNA_INVALID_ORIGIN");
-      }
-      if (originHost !== host) throw new Error("HOME_DNA_INVALID_ORIGIN");
+    if (origin && !isAllowedRequestOrigin(request, origin)) {
+      throw new Error("HOME_DNA_INVALID_ORIGIN");
     }
 
     const requestIp = getRequestIP({ xForwardedFor: true }) ?? "unknown";
@@ -110,3 +99,71 @@ export const submitHomeDna = createServerFn({ method: "POST" })
   });
 
 export type HomeDnaSubmissionInput = z.infer<typeof SubmissionInput>;
+
+function isAllowedRequestOrigin(request: Request, origin: string): boolean {
+  let originUrl: URL;
+  try {
+    originUrl = new URL(origin);
+  } catch {
+    return false;
+  }
+
+  const candidates = new Set<string>();
+  const directHost = request.headers.get("host");
+  if (directHost) candidates.add(directHost.trim());
+
+  const forwardedHosts = request.headers.get("x-forwarded-host");
+  for (const host of forwardedHosts?.split(",") ?? []) {
+    if (host.trim()) candidates.add(host.trim());
+  }
+
+  try {
+    candidates.add(new URL(request.url).host);
+  } catch {
+    // A malformed request URL must not weaken the Origin check.
+  }
+
+  const normalizedOriginHost = normalizeHost(originUrl.host, originUrl.protocol);
+  if (!normalizedOriginHost) return false;
+
+  for (const candidate of candidates) {
+    if (normalizeHost(candidate, originUrl.protocol) === normalizedOriginHost) return true;
+  }
+
+  if (!isLoopbackHostname(originUrl.hostname)) return false;
+
+  return [...candidates].some((candidate) => {
+    const hostname = hostnameFromHost(candidate, originUrl.protocol);
+    return hostname ? isLoopbackHostname(hostname) : false;
+  });
+}
+
+function normalizeHost(host: string, protocol: string): string | null {
+  try {
+    return new URL(`${protocol}//${host}`).host.toLowerCase();
+  } catch {
+    return null;
+  }
+}
+
+function hostnameFromHost(host: string, protocol: string): string | null {
+  try {
+    return new URL(`${protocol}//${host}`).hostname;
+  } catch {
+    return null;
+  }
+}
+
+function isLoopbackHostname(hostname: string): boolean {
+  const normalized = hostname
+    .toLowerCase()
+    .replace(/^\[|\]$/g, "")
+    .replace(/\.$/, "");
+  return (
+    normalized === "localhost" ||
+    normalized.endsWith(".localhost") ||
+    normalized === "127.0.0.1" ||
+    normalized === "0.0.0.0" ||
+    normalized === "::1"
+  );
+}
