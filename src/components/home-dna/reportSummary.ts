@@ -22,6 +22,24 @@ const childrenLabels: Record<string, string> = {
   yes: "Otroci",
 };
 
+const cookingFrequencyLabels: Record<string, string> = {
+  rarely: "Občasno",
+  weekly: "Večkrat na teden",
+  daily: "Vsak dan",
+};
+
+const workFromHomeFrequencyLabels: Record<string, string> = {
+  never: "Nikoli",
+  sometimes: "Občasno",
+  frequently: "Pogosto",
+};
+
+const hostingFrequencyLabels: Record<string, string> = {
+  rarely: "Redko",
+  occasionally: "Občasno",
+  often: "Pogosto",
+};
+
 export const roomLabel = (key: RoomKey) => roomOptions.find((r) => r.key === key)?.title ?? key;
 
 export function roomLabelForState(key: RoomKey, state: HomeDnaState): string {
@@ -77,6 +95,16 @@ export function buildReportInput(state: HomeDnaState): ReportInput {
   push("Barvna smer", style.colourDirection ? colourLabel(style.colourDirection) : undefined);
   push("Povezava z navdihom", style.inspirationUrl);
   push("Prioritete", lifestyle.priorities.join(", "));
+  push(
+    "Pogostost kuhanja",
+    lifestyle.cookingFrequency ? cookingFrequencyLabels[lifestyle.cookingFrequency] : undefined,
+  );
+  push(
+    "Delo od doma",
+    lifestyle.workFromHomeFrequency ? workFromHomeFrequencyLabels[lifestyle.workFromHomeFrequency] : undefined,
+  );
+  push("Pogostost gostov", lifestyle.hostingFrequency ? hostingFrequencyLabels[lifestyle.hostingFrequency] : undefined);
+  push("Hobiji in oprema", lifestyle.hobbies.join(", "));
   push("Trenutni izzivi", lifestyle.currentChallenges.join(", "));
   push("Opomba o izzivih", lifestyle.challengeNote);
   push("Prihodnje potrebe", lifestyle.futureNeeds.join(", "));
