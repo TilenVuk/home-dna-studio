@@ -1,5 +1,3 @@
-Gallery.tsx;
-
 import kitchen from "@/assets/project-kitchen.jpg";
 import closet from "@/assets/project-closet.jpg";
 import living from "@/assets/project-living.jpg";
