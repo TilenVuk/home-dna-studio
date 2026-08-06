@@ -1,0 +1,15 @@
+# Samo za lokalni razvoj. Datoteko kopirajte v .dev.vars in je ne objavite.
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-3.6-flash
+
+TURNSTILE_SECRET_KEY=
+TURNSTILE_EXPECTED_HOSTNAME=localhost
+
+SUPABASE_URL=
+SUPABASE_PUBLISHABLE_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+RESEND_API_KEY=
+
+# Naključen niz z vsaj 32 znaki. Uporablja se samo za enosmerno zgoščevanje IP-ja.
+HOME_DNA_RATE_LIMIT_SALT=
+HOME_DNA_REPORT_RATE_LIMIT_PER_HOUR=5
