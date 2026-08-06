@@ -42,6 +42,8 @@ export async function reserveConsultation(input: ReservationData) {
 
   if (!validSlot) throw new Error("BOOKING_INVALID_SLOT");
 
+  const customerEmail = input.contact.email.toLowerCase();
+
   const { data, error } = await supabaseAdmin
     .from("consultation_bookings")
     .insert({
@@ -50,7 +52,7 @@ export async function reserveConsultation(input: ReservationData) {
       consultation_type: input.consultationType,
       source: input.source,
       customer_name: input.contact.name,
-      customer_email: input.contact.email.toLowerCase(),
+      customer_email: customerEmail,
       customer_phone: input.contact.phone,
       project_type: input.contact.projectType,
       message: input.contact.message,
@@ -64,10 +66,44 @@ export async function reserveConsultation(input: ReservationData) {
     throw new Error("BOOKING_RESERVATION_FAILED");
   }
 
+  // The slot is reserved from here on. Email failures must never cancel it.
+  const { sendBookingEmails } = await import("./bookingEmail.server");
+  const outcome = await sendBookingEmails({
+    bookingId: data.id,
+    slotStart: data.slot_start,
+    slotEnd: data.slot_end,
+    consultationType: data.consultation_type,
+    source: input.source,
+    customerName: input.contact.name,
+    customerEmail,
+    customerPhone: input.contact.phone,
+    projectType: input.contact.projectType,
+    message: input.contact.message,
+  });
+
+  const { error: updateError } = await supabaseAdmin
+    .from("consultation_bookings")
+    .update({
+      customer_email_status: outcome.customerStatus,
+      internal_email_status: outcome.internalStatus,
+      customer_resend_id: outcome.customerResendId,
+      internal_resend_id: outcome.internalResendId,
+      email_attempt_count: 1,
+      email_last_error: outcome.error,
+    })
+    .eq("id", data.id);
+
+  if (updateError) {
+    console.error("Booking: email status update failed", updateError.message);
+  }
+
   return {
     bookingId: data.id,
     slotStart: data.slot_start,
     slotEnd: data.slot_end,
     consultationType: data.consultation_type,
+    customerEmailStatus: outcome.customerStatus,
+    internalEmailStatus: outcome.internalStatus,
   };
 }
+

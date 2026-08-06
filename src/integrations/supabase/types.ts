@@ -19,43 +19,64 @@ export type Database = {
           consultation_type: string
           created_at: string
           customer_email: string
+          customer_email_status: string
           customer_name: string
           customer_phone: string
+          customer_resend_id: string | null
+          email_attempt_count: number
+          email_last_error: string | null
           id: string
+          internal_email_status: string
+          internal_resend_id: string | null
           message: string
           project_type: string
           slot_end: string
           slot_start: string
           source: string
           status: string
+          updated_at: string
         }
         Insert: {
           consultation_type: string
           created_at?: string
           customer_email: string
+          customer_email_status?: string
           customer_name: string
           customer_phone?: string
+          customer_resend_id?: string | null
+          email_attempt_count?: number
+          email_last_error?: string | null
           id?: string
+          internal_email_status?: string
+          internal_resend_id?: string | null
           message?: string
           project_type?: string
           slot_end: string
           slot_start: string
           source: string
           status?: string
+          updated_at?: string
         }
         Update: {
           consultation_type?: string
           created_at?: string
           customer_email?: string
+          customer_email_status?: string
           customer_name?: string
           customer_phone?: string
+          customer_resend_id?: string | null
+          email_attempt_count?: number
+          email_last_error?: string | null
           id?: string
+          internal_email_status?: string
+          internal_resend_id?: string | null
           message?: string
           project_type?: string
           slot_end?: string
           slot_start?: string
           source?: string
           status?: string
+          updated_at?: string
         }
         Relationships: []
       }
