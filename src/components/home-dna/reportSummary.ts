@@ -61,7 +61,8 @@ export function reportRooms(state: HomeDnaState): RoomKey[] {
 }
 
 export interface ReportInput {
-  summary: string;
+  projectSummary: string;
+  turnstileToken: string;
   rooms: { key: string; label: string }[];
   investmentLine: string;
   executionLevel: string;
@@ -78,7 +79,6 @@ export function buildReportInput(state: HomeDnaState): ReportInput {
     lines.push(`${label}: ${value}`);
   };
 
-  push("Ime", state.contact.name);
   push("Faza projekta", home.projectStage ? projectStageLabels[home.projectStage] : undefined);
   push("Tip nepremičnine", home.propertyType ? propertyTypeLabels[home.propertyType] : undefined);
   push("Kvadratura", home.floorArea ? `${home.floorArea} m2` : undefined);
@@ -93,7 +93,6 @@ export function buildReportInput(state: HomeDnaState): ReportInput {
   push("Slogi", style.selectedStyles.map(styleLabel).join(", "));
   push("Vzdušje", style.atmosphere.join(", "));
   push("Barvna smer", style.colourDirection ? colourLabel(style.colourDirection) : undefined);
-  push("Povezava z navdihom", style.inspirationUrl);
   push("Prioritete", lifestyle.priorities.join(", "));
   push(
     "Pogostost kuhanja",
@@ -152,7 +151,8 @@ export function buildReportInput(state: HomeDnaState): ReportInput {
   const level = executionLevelLabel(state.investment.level);
 
   return {
-    summary: lines.join("\n"),
+    projectSummary: lines.join("\n"),
+    turnstileToken: state.contact.turnstileToken,
     rooms: selected.map((key) => ({ key, label: roomLabelForState(key, state) })),
     investmentLine: est ? `${est.min} – ${est.max} EUR` : "Ocena bo pripravljena po posvetu",
     executionLevel: level,
