@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { DiscoveryNavigation } from "./DiscoveryNavigation";
 import { ScreenShell } from "./ScreenShell";
+import { TurnstileWidget } from "./TurnstileWidget";
 import type { ContactState } from "./homeDnaTypes";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i;
 
 const fieldClass =
   "mt-3 w-full border-b border-border bg-transparent py-4 text-base outline-none placeholder:text-muted-foreground/50 focus:border-foreground";
+
+const turnstileSiteKey = import.meta.env["VITE_TURNSTILE_SITE_KEY"] ?? "";
 
 export function ContactScreen({
   value,
@@ -17,7 +20,7 @@ export function ContactScreen({
   onSubmit: (contact: ContactState) => void;
   onBack: () => void;
 }) {
-  const [form, setForm] = useState<ContactState>(value);
+  const [form, setForm] = useState<ContactState>({ ...value, turnstileToken: "" });
   const [error, setError] = useState<string | null>(null);
 
   const set = (patch: Partial<ContactState>) => {
@@ -38,11 +41,20 @@ export function ContactScreen({
       setError("Za pripravo poročila potrebujemo vaše soglasje.");
       return;
     }
+    if (!turnstileSiteKey) {
+      setError("Varnostna zaščita obrazca ni konfigurirana.");
+      return;
+    }
+    if (!form.turnstileToken) {
+      setError("Počakajte, da se varnostno preverjanje zaključi.");
+      return;
+    }
     onSubmit({
       name: form.name.trim(),
       email: form.email.trim(),
       phone: form.phone.trim(),
       consent: true,
+      turnstileToken: form.turnstileToken,
     });
   };
 
@@ -106,10 +118,22 @@ export function ContactScreen({
             className="mt-1 size-4 shrink-0 accent-[currentColor]"
           />
           <span>
-            Strinjam se, da Nuveli Studio moje podatke uporabi za pripravo in dostavo Home DNA™
-            Reporta ter stik v zvezi z mojim projektom.
+            Strinjam se, da Nuveli Studio moje podatke uporabi za pripravo in dostavo Home DNA™ Reporta ter stik v zvezi
+            z mojim projektom.
           </span>
         </label>
+
+        <div className="mt-8">
+          {turnstileSiteKey ? (
+            <TurnstileWidget
+              siteKey={turnstileSiteKey}
+              onVerify={(turnstileToken) => set({ turnstileToken })}
+              onError={() => setError("Varnostnega preverjanja ni bilo mogoče naložiti.")}
+            />
+          ) : (
+            <p className="text-sm text-foreground">Varnostna zaščita obrazca ni konfigurirana.</p>
+          )}
+        </div>
 
         {error && (
           <p role="alert" className="mt-6 text-sm text-foreground">
