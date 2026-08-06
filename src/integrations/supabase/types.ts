@@ -59,6 +59,72 @@ export type Database = {
         }
         Relationships: []
       }
+      home_dna_submissions: {
+        Row: {
+          answers: Json
+          attempt_count: number
+          consent: boolean
+          consent_at: string
+          created_at: string
+          customer_email: string
+          customer_email_status: string
+          customer_name: string
+          customer_phone: string
+          customer_resend_id: string | null
+          id: string
+          internal_email_status: string
+          internal_resend_id: string | null
+          last_error: string | null
+          report: Json
+          request_ip_hash: string
+          send_status: string
+          summary: string
+          updated_at: string
+        }
+        Insert: {
+          answers: Json
+          attempt_count?: number
+          consent: boolean
+          consent_at: string
+          created_at?: string
+          customer_email: string
+          customer_email_status?: string
+          customer_name: string
+          customer_phone?: string
+          customer_resend_id?: string | null
+          id: string
+          internal_email_status?: string
+          internal_resend_id?: string | null
+          last_error?: string | null
+          report: Json
+          request_ip_hash: string
+          send_status?: string
+          summary: string
+          updated_at?: string
+        }
+        Update: {
+          answers?: Json
+          attempt_count?: number
+          consent?: boolean
+          consent_at?: string
+          created_at?: string
+          customer_email?: string
+          customer_email_status?: string
+          customer_name?: string
+          customer_phone?: string
+          customer_resend_id?: string | null
+          id?: string
+          internal_email_status?: string
+          internal_resend_id?: string | null
+          last_error?: string | null
+          report?: Json
+          request_ip_hash?: string
+          send_status?: string
+          summary?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
