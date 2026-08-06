@@ -214,9 +214,14 @@ export function BookingCalendar({
             : "Obisk na domu — naslov in podrobnosti uskladimo naknadno."}
         </p>
         <p className="mt-6 max-w-[58ch] text-sm leading-relaxed text-muted-foreground">
-          Potrditev je prikazana na tej strani. Samodejno potrditveno e-sporočilo bo dodano, ko bo
-          vzpostavljen poslovni e-naslov.
+          {confirmation.customerEmailStatus === "sent" &&
+          confirmation.internalEmailStatus === "sent"
+            ? `Potrditev smo poslali na ${contact.email}, o rezervaciji pa je obveščen tudi studio.`
+            : confirmation.customerEmailStatus === "sent"
+              ? `Potrditev smo poslali na ${contact.email}. Obvestila studiu ni bilo mogoče dostaviti, zato vas bomo kontaktirali tudi neposredno. Vaš termin ostaja potrjen.`
+              : "Termin je potrjen in shranjen, potrditvenega e-sporočila pa trenutno ni bilo mogoče dostaviti. Kontaktirali vas bomo neposredno."}
         </p>
+
       </section>
     );
   }
