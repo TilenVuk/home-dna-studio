@@ -67,8 +67,17 @@ export function HomeDnaReport({
         },
       });
 
-      if (!result.delivered) throw new Error("EMAIL_DELIVERY_INCOMPLETE");
+      if (!result.delivered) {
+        setDeliveryError(
+          result.customerEmailStatus === "sent"
+            ? "Poročilo smo poslali na vaš e-naslov, obvestila studiu pa trenutno ni bilo mogoče dostaviti."
+            : "Poročilo je pripravljeno, vendar ga trenutno ni bilo mogoče poslati po e-pošti.",
+        );
+        onDeliveryStateChange?.("delivery-error");
+        return;
+      }
       onDeliveryStateChange?.("sent");
+
     } catch (error) {
       console.error("Home DNA preparation or delivery failed", error);
       if (!reportReady) {
