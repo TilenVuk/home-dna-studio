@@ -1,10 +1,15 @@
 import {
-  challengeOptions,
-  futureNeedsOptions,
+  challengeOptionsForRooms,
+  cookingOptions,
   executionLevelOptions,
-  lifestyleOptions,
+  futureNeedsOptionsForRooms,
+  hobbyOptions,
+  hostingOptions,
+  lifestyleOptionsForRooms,
+  noHobbiesLabel,
   noFutureChangesLabel,
   otherChallengeLabel,
+  workFromHomeOptions,
 } from "./discoveryData";
 import {
   atmosphereOptions,
@@ -22,11 +27,15 @@ import { hasRoom, type ScreenDef } from "./screenDef";
 import { calculateInvestment } from "./pricing";
 import type {
   ChildrenAnswer,
+  CookingFrequency,
+  HostingFrequency,
   HomeDnaState,
   ExecutionLevel,
   LifestyleState,
   ProjectStage,
   PropertyType,
+  RoomKey,
+  WorkFromHomeFrequency,
 } from "./homeDnaTypes";
 
 const noPetsLabel = petOptions[3]?.label ?? "Brez hišnih ljubljenčkov";
@@ -35,11 +44,85 @@ function setLife(state: HomeDnaState, patch: Partial<LifestyleState>): HomeDnaSt
   return { ...state, lifestyle: { ...state.lifestyle, ...patch } };
 }
 
+function scopeIncludes(selectedRooms: RoomKey[], room: RoomKey): boolean {
+  return selectedRooms.includes("complete-home") || selectedRooms.includes(room);
+}
+
+function selectedIndividualRooms(selectedRooms: RoomKey[]): RoomKey[] {
+  return selectedRooms.filter((room) => room !== "complete-home");
+}
+
+function shouldAskPets(selectedRooms: RoomKey[]): boolean {
+  return ["living-room", "entry-hall", "bedroom", "children-room"].some((room) =>
+    scopeIncludes(selectedRooms, room as RoomKey),
+  );
+}
+
+function shouldAskFloorArea(selectedRooms: RoomKey[]): boolean {
+  return selectedRooms.includes("complete-home") || selectedIndividualRooms(selectedRooms).length > 1;
+}
+
+function shouldAskHobbies(selectedRooms: RoomKey[]): boolean {
+  return ["wardrobe", "living-room", "entry-hall", "utility-room", "children-room"].some((room) =>
+    scopeIncludes(selectedRooms, room as RoomKey),
+  );
+}
+
+function applyRoomScope(state: HomeDnaState, selectedRooms: RoomKey[]): HomeDnaState {
+  const priorities = lifestyleOptionsForRooms(selectedRooms);
+  const challenges = challengeOptionsForRooms(selectedRooms);
+  const futureNeeds = futureNeedsOptionsForRooms(selectedRooms).filter(
+    (value) =>
+      state.home.children !== "none" || (value !== "Rast družine" && value !== "Otroci bodo potrebovali več prostora"),
+  );
+  const lifestyle = {
+    ...state.lifestyle,
+    priorities: state.lifestyle.priorities.filter((value) => priorities.includes(value)),
+    currentChallenges: state.lifestyle.currentChallenges.filter((value) => challenges.includes(value)),
+    futureNeeds: state.lifestyle.futureNeeds.filter((value) => futureNeeds.includes(value)),
+  };
+
+  if (!scopeIncludes(selectedRooms, "kitchen")) delete lifestyle.cookingFrequency;
+  if (!scopeIncludes(selectedRooms, "living-room") && !scopeIncludes(selectedRooms, "bedroom")) {
+    delete lifestyle.workFromHomeFrequency;
+  }
+  if (!scopeIncludes(selectedRooms, "kitchen") && !scopeIncludes(selectedRooms, "living-room")) {
+    delete lifestyle.hostingFrequency;
+  }
+  if (!shouldAskHobbies(selectedRooms)) lifestyle.hobbies = [];
+  if (!lifestyle.currentChallenges.includes(otherChallengeLabel)) delete lifestyle.challengeNote;
+
+  return { ...state, selectedRooms, lifestyle };
+}
+
 /* ---------------- about your home ---------------- */
 
 function homeScreens(state: HomeDnaState): ScreenDef[] {
   const home = state.home;
   const screens: ScreenDef[] = [
+    {
+      kind: "visual",
+      key: "project-stage",
+      headline: "V kateri fazi je vaš projekt?",
+      support: "Kontekst projekta nam pomaga pripraviti priporočila, primerna za vaš prostor in časovni okvir.",
+      options: projectStageOptions,
+      value: home.projectStage,
+      apply: (s, v) => ({ ...s, home: { ...s.home, projectStage: v as ProjectStage } }),
+    },
+    {
+      kind: "visual",
+      key: "property-type",
+      headline: "Kakšen dom opremljate?",
+      options: propertyTypeOptions,
+      value: home.propertyType,
+      apply: (s, v) => ({ ...s, home: { ...s.home, propertyType: v as PropertyType } }),
+    },
+    {
+      kind: "rooms",
+      key: "rooms",
+      selected: state.selectedRooms,
+      apply: (s, selectedRooms) => applyRoomScope(s, selectedRooms),
+    },
     {
       kind: "choice",
       key: "household-size",
@@ -73,12 +156,13 @@ function homeScreens(state: HomeDnaState): ScreenDef[] {
         const nextRooms = { ...s.rooms };
         delete nextRooms.childrenRoom;
 
-        return {
+        const nextState = {
           ...s,
           home: nextHome,
           rooms: nextRooms,
           selectedRooms: s.selectedRooms.filter((room) => room !== "children-room"),
         };
+        return applyRoomScope(nextState, nextState.selectedRooms);
       },
     },
   ];
@@ -106,18 +190,21 @@ function homeScreens(state: HomeDnaState): ScreenDef[] {
     });
   }
 
-  screens.push(
-    {
+  if (shouldAskPets(state.selectedRooms)) {
+    screens.push({
       kind: "multi",
       key: "pets",
       headline: "Ali z vami živijo hišni ljubljenčki?",
-      support: "Vplivajo na materiale, vzdrževanje in organizacijo predsobe.",
+      support: "Vplivajo na izbiro materialov, vzdrževanje in organizacijo izbranih prostorov.",
       options: petOptions.map((p) => p.label),
       exclusive: noPetsLabel,
       selected: home.pets,
       apply: (s, pets) => ({ ...s, home: { ...s.home, pets } }),
-    },
-    {
+    });
+  }
+
+  if (shouldAskFloorArea(state.selectedRooms)) {
+    screens.push({
       kind: "number",
       key: "home-size",
       headline: "Kako velik je vaš dom?",
@@ -128,31 +215,8 @@ function homeScreens(state: HomeDnaState): ScreenDef[] {
       presets: floorAreaPresets,
       value: home.floorArea,
       apply: (s, floorArea) => ({ ...s, home: { ...s.home, floorArea } }),
-    },
-    {
-      kind: "visual",
-      key: "project-stage",
-      headline: "V kateri fazi je vaš projekt?",
-      support: "Kontekst projekta nam pomaga pripraviti priporočila, primerna za vaš prostor in časovni okvir.",
-      options: projectStageOptions,
-      value: home.projectStage,
-      apply: (s, v) => ({ ...s, home: { ...s.home, projectStage: v as ProjectStage } }),
-    },
-    {
-      kind: "visual",
-      key: "property-type",
-      headline: "Kakšen dom opremljate?",
-      options: propertyTypeOptions,
-      value: home.propertyType,
-      apply: (s, v) => ({ ...s, home: { ...s.home, propertyType: v as PropertyType } }),
-    },
-    {
-      kind: "rooms",
-      key: "rooms",
-      selected: state.selectedRooms,
-      apply: (s, selectedRooms) => ({ ...s, selectedRooms }),
-    },
-  );
+    });
+  }
 
   return screens;
 }
@@ -171,8 +235,8 @@ function styleScreens(state: HomeDnaState): ScreenDef[] {
     {
       kind: "multi",
       key: "atmosphere",
-      headline: "Kako želite, da se vaš dom občuti?",
-      support: "Izberite največ tri občutke, ki naj vodijo oblikovanje prostora.",
+      headline: "Kako želite, da se občutijo izbrani prostori?",
+      support: "Izberite največ tri občutke, ki naj vodijo njihovo oblikovanje.",
       options: atmosphereOptions,
       max: 3,
       limitNotice: "Izberete lahko največ tri občutke.",
@@ -204,30 +268,98 @@ function styleScreens(state: HomeDnaState): ScreenDef[] {
 
 function lifestyleScreens(state: HomeDnaState): ScreenDef[] {
   const life = state.lifestyle;
+  const priorities = lifestyleOptionsForRooms(state.selectedRooms);
+  const challenges = challengeOptionsForRooms(state.selectedRooms);
+  const futureNeeds = futureNeedsOptionsForRooms(state.selectedRooms).filter(
+    (value) =>
+      state.home.children !== "none" || (value !== "Rast družine" && value !== "Otroci bodo potrebovali več prostora"),
+  );
   const screens: ScreenDef[] = [
     {
       kind: "multi",
       key: "lifestyle",
-      headline: "Kaj vam je doma najpomembnejše?",
-      support: "Izberite največ tri stvari, ki naj najbolj vplivajo na zasnovo vašega doma.",
-      options: lifestyleOptions,
+      headline: "Kaj vam je pri izbranih prostorih najpomembnejše?",
+      support: "Izberite največ tri prioritete, ki naj najbolj vplivajo na zasnovo.",
+      options: priorities,
       max: 3,
       limitNotice: "Izberete lahko največ tri prioritete.",
-      selected: life.priorities,
+      selected: life.priorities.filter((value) => priorities.includes(value)),
       apply: (s, priorities) => setLife(s, { priorities }),
     },
-    {
-      kind: "multi",
-      key: "challenges",
-      headline: "Kaj vas v trenutnem domu najbolj ovira?",
-      support: "Izberite največ tri konkretne težave, ki jih mora novi projekt rešiti.",
-      options: challengeOptions,
-      max: 3,
-      limitNotice: "Izberete lahko največ tri izzive.",
-      selected: life.currentChallenges,
-      apply: (s, currentChallenges) => setLife(s, { currentChallenges }),
-    },
   ];
+
+  if (scopeIncludes(state.selectedRooms, "kitchen")) {
+    screens.push({
+      kind: "choice",
+      key: "cooking-frequency",
+      headline: "Kako pogosto kuhate doma?",
+      support: "Pogostost kuhanja vpliva na delovni tok, količino shranjevanja in izbiro površin.",
+      options: cookingOptions.map((option) => ({
+        value: option.value,
+        label: option.label,
+        description: option.description,
+      })),
+      value: life.cookingFrequency,
+      apply: (s, cookingFrequency) => setLife(s, { cookingFrequency: cookingFrequency as CookingFrequency }),
+    });
+  }
+
+  if (scopeIncludes(state.selectedRooms, "kitchen") || scopeIncludes(state.selectedRooms, "living-room")) {
+    screens.push({
+      kind: "choice",
+      key: "hosting-frequency",
+      headline: "Kako pogosto gostite družino ali prijatelje?",
+      support: "To vpliva na količino sedišč, delovne površine in način povezovanja prostorov.",
+      options: hostingOptions.map((option) => ({
+        value: option.value,
+        label: option.label,
+      })),
+      value: life.hostingFrequency,
+      apply: (s, hostingFrequency) => setLife(s, { hostingFrequency: hostingFrequency as HostingFrequency }),
+    });
+  }
+
+  if (scopeIncludes(state.selectedRooms, "living-room") || scopeIncludes(state.selectedRooms, "bedroom")) {
+    screens.push({
+      kind: "choice",
+      key: "work-from-home-frequency",
+      headline: "Kako pogosto delate od doma?",
+      support: "Vprašanje prikažemo le tam, kjer lahko izbrani prostor vključuje delovno mesto.",
+      options: workFromHomeOptions.map((option) => ({
+        value: option.value,
+        label: option.label,
+        ...(option.description ? { description: option.description } : {}),
+      })),
+      value: life.workFromHomeFrequency,
+      apply: (s, workFromHomeFrequency) =>
+        setLife(s, { workFromHomeFrequency: workFromHomeFrequency as WorkFromHomeFrequency }),
+    });
+  }
+
+  if (shouldAskHobbies(state.selectedRooms)) {
+    screens.push({
+      kind: "multi",
+      key: "hobbies",
+      headline: "Katere hobije ali opremo morajo izbrani prostori upoštevati?",
+      support: "Izberite le tisto, kar vpliva na shranjevanje ali uporabo prostora.",
+      options: hobbyOptions,
+      exclusive: noHobbiesLabel,
+      selected: life.hobbies,
+      apply: (s, hobbies) => setLife(s, { hobbies }),
+    });
+  }
+
+  screens.push({
+    kind: "multi",
+    key: "challenges",
+    headline: "Kaj vas pri teh prostorih trenutno najbolj ovira?",
+    support: "Prikazane so samo težave, povezane z izbranimi prostori. Izberite največ tri.",
+    options: challenges,
+    max: 3,
+    limitNotice: "Izberete lahko največ tri izzive.",
+    selected: life.currentChallenges.filter((value) => challenges.includes(value)),
+    apply: (s, currentChallenges) => setLife(s, { currentChallenges }),
+  });
 
   if (life.currentChallenges.includes(otherChallengeLabel)) {
     screens.push({
@@ -243,11 +375,11 @@ function lifestyleScreens(state: HomeDnaState): ScreenDef[] {
   screens.push({
     kind: "multi",
     key: "future-needs",
-    headline: "Kako naj se dom prilagaja prihodnosti?",
-    support: "Izberite vse spremembe, ki bi jih bilo smiselno upoštevati že danes.",
-    options: futureNeedsOptions,
+    headline: "Kako naj se izbrani prostori prilagajajo prihodnosti?",
+    support: "Prikazane so samo spremembe, ki lahko vplivajo na izbrani obseg projekta.",
+    options: futureNeeds,
     exclusive: noFutureChangesLabel,
-    selected: life.futureNeeds,
+    selected: life.futureNeeds.filter((value) => futureNeeds.includes(value)),
     apply: (s, futureNeeds) => setLife(s, { futureNeeds }),
   });
 
