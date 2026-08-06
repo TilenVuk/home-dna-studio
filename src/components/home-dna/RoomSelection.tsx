@@ -55,9 +55,9 @@ export function RoomSelection({
             <VisualChoiceCard
               key={room.key}
               image={room.image}
-              title={isChildrenRoom ? `${room.title} (${quantity})` : room.title}
+              title={isChildrenRoom && quantity ? `${room.title} (${quantity})` : room.title}
               description={
-                isChildrenRoom
+                isChildrenRoom && quantity
                   ? `Izbor pomeni ${quantity} ${childrenCount === 1 ? "otroško sobo" : "otroške sobe"}; ocena investicije se samodejno pomnoži s številom otrok.`
                   : room.description
               }
