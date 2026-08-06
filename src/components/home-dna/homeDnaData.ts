@@ -39,8 +39,8 @@ export const individualRoomKeys: RoomKey[] = [
   "children-room",
 ];
 
-export function availableIndividualRoomKeys(childrenCount?: number): RoomKey[] {
-  return individualRoomKeys.filter((key) => key !== childrenRoomKey || Boolean(childrenCount));
+export function availableIndividualRoomKeys(_childrenCount?: number): RoomKey[] {
+  return individualRoomKeys;
 }
 
 export const roomOptions: RoomOption[] = [
@@ -100,8 +100,8 @@ export const roomOptions: RoomOption[] = [
   },
 ];
 
-export function availableRoomOptions(childrenCount?: number): RoomOption[] {
-  return roomOptions.filter((room) => room.key !== childrenRoomKey || Boolean(childrenCount));
+export function availableRoomOptions(_childrenCount?: number): RoomOption[] {
+  return roomOptions;
 }
 
 export const welcomeCopy = {
