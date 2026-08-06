@@ -176,7 +176,10 @@ export function BookingCalendar({
       setConfirmation({
         slotStart: result.slotStart,
         consultationType: result.consultationType as ConsultationType,
+        customerEmailStatus: result.customerEmailStatus,
+        internalEmailStatus: result.internalEmailStatus,
       });
+
     } catch (reservationError) {
       console.error(reservationError);
       setSelectedStart(null);
