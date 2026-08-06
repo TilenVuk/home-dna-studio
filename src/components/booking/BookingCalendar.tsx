@@ -39,7 +39,10 @@ interface BookingCalendarProps {
 interface Confirmation {
   slotStart: string;
   consultationType: ConsultationType;
+  customerEmailStatus: "pending" | "sent" | "failed";
+  internalEmailStatus: "pending" | "sent" | "failed";
 }
+
 
 const dateFormatter = new Intl.DateTimeFormat("sl-SI", {
   weekday: "short",
