@@ -16,9 +16,11 @@ export type HomeDnaDeliveryState = "processing" | "sent" | "generation-error" | 
 export function HomeDnaReport({
   state,
   onDeliveryStateChange,
+  onRequireNewVerification,
 }: {
   state: HomeDnaState;
   onDeliveryStateChange?: (status: HomeDnaDeliveryState) => void;
+  onRequireNewVerification: () => void;
 }) {
   const generate = useServerFn(generateHomeDnaReport);
   const submit = useServerFn(submitHomeDna);
@@ -131,12 +133,11 @@ export function HomeDnaReport({
         </p>
         <button
           type="button"
-          disabled={preparing}
-          onClick={() => void prepareAndSubmit()}
-          className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full border border-border px-6 py-3 text-sm disabled:opacity-60"
+          onClick={onRequireNewVerification}
+          className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full border border-border px-6 py-3 text-sm"
         >
-          {preparing ? <Loader2 size={16} className="animate-spin" /> : <RotateCcw size={16} />}
-          Poskusi znova
+          <RotateCcw size={16} />
+          Nazaj na varnostno preverjanje
         </button>
       </div>
     );

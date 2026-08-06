@@ -23,7 +23,10 @@ export async function authorizeHomeDnaReport(input: {
 
 async function verifyTurnstile(token: string, requestIp: string): Promise<void> {
   const secret = process.env["TURNSTILE_SECRET_KEY"]?.trim();
-  if (!secret) throw new Error("HOME_DNA_BOT_PROTECTION_UNAVAILABLE");
+  if (!secret) {
+    console.error("Home DNA Turnstile configuration is missing");
+    throw new Error("HOME_DNA_BOT_PROTECTION_UNAVAILABLE");
+  }
 
   const body = new FormData();
   body.set("secret", secret);
@@ -41,13 +44,19 @@ async function verifyTurnstile(token: string, requestIp: string): Promise<void> 
       body,
       signal: controller.signal,
     });
-  } catch {
+  } catch (error) {
+    console.error("Home DNA Turnstile request failed", {
+      reason: error instanceof DOMException && error.name === "AbortError" ? "timeout" : "network",
+    });
     throw new Error("HOME_DNA_BOT_PROTECTION_UNAVAILABLE");
   } finally {
     clearTimeout(timeoutId);
   }
 
-  if (!response.ok) throw new Error("HOME_DNA_BOT_PROTECTION_UNAVAILABLE");
+  if (!response.ok) {
+    console.error("Home DNA Turnstile endpoint returned an error", { status: response.status });
+    throw new Error("HOME_DNA_BOT_PROTECTION_UNAVAILABLE");
+  }
 
   let result: TurnstileResult;
   try {
@@ -55,15 +64,27 @@ async function verifyTurnstile(token: string, requestIp: string): Promise<void> 
   } catch {
     throw new Error("HOME_DNA_BOT_PROTECTION_UNAVAILABLE");
   }
-  if (!result.success) throw new Error("HOME_DNA_BOT_CHECK_FAILED");
+  if (!result.success) {
+    console.warn("Home DNA Turnstile verification failed", {
+      errorCodes: result["error-codes"] ?? [],
+    });
+    throw new Error("HOME_DNA_BOT_CHECK_FAILED");
+  }
 
   const isTestSecret = secret === "1x0000000000000000000000000000000AA";
   const validAction =
     result.action === TURNSTILE_ACTION || (isTestSecret && result.action === "test");
-  if (!validAction) throw new Error("HOME_DNA_BOT_CHECK_FAILED");
+  if (!validAction) {
+    console.warn("Home DNA Turnstile action mismatch", { receivedAction: result.action ?? null });
+    throw new Error("HOME_DNA_BOT_CHECK_FAILED");
+  }
 
   const expectedHostname = process.env["TURNSTILE_EXPECTED_HOSTNAME"]?.trim().toLowerCase();
   if (expectedHostname && result.hostname?.toLowerCase() !== expectedHostname) {
+    console.warn("Home DNA Turnstile hostname mismatch", {
+      expectedHostname,
+      receivedHostname: result.hostname ?? null,
+    });
     throw new Error("HOME_DNA_BOT_CHECK_FAILED");
   }
 }

@@ -5,7 +5,15 @@ import { BookingCalendar } from "@/components/booking/BookingCalendar";
 import { HomeDnaReport, type HomeDnaDeliveryState } from "./HomeDnaReport";
 import type { HomeDnaState } from "./homeDnaTypes";
 
-export function SuccessScreen({ name, state }: { name?: string; state: HomeDnaState }) {
+export function SuccessScreen({
+  name,
+  state,
+  onBack,
+}: {
+  name?: string;
+  state: HomeDnaState;
+  onBack: () => void;
+}) {
   const [deliveryState, setDeliveryState] = useState<HomeDnaDeliveryState>("processing");
 
   const heading =
@@ -23,7 +31,7 @@ export function SuccessScreen({ name, state }: { name?: string; state: HomeDnaSt
       : deliveryState === "delivery-error"
         ? "Vaši odgovori so ostali na tej strani. Spodaj lahko prenesete PDF in ponovno poskusite s pošiljanjem."
         : deliveryState === "generation-error"
-          ? "Vaši odgovori so ostali na tej strani. Spodaj lahko ponovno poskusite brez ponovnega izpolnjevanja obrazca."
+          ? "Vaši odgovori so ohranjeni. Vrnite se samo na zadnji korak in ponovno opravite varnostno preverjanje."
           : "Na podlagi vaših odgovorov pripravljamo osebno analizo doma, oblikovalske smernice in okvirno oceno investicije.";
 
   return (
@@ -100,7 +108,11 @@ export function SuccessScreen({ name, state }: { name?: string; state: HomeDnaSt
         />
       )}
 
-      <HomeDnaReport state={state} onDeliveryStateChange={setDeliveryState} />
+      <HomeDnaReport
+        state={state}
+        onDeliveryStateChange={setDeliveryState}
+        onRequireNewVerification={onBack}
+      />
     </>
   );
 }
