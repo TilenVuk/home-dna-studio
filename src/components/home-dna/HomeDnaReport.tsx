@@ -44,12 +44,12 @@ export function HomeDnaReport({
     onDeliveryStateChange?.("processing");
 
     try {
-      const currentReport = report ?? (await generate({ data: buildReportInput(state) }));
+      const reportInput = buildReportInput(state);
+      const currentReport = report ?? (await generate({ data: reportInput }));
       reportReady = true;
       if (!report) setReport(currentReport);
 
-      const currentPdf =
-        pdfBlob ?? (await withTimeout(createPdfBlob(state, currentReport), 120_000, "PDF timeout"));
+      const currentPdf = pdfBlob ?? (await withTimeout(createPdfBlob(state, currentReport), 120_000, "PDF timeout"));
       pdfReady = true;
       if (!pdfBlob) setPdfBlob(currentPdf);
 
@@ -58,9 +58,14 @@ export function HomeDnaReport({
       const result = await submit({
         data: {
           submissionId: submissionId.current,
-          contact: state.contact,
-          answers: JSON.parse(JSON.stringify(state)),
-          summary: buildReportInput(state).summary,
+          contact: {
+            name: state.contact.name,
+            email: state.contact.email,
+            phone: state.contact.phone,
+            consent: state.contact.consent,
+          },
+          answers: buildStoredAnswers(state),
+          summary: reportInput.projectSummary,
           report: currentReport,
           pdfBase64: await blobToBase64(currentPdf),
           pdfFilename: PDF_FILENAME,
@@ -77,7 +82,6 @@ export function HomeDnaReport({
         return;
       }
       onDeliveryStateChange?.("sent");
-
     } catch (error) {
       console.error("Home DNA preparation or delivery failed", error);
       if (!reportReady) {
@@ -87,9 +91,7 @@ export function HomeDnaReport({
         setGenerationError("PDF-ja trenutno ni bilo mogoče pripraviti.");
         onDeliveryStateChange?.("generation-error");
       } else {
-        setDeliveryError(
-          "Poročilo je pripravljeno, vendar ga trenutno ni bilo mogoče poslati po e-pošti.",
-        );
+        setDeliveryError("Poročilo je pripravljeno, vendar ga trenutno ni bilo mogoče poslati po e-pošti.");
         onDeliveryStateChange?.("delivery-error");
       }
     } finally {
@@ -110,8 +112,7 @@ export function HomeDnaReport({
     setPdfError(null);
 
     try {
-      const blob =
-        pdfBlob ?? (await withTimeout(createPdfBlob(state, report), 120_000, "PDF timeout"));
+      const blob = pdfBlob ?? (await withTimeout(createPdfBlob(state, report), 120_000, "PDF timeout"));
       if (!pdfBlob) setPdfBlob(blob);
       downloadBlob(blob, PDF_FILENAME);
     } catch (error) {
@@ -177,8 +178,7 @@ export function HomeDnaReport({
           <div role="alert" className="mb-6 max-w-2xl border-l-2 border-destructive pl-5">
             <p className="text-sm text-destructive">{deliveryError}</p>
             <p className="mt-2 text-sm text-muted-foreground">
-              PDF lahko prenesete takoj. Ponovni poskus ne bo ustvaril podvojene oddaje ali
-              podvojenih sporočil.
+              PDF lahko prenesete takoj. Ponovni poskus ne bo ustvaril podvojene oddaje ali podvojenih sporočil.
             </p>
             <button
               type="button"
@@ -299,6 +299,11 @@ async function createPdfBlob(state: HomeDnaState, report: Report): Promise<Blob>
   });
 }
 
+function buildStoredAnswers(state: HomeDnaState): Record<string, unknown> {
+  const { contact: _contact, ...answers } = state;
+  return JSON.parse(JSON.stringify(answers)) as Record<string, unknown>;
+}
+
 function blobToBase64(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -316,11 +321,7 @@ function blobToBase64(blob: Blob): Promise<string> {
   });
 }
 
-async function withTimeout<T>(
-  promise: Promise<T>,
-  milliseconds: number,
-  message: string,
-): Promise<T> {
+async function withTimeout<T>(promise: Promise<T>, milliseconds: number, message: string): Promise<T> {
   let timeoutId: number | undefined;
   const timeout = new Promise<never>((_, reject) => {
     timeoutId = window.setTimeout(() => reject(new Error(message)), milliseconds);
@@ -335,12 +336,7 @@ async function withTimeout<T>(
 
 function ReportImage({ image, className = "" }: { image: ReportImageAsset; className?: string }) {
   return (
-    <img
-      src={image.src}
-      alt={image.alt}
-      loading="lazy"
-      className={`w-full rounded-2xl object-cover ${className}`}
-    />
+    <img src={image.src} alt={image.alt} loading="lazy" className={`w-full rounded-2xl object-cover ${className}`} />
   );
 }
 
