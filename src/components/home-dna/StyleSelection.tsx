@@ -34,14 +34,10 @@ export function StyleSelection({
   return (
     <ScreenShell
       screenKey="style-selection"
-      headline="V katerem od teh domov bi si predstavljali živeti tudi čez 15 let?"
+      headline="Kateri slog bi si predstavljali v izbranih prostorih tudi čez 15 let?"
       support="Izberete lahko največ dva sloga. Njuno kombinacijo bomo povezali v osebni slogovni profil."
     >
-      <div
-        role="group"
-        aria-label="Izbira sloga"
-        className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
-      >
+      <div role="group" aria-label="Izbira sloga" className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {styleOptions.map((option) => (
           <VisualChoiceCard
             key={option.value}
