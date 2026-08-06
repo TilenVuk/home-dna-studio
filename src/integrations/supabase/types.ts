@@ -80,6 +80,24 @@ export type Database = {
         }
         Relationships: []
       }
+      home_dna_report_attempts: {
+        Row: {
+          created_at: string
+          id: number
+          request_ip_hash: string
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          request_ip_hash: string
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          request_ip_hash?: string
+        }
+        Relationships: []
+      }
       home_dna_submissions: {
         Row: {
           answers: Json
@@ -151,7 +169,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      consume_home_dna_report_quota: {
+        Args: {
+          p_max_requests?: number
+          p_request_ip_hash: string
+          p_window_seconds?: number
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
