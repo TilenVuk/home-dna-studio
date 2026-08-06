@@ -188,6 +188,7 @@ export interface ContactState {
   email: string;
   phone: string;
   consent: boolean;
+  turnstileToken: string;
 }
 
 export interface HomeDnaState {
@@ -325,5 +326,5 @@ export const initialHomeDnaState: HomeDnaState = {
   },
   rooms: {},
   investment: { level: "premium" },
-  contact: { name: "", email: "", phone: "", consent: false },
+  contact: { name: "", email: "", phone: "", consent: false, turnstileToken: "" },
 };
