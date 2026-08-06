@@ -1,85 +1,150 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Download, Loader2 } from "lucide-react";
+import { Download, Loader2, RotateCcw } from "lucide-react";
 import { generateHomeDnaReport, type HomeDnaReport as Report } from "@/lib/homeDnaReport.functions";
+import { submitHomeDna } from "@/lib/homeDnaSubmission.functions";
 import { buildReportInput } from "./reportSummary";
 import { generateHomeDnaPdf, downloadBlob } from "./reportPdf";
 import { resolveReportImages, type ReportImageAsset } from "./reportImages";
 import { formatEuro } from "./pricing";
 import type { HomeDnaState } from "./homeDnaTypes";
 
-export function HomeDnaReport({ state }: { state: HomeDnaState }) {
+const PDF_FILENAME = "Nuveli-Studio-Home-DNA-Report.pdf";
+
+export type HomeDnaDeliveryState = "processing" | "sent" | "generation-error" | "delivery-error";
+
+export function HomeDnaReport({
+  state,
+  onDeliveryStateChange,
+}: {
+  state: HomeDnaState;
+  onDeliveryStateChange?: (status: HomeDnaDeliveryState) => void;
+}) {
   const generate = useServerFn(generateHomeDnaReport);
+  const submit = useServerFn(submitHomeDna);
   const [report, setReport] = useState<Report | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [pdfBusy, setPdfBusy] = useState(false);
+  const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
+  const [generationError, setGenerationError] = useState<string | null>(null);
+  const [deliveryError, setDeliveryError] = useState<string | null>(null);
+  const [preparing, setPreparing] = useState(false);
+  const [downloadBusy, setDownloadBusy] = useState(false);
   const [pdfError, setPdfError] = useState<string | null>(null);
   const started = useRef(false);
+  const submissionId = useRef<string | null>(null);
+
+  const prepareAndSubmit = useCallback(async () => {
+    if (preparing) return;
+
+    let reportReady = Boolean(report);
+    let pdfReady = Boolean(pdfBlob);
+
+    setPreparing(true);
+    setGenerationError(null);
+    setDeliveryError(null);
+    onDeliveryStateChange?.("processing");
+
+    try {
+      const currentReport = report ?? (await generate({ data: buildReportInput(state) }));
+      reportReady = true;
+      if (!report) setReport(currentReport);
+
+      const currentPdf =
+        pdfBlob ?? (await withTimeout(createPdfBlob(state, currentReport), 120_000, "PDF timeout"));
+      pdfReady = true;
+      if (!pdfBlob) setPdfBlob(currentPdf);
+
+      if (!submissionId.current) submissionId.current = crypto.randomUUID();
+
+      const result = await submit({
+        data: {
+          submissionId: submissionId.current,
+          contact: state.contact,
+          answers: JSON.parse(JSON.stringify(state)),
+          summary: buildReportInput(state).summary,
+          report: currentReport,
+          pdfBase64: await blobToBase64(currentPdf),
+          pdfFilename: PDF_FILENAME,
+        },
+      });
+
+      if (!result.delivered) throw new Error("EMAIL_DELIVERY_INCOMPLETE");
+      onDeliveryStateChange?.("sent");
+    } catch (error) {
+      console.error("Home DNA preparation or delivery failed", error);
+      if (!reportReady) {
+        setGenerationError("Poročila trenutno ni bilo mogoče pripraviti.");
+        onDeliveryStateChange?.("generation-error");
+      } else if (!pdfReady) {
+        setGenerationError("PDF-ja trenutno ni bilo mogoče pripraviti.");
+        onDeliveryStateChange?.("generation-error");
+      } else {
+        setDeliveryError(
+          "Poročilo je pripravljeno, vendar ga trenutno ni bilo mogoče poslati po e-pošti.",
+        );
+        onDeliveryStateChange?.("delivery-error");
+      }
+    } finally {
+      setPreparing(false);
+    }
+  }, [generate, onDeliveryStateChange, pdfBlob, preparing, report, state, submit]);
 
   useEffect(() => {
     if (started.current) return;
     started.current = true;
+    void prepareAndSubmit();
+  }, [prepareAndSubmit]);
 
-    const input = buildReportInput(state);
+  const handleDownload = async () => {
+    if (downloadBusy || !report) return;
 
-    generate({ data: input })
-      .then((result) => {
-        setReport(result);
-      })
-      .catch((err) => {
-        console.error(err);
-        setError("Poročila trenutno ni bilo mogoče pripraviti.");
-      });
+    setDownloadBusy(true);
+    setPdfError(null);
 
-    // Poročilo se ustvari samo enkrat, ko se prikaže zaključni zaslon.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    try {
+      const blob =
+        pdfBlob ?? (await withTimeout(createPdfBlob(state, report), 120_000, "PDF timeout"));
+      if (!pdfBlob) setPdfBlob(blob);
+      downloadBlob(blob, PDF_FILENAME);
+    } catch (error) {
+      console.error(error);
+      setPdfError("PDF-ja trenutno ni bilo mogoče ustvariti.");
+    } finally {
+      setDownloadBusy(false);
+    }
+  };
 
-  const est = state.investment.estimatedInvestment;
-  const { executionLevel } = buildReportInput(state);
-
-  if (error) return <p className="mt-16 text-sm text-destructive">{error}</p>;
+  if (generationError) {
+    return (
+      <div className="mt-16">
+        <p role="alert" className="text-sm text-destructive">
+          {generationError}
+        </p>
+        <button
+          type="button"
+          disabled={preparing}
+          onClick={() => void prepareAndSubmit()}
+          className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full border border-border px-6 py-3 text-sm disabled:opacity-60"
+        >
+          {preparing ? <Loader2 size={16} className="animate-spin" /> : <RotateCcw size={16} />}
+          Poskusi znova
+        </button>
+      </div>
+    );
+  }
 
   if (!report) {
     return (
       <p className="mt-16 flex items-center gap-3 text-sm text-muted-foreground">
         <Loader2 size={16} className="animate-spin" />
-        Pripravljamo vaš Home DNA™ Report …
+        Pripravljamo vaš Home DNA™ Report in e-pošto …
       </p>
     );
   }
 
+  const est = state.investment.estimatedInvestment;
+  const { executionLevel } = buildReportInput(state);
   const investmentRange = est ? `${formatEuro(est.min)} – ${formatEuro(est.max)}` : "Po posvetu";
   const images = resolveReportImages(state, report);
-
-  async function handleDownload() {
-    if (pdfBusy || !report) return;
-
-    setPdfBusy(true);
-    setPdfError(null);
-
-    try {
-      const pdfPromise = generateHomeDnaPdf({
-        report,
-        images,
-        customerName: state.contact.name ?? "",
-        investmentRange,
-        executionLevel,
-      });
-
-      const timeout = new Promise<never>((_, reject) => {
-        window.setTimeout(() => reject(new Error("PDF timeout")), 120_000);
-      });
-
-      const blob = await Promise.race([pdfPromise, timeout]);
-      downloadBlob(blob, "Nuveli-Studio-Home-DNA-Report.pdf");
-    } catch (err) {
-      console.error(err);
-      setPdfError("PDF-ja trenutno ni bilo mogoče ustvariti.");
-    } finally {
-      setPdfBusy(false);
-    }
-  }
 
   return (
     <article className="mt-20 border-t border-border pt-16">
@@ -92,13 +157,39 @@ export function HomeDnaReport({ state }: { state: HomeDnaState }) {
       </div>
 
       <div className="mb-16">
+        {preparing && (
+          <p className="mb-5 flex items-center gap-3 text-sm text-muted-foreground">
+            <Loader2 size={16} className="animate-spin" />
+            Poročilo pošiljamo na {state.contact.email} …
+          </p>
+        )}
+
+        {deliveryError && (
+          <div role="alert" className="mb-6 max-w-2xl border-l-2 border-destructive pl-5">
+            <p className="text-sm text-destructive">{deliveryError}</p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              PDF lahko prenesete takoj. Ponovni poskus ne bo ustvaril podvojene oddaje ali
+              podvojenih sporočil.
+            </p>
+            <button
+              type="button"
+              disabled={preparing}
+              onClick={() => void prepareAndSubmit()}
+              className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-full border border-border px-6 py-3 text-sm disabled:opacity-60"
+            >
+              {preparing ? <Loader2 size={16} className="animate-spin" /> : <RotateCcw size={16} />}
+              Ponovno pošlji
+            </button>
+          </div>
+        )}
+
         <button
           type="button"
-          disabled={pdfBusy}
-          onClick={handleDownload}
+          disabled={downloadBusy}
+          onClick={() => void handleDownload()}
           className="inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-7 py-4 text-sm text-primary-foreground disabled:opacity-60"
         >
-          {pdfBusy ? (
+          {downloadBusy ? (
             <>
               <Loader2 size={16} className="animate-spin" />
               Pripravljamo PDF ...
@@ -185,6 +276,52 @@ export function HomeDnaReport({ state }: { state: HomeDnaState }) {
       </Section>
     </article>
   );
+}
+
+async function createPdfBlob(state: HomeDnaState, report: Report): Promise<Blob> {
+  const est = state.investment.estimatedInvestment;
+  const { executionLevel } = buildReportInput(state);
+  return generateHomeDnaPdf({
+    report,
+    images: resolveReportImages(state, report),
+    customerName: state.contact.name,
+    investmentRange: est ? `${formatEuro(est.min)} – ${formatEuro(est.max)}` : "Po posvetu",
+    executionLevel,
+  });
+}
+
+function blobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = String(reader.result);
+      const separator = result.indexOf(",");
+      if (separator < 0) {
+        reject(new Error("PDF encoding failed"));
+        return;
+      }
+      resolve(result.slice(separator + 1));
+    };
+    reader.onerror = () => reject(reader.error ?? new Error("PDF encoding failed"));
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function withTimeout<T>(
+  promise: Promise<T>,
+  milliseconds: number,
+  message: string,
+): Promise<T> {
+  let timeoutId: number | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    timeoutId = window.setTimeout(() => reject(new Error(message)), milliseconds);
+  });
+
+  try {
+    return await Promise.race([promise, timeout]);
+  } finally {
+    if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+  }
 }
 
 function ReportImage({ image, className = "" }: { image: ReportImageAsset; className?: string }) {
