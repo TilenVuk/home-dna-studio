@@ -82,22 +82,37 @@ export function Contact() {
             />
           ) : (
             <form onSubmit={onSubmit} noValidate className="grid gap-8 sm:grid-cols-2">
-              <Field label="Ime" error={errors["name"]}>
-                <input name="name" className={fieldClass} placeholder="Vaše ime in priimek" />
-              </Field>
-              <Field label="E-pošta" error={errors["email"]}>
+              <Field label="Ime" htmlFor="contact-name" error={errors["name"]}>
                 <input
+                  id="contact-name"
+                  name="name"
+                  autoComplete="name"
+                  className={fieldClass}
+                  placeholder="Vaše ime in priimek"
+                />
+              </Field>
+              <Field label="E-pošta" htmlFor="contact-email" error={errors["email"]}>
+                <input
+                  id="contact-email"
                   name="email"
                   type="email"
+                  autoComplete="email"
                   className={fieldClass}
                   placeholder="vi@epošta.si"
                 />
               </Field>
-              <Field label="Telefon" error={errors["phone"]}>
-                <input name="phone" className={fieldClass} placeholder="+386" />
+              <Field label="Telefon" htmlFor="contact-phone" error={errors["phone"]}>
+                <input
+                  id="contact-phone"
+                  name="phone"
+                  type="tel"
+                  autoComplete="tel"
+                  className={fieldClass}
+                  placeholder="+386"
+                />
               </Field>
-              <Field label="Vrsta projekta" error={errors["projectType"]}>
-                <select name="projectType" defaultValue="" className={fieldClass}>
+              <Field label="Vrsta projekta" htmlFor="contact-project-type" error={errors["projectType"]}>
+                <select id="contact-project-type" name="projectType" defaultValue="" className={fieldClass}>
                   <option value="" disabled>
                     Izberite
                   </option>
@@ -108,11 +123,12 @@ export function Contact() {
                   ))}
                 </select>
               </Field>
-              <Field label="Slike za navdih" error={undefined}>
+              <Field label="Slike za navdih" htmlFor="contact-inspiration" error={undefined}>
                 <label className="flex cursor-pointer items-center gap-3 border-b border-border py-3 text-sm text-muted-foreground transition-colors hover:text-foreground">
                   <Upload size={16} />
                   {files.length ? `Izbranih datotek: ${files.length}` : "Naložite slike"}
                   <input
+                    id="contact-inspiration"
                     type="file"
                     accept="image/*"
                     multiple
@@ -128,8 +144,9 @@ export function Contact() {
                 </label>
               </Field>
               <div className="sm:col-span-2">
-                <Field label="Sporočilo" error={errors["message"]}>
+                <Field label="Sporočilo" htmlFor="contact-message" error={errors["message"]}>
                   <textarea
+                    id="contact-message"
                     name="message"
                     rows={4}
                     maxLength={1500}
@@ -156,16 +173,20 @@ export function Contact() {
 
 function Field({
   label,
+  htmlFor,
   error,
   children,
 }: {
   label: string;
+  htmlFor: string;
   error?: string | undefined;
   children: React.ReactNode;
 }) {
   return (
     <div>
-      <span className="eyebrow">{label}</span>
+      <label htmlFor={htmlFor} className="eyebrow">
+        {label}
+      </label>
       <div className="mt-1">{children}</div>
       {error && <p className="mt-2 text-xs text-destructive">{error}</p>}
     </div>
