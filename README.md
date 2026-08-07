@@ -1,612 +1,247 @@
-# Home DNA Studio
-
-You are a senior brand strategist, UX designer and full-stack React developer.
-
-Create a premium website for a Slovenian company called:
-
-NUVELI STUDIO
-
-Brand concept:
-
-Nuveli Studio is not a traditional carpenter.
-
-We create complete interior solutions for homes.
-
-We design and deliver:
-
-- custom kitchens
-
-- wardrobes
-
-- walk-in closets
-
-- bathroom furniture
-
-- living room furniture
-
-- home offices
-
-- complete furnishing of apartments and houses
-
-Our goal is not to sell furniture.
-
-Our goal is to create spaces that are perfectly adapted to the way people live.
-
-Our unique methodology is called:
-
-HOME DNA™
-
-Home DNA™ is our process of understanding the customer's lifestyle, habits and storage needs before designing furniture.
-
-Core message:
-
-"Every home has its own DNA."
-
-"Furniture designed around the way you live."
-
-The website should feel like a premium interior design studio, not like a traditional woodworking company.
-
-Reference feeling:
-
-- Apple
-
-- Tesla
-
-- premium architecture studios
-
-- Scandinavian minimalism
-
-Avoid:
-
-- generic carpenter websites
-
-- industrial woodworking style
-
-- cheap furniture store feeling
-
----
-
-BRAND IDENTITY
-
-Company:
-
-Nuveli Studio
-
-Methodology:
-
-Home DNA™
-
-Tone:
-
-- premium
-
-- modern
-
-- intelligent
-
-- personal
-
-- trustworthy
-
-- minimal
-
-Visual style:
-
-- Scandinavian
-
-- warm minimalism
-
-- natural materials
-
-- oak wood
-
-- stone
-
-- matte surfaces
-
-- architecture photography
-
-Colors:
-
-- warm white background
-
-- charcoal black typography
-
-- natural oak accents
-
-- subtle dark green details
-
-Typography:
-
-Premium modern fonts.
-
-Large headlines.
-
-Lots of whitespace.
-
----
-
-HOMEPAGE STRUCTURE
-
-SECTION 1 - HERO
-
-Large premium image of a modern interior.
-
-Headline:
-
-"Every home has its own DNA."
-
-Subheadline:
-
-"We design custom interiors around your lifestyle, habits and everyday needs."
-
-Primary CTA:
-
-"Discover your Home DNA™"
-
-Secondary CTA:
-
-"View our projects"
-
----
-
-SECTION 2 - EXPLAIN THE CONCEPT
-
-Title:
-
-"Furniture should adapt to your life.
-
-Not your life to furniture."
-
-Explain:
-
-Most furniture is designed around dimensions.
-
-We design around:
-
-- your habits
-
-- your family
-
-- your belongings
-
-- your daily routines
-
-Every project starts by understanding how you live.
-
----
-
-SECTION 3 - HOME DNA™ PROCESS
-
-Create a premium 4-step process.
-
-Step 1:
-
-UNDERSTAND
-
-"We discover how you live."
-
-Questions about:
-
-- family members
-
-- habits
-
-- storage needs
-
-- lifestyle
-
-Step 2:
-
-DESIGN
-
-"We transform your needs into intelligent spaces."
-
-Step 3:
-
-CREATE
-
-"Precision production and professional installation."
-
-Step 4:
-
-LIVE
-
-"A home where everything has its place."
-
----
-
-SECTION 4 - HOME DNA™ INTERACTIVE ASSESSMENT
-
-Create an interactive questionnaire.
-
-This is the main conversion tool.
-
-Goal:
-
-Collect qualified leads.
-
-Title:
-
-"Discover your Home DNA™"
-
-Description:
-
-"Answer a few questions and discover what type of space fits your lifestyle."
-
-Do NOT create a full CAD planner.
-
-Create a guided experience.
-
----
-
-HOME DNA QUESTIONS
-
-PART 1:
-
-Who lives in your home?
-
-Options:
-
-- Single person
-
-- Couple
-
-- Family
-
-- Family with children
-
----
-
-PART 2:
-
-What type of project are you planning?
-
-Options:
-
-- Complete home furnishing
-
-- Kitchen
-
-- Wardrobe
-
-- Walk-in closet
-
-- Bathroom furniture
-
-- Living room
-
----
-
-PART 3:
-
-Storage analysis
-
-Important:
-
-Ask what people need to store.
-
-Examples:
-
-Wardrobe:
-
-- number of people
-
-- jackets
-
-- coats
-
-- shirts
-
-- dresses
-
-- shoes
-
-- boots
-
-- bags
-
-- luggage
-
-- sports equipment
-
-- vacuum cleaner
-
-Kitchen:
-
-- cooking frequency
-
-- number of people
-
-- pots
-
-- pans
-
-- appliances
-
-- coffee machine
-
-- wine
-
-- pantry needs
-
-- baking equipment
-
-Entry hall:
-
-- shoes
-
-- jackets
-
-- umbrellas
-
-- bags
-
-- children equipment
-
-Bathroom:
-
-- cosmetics
-
-- towels
-
-- cleaning products
-
-- appliances
-
----
-
-PART 4:
-
-Preferred style
-
-Show visual cards:
-
-Modern minimalist
-
-Classic
-
-Rustic / natural
-
-Luxury
-
-Industrial
-
----
-
-PART 5:
-
-Investment level
-
-Do not ask:
-
-"How much money do you have?"
-
-Ask:
-
-"What level of investment are you considering?"
-
-Options:
-
-Functional:
-
-8.000 - 12.000 €
-
-Balanced:
-
-12.000 - 20.000 €
-
-Premium:
-
-20.000 - 35.000 €
-
-Luxury:
-
-35.000 €+
-
----
-
-RESULT PAGE
-
-Generate a premium result summary.
-
-Example:
-
-"Your Home DNA™"
-
-Profile:
-
-Modern family home
-
-Recommended solutions:
-
-- optimized wardrobe system
-
-- kitchen with high storage capacity
-
-- hidden appliance storage
-
-- custom entry solution
-
-Estimated investment:
-
-15.000 - 22.000 €
-
-Message:
-
-"This is an initial estimate.
-
-After laser measurement we create a fully customized solution."
-
-CTA:
-
-"Request personal consultation"
-
----
-
-SECTION 5 - SERVICES
-
-Create premium cards:
-
-Kitchen
-
-"Designed around cooking habits and daily routines."
-
-Wardrobes
-
-"Storage designed around what you own."
-
-Living spaces
-
-"Furniture that connects the room."
-
-Complete homes
-
-"One vision from empty space to finished home."
-
----
-
-SECTION 6 - PROJECT GALLERY
-
-Create a premium portfolio section.
-
-Focus on:
-
-- modern homes
-
-- details
-
-- materials
-
-- storage solutions
-
-- architecture
-
-Not only furniture close-ups.
-
----
-
-SECTION 7 - CUSTOMER JOURNEY
-
-Timeline:
-
-1.
-
-Initial consultation
-
-2.
-
-Laser measurement
-
-3.
-
-Home DNA™ analysis
-
-4.
-
-3D design
-
-5.
-
-Production
-
-6.
-
-Installation
-
----
-
-SECTION 8 - WHY NUVELI STUDIO
-
-Create benefits:
-
-Personal approach
-
-Every project is unique.
-
-Smart storage
-
-Every item has a place.
-
-Precision
-
-Designed and measured to the millimeter.
-
-Complete solution
-
-One partner from idea to installation.
-
----
-
-SECTION 9 - CONTACT
-
-Premium contact form.
-
-Fields:
-
-Name
-
-Email
-
-Phone
-
-Project type
-
-Approximate budget
-
-Message
-
-Upload inspiration images
-
----
-
-TECHNICAL REQUIREMENTS
-
-Build using:
-
-React
-
-Tailwind CSS
-
-Modern reusable components
-
-Responsive design
-
-Smooth animations
-
-Lucide icons
-
-Clean architecture
-
-Fast loading
-
-SEO friendly
-
-Editable content
-
-Create a premium website ready for production.
-
-The final result should look like a high-end interior design studio, not a furniture manufacturer.
-
-This project was built with [Lovable](https://lovable.dev).
-
-**Live app**: https://home-dna-studio.lovable.app
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/fa2103f2-0060-4a43-8295-322b68e0ab91).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
-
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
+# Nuveli Studio — Home DNA™
+
+Production website and Home DNA™ discovery experience for **Nuveli Studio**, a Slovenian interior studio focused on complete, custom interior solutions designed around the way people live.
+
+Home DNA™ is Nuveli Studio's methodology for understanding lifestyle, routines, storage requirements, spatial needs and design preferences before creating an interior solution.
+
+## Production
+
+- Website: https://nuvelistudio.com
+- Primary production hostname: `nuvelistudio.com`
+- `www.nuvelistudio.com` is intended to redirect permanently to the primary hostname.
+
+## What this repository contains
+
+The repository contains the public Nuveli Studio website and the Home DNA™ discovery flow, including:
+
+- marketing website and SEO metadata;
+- Home DNA™ guided questionnaire;
+- server-side Home DNA™ report generation;
+- client-side PDF generation;
+- lead/report persistence in Supabase;
+- transactional email delivery;
+- bot protection and report-rate limiting.
+
+## Architecture
+
+```text
+GitHub source
+    ↓
+Vite / TanStack Start build
+    ↓
+Cloudflare Worker
+    ↓
+https://nuvelistudio.com
+
+Home DNA™ report flow
+    ↓
+Cloudflare Turnstile verification
+    ↓
+Supabase rate-limit check
+    ↓
+Google Gemini API
+    ↓
+Home DNA™ result
+    ↓
+PDF generation in the browser with jsPDF
+    ↓
+Resend transactional email
 ```
+
+GitHub is the source of truth for the application code.
+
+The Lovable editor and Lovable hosting are no longer part of the production deployment workflow. The project still uses `@lovable.dev/vite-tanstack-config` as a build-configuration dependency; it currently provides the TanStack Start, React, Tailwind, Nitro/Cloudflare and related Vite configuration used by this codebase.
+
+## Tech stack
+
+- React 19
+- TypeScript
+- TanStack Start
+- TanStack Router
+- TanStack Query
+- Vite
+- Tailwind CSS 4
+- Nitro with Cloudflare target
+- Cloudflare Workers
+- Cloudflare Turnstile
+- Supabase
+- Google Gemini API
+- Resend
+- jsPDF
+- Lucide React
+
+## Requirements
+
+- Node.js 20 or newer
+- pnpm
+- access to the required development or production environment values
+
+## Local development
+
+Install dependencies:
+
+```bash
+pnpm install --frozen-lockfile
+```
+
+Create the local public environment file:
+
+```bash
+cp .env.example .env.local
+```
+
+Create the local server-secret file when testing server functionality locally:
+
+```bash
+cp .dev.vars.example .dev.vars
+```
+
+Start the development server:
+
+```bash
+pnpm dev
+```
+
+## Public environment variables
+
+`.env.example` defines values that may be bundled into client-side JavaScript:
+
+```dotenv
+VITE_SUPABASE_URL=
+VITE_SUPABASE_PUBLISHABLE_KEY=
+VITE_SUPABASE_PROJECT_ID=
+VITE_TURNSTILE_SITE_KEY=
+```
+
+Anything prefixed with `VITE_` must be treated as public. Never place private API keys or service-role credentials in a `VITE_` variable.
+
+## Server-side secrets
+
+`.dev.vars.example` documents the server-side values used by the Cloudflare Worker:
+
+```dotenv
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-3.6-flash
+
+TURNSTILE_SECRET_KEY=
+TURNSTILE_EXPECTED_HOSTNAME=
+
+SUPABASE_URL=
+SUPABASE_PUBLISHABLE_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+RESEND_API_KEY=
+
+HOME_DNA_RATE_LIMIT_SALT=
+HOME_DNA_REPORT_RATE_LIMIT_PER_HOUR=5
+```
+
+Production secrets must be stored as Cloudflare Worker secrets and must not be committed to Git.
+
+`HOME_DNA_RATE_LIMIT_SALT` should be a random value of at least 32 characters.
+
+## Supabase
+
+The Home DNA™ report protection migration is located at:
+
+```text
+supabase/migrations/20260806101500_home_dna_report_protection.sql
+```
+
+It provides the database-side rate limiting used before report generation. The implementation stores a one-way SHA-256 hash derived from the requester IP rather than the original IP address.
+
+## Home DNA™ report generation
+
+The production report flow calls Gemini directly from the server-side Cloudflare Worker.
+
+The AI request is limited to relevant Home DNA™ answers such as rooms, lifestyle, style, investment and execution preferences. Contact details, consent information, Turnstile tokens and inspiration links are handled separately and are not intended to be included in the Gemini prompt.
+
+If the Gemini request fails, times out or returns invalid data, the application has a local fallback path so the user can still receive a report.
+
+## Build
+
+Create a production build:
+
+```bash
+pnpm build
+```
+
+The build generates the Cloudflare Wrangler configuration at:
+
+```text
+.output/server/wrangler.json
+```
+
+## Deployment to Cloudflare
+
+Run a deployment dry-run first:
+
+```bash
+pnpm deploy:cloudflare:dry-run
+```
+
+Deploy to production:
+
+```bash
+pnpm deploy:cloudflare
+```
+
+The deployment scripts are defined in `package.json` and use Wrangler with the generated `.output/server/wrangler.json` configuration.
+
+For the full Cloudflare setup, required Worker secrets, Turnstile configuration and deployment procedure, see:
+
+- [`CLOUDFLARE_DEPLOY.md`](./CLOUDFLARE_DEPLOY.md)
+
+## Security model
+
+Home DNA™ report generation is protected before the Gemini call by two independent controls:
+
+1. **Cloudflare Turnstile** verifies the browser request on the server.
+2. **Supabase rate limiting** restricts the number of reports generated for a hashed requester IP during the configured time window.
+
+Additional server-side validation limits accepted fields and input lengths and rejects unexpected request origins.
+
+Never commit:
+
+- `GEMINI_API_KEY`
+- `TURNSTILE_SECRET_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `RESEND_API_KEY`
+- `HOME_DNA_RATE_LIMIT_SALT`
+- `.env.local`
+- `.dev.vars`
+
+## SEO
+
+Public crawl configuration is stored in:
+
+- `public/robots.txt`
+- `public/sitemap.xml`
+
+The sitemap currently exposes the main website and the Home DNA™ discovery route under the canonical `https://nuvelistudio.com` hostname.
+
+## Useful scripts
+
+```bash
+pnpm dev                         # local development
+pnpm build                       # production build
+pnpm build:dev                   # development-mode build
+pnpm preview                     # preview built application
+pnpm lint                        # ESLint
+pnpm format                      # Prettier
+pnpm deploy:cloudflare:dry-run   # build + Wrangler dry-run
+pnpm deploy:cloudflare           # build + deploy to Cloudflare
+```
+
+## Repository conventions
+
+- `main` is the production source branch unless a different workflow is explicitly introduced.
+- GitHub is the canonical source for code changes.
+- Keep secrets outside the repository.
+- Use the checked-in lockfile and `pnpm install --frozen-lockfile` for reproducible installs.
+- Keep production-domain references canonicalized to `https://nuvelistudio.com`.
+
+## Brand context
+
+Nuveli Studio is positioned as a premium interior studio rather than a traditional furniture manufacturer or carpenter. The Home DNA™ methodology is the central product and conversion concept: spaces and furniture are designed around the customer's lifestyle, habits and real storage needs.
+
+The public brand experience should remain modern, minimal, warm and architecture-led.
