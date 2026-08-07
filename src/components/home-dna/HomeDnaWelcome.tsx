@@ -1,5 +1,8 @@
 import { ArrowRight, Check } from "lucide-react";
 import heroInterior from "@/assets/hero-interior.jpg";
+import heroWebp768 from "@/assets/hero-interior-768.webp";
+import heroWebp1280 from "@/assets/hero-interior-1280.webp";
+import heroWebp1920 from "@/assets/hero-interior-1920.webp";
 import { welcomeCopy } from "./homeDnaData";
 
 export function HomeDnaWelcome({ onStart }: { onStart: () => void }) {
@@ -37,13 +40,22 @@ export function HomeDnaWelcome({ onStart }: { onStart: () => void }) {
       </div>
 
       <div className="order-1 lg:order-2 lg:col-span-6">
-        <img
-          src={heroInterior}
-          alt="Sodoben interier z izdelano hrastovo opremo"
-          width={1920}
-          height={1200}
-          className="aspect-[4/5] w-full object-cover md:aspect-[4/3] lg:aspect-[4/5]"
-        />
+        <picture className="block">
+          <source
+            type="image/webp"
+            srcSet={`${heroWebp768} 768w, ${heroWebp1280} 1280w, ${heroWebp1920} 1920w`}
+            sizes="(min-width: 1024px) 50vw, 100vw"
+          />
+          <img
+            src={heroInterior}
+            alt="Sodoben interjer z izdelano hrastovo opremo"
+            width={1920}
+            height={1200}
+            fetchPriority="high"
+            decoding="async"
+            className="aspect-[4/5] w-full object-cover md:aspect-[4/3] lg:aspect-[4/5]"
+          />
+        </picture>
       </div>
     </div>
   );
