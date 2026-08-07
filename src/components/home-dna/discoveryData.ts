@@ -12,7 +12,15 @@ import wardrobeOpen from "@/assets/wardrobe-open.jpg";
 import investmentEssential from "@/assets/investment-essential.jpg";
 import investmentConsidered from "@/assets/investment-considered.jpg";
 import investmentSignature from "@/assets/investment-signature.jpg";
-import type { ExecutionLevel, KitchenState, RoomKey, VisualOption, WardrobeState } from "./homeDnaTypes";
+import type {
+  ExecutionLevel,
+  KitchenFrontMaterial,
+  KitchenFrontPriority,
+  KitchenState,
+  RoomKey,
+  VisualOption,
+  WardrobeState,
+} from "./homeDnaTypes";
 
 const individualRoomKeys: RoomKey[] = [
   "kitchen",
@@ -26,12 +34,20 @@ const individualRoomKeys: RoomKey[] = [
 ];
 
 function includesScope(selectedRooms: RoomKey[], rooms: RoomKey[]): boolean {
-  return selectedRooms.includes("complete-home") || rooms.some((room) => selectedRooms.includes(room));
+  return (
+    selectedRooms.includes("complete-home") || rooms.some((room) => selectedRooms.includes(room))
+  );
 }
 
-function scopedOptions(options: string[], rules: Record<string, RoomKey[]>, selectedRooms: RoomKey[]): string[] {
+function scopedOptions(
+  options: string[],
+  rules: Record<string, RoomKey[]>,
+  selectedRooms: RoomKey[],
+): string[] {
   if (selectedRooms.includes("complete-home")) return options;
-  return options.filter((option) => includesScope(selectedRooms, rules[option] ?? individualRoomKeys));
+  return options.filter((option) =>
+    includesScope(selectedRooms, rules[option] ?? individualRoomKeys),
+  );
 }
 
 export const priorityOptions = [
@@ -48,7 +64,14 @@ export const priorityOptions = [
 export const lifestyleOptions = priorityOptions;
 
 const lifestyleScope: Record<string, RoomKey[]> = {
-  "Družinsko življenje": ["kitchen", "living-room", "entry-hall", "bathroom", "bedroom", "children-room"],
+  "Družinsko življenje": [
+    "kitchen",
+    "living-room",
+    "entry-hall",
+    "bathroom",
+    "bedroom",
+    "children-room",
+  ],
   Kuhanje: ["kitchen"],
   Organizacija: individualRoomKeys,
   Sprostitev: ["living-room", "bathroom", "bedroom"],
@@ -66,7 +89,8 @@ export const executionLevelOptions: VisualOption<ExecutionLevel>[] = [
   {
     value: "basic",
     title: "Osnovni",
-    description: "Kakovostna izdelava iz preverjenih materialov. Odlična izbira za večino projektov.",
+    description:
+      "Kakovostna izdelava iz preverjenih materialov. Odlična izbira za večino projektov.",
     image: investmentEssential,
   },
   {
@@ -145,10 +169,30 @@ export const futureNeedsOptions = [
 ];
 
 const futureNeedsScope: Record<string, RoomKey[]> = {
-  "Rast družine": ["kitchen", "wardrobe", "living-room", "entry-hall", "bathroom", "bedroom", "children-room"],
-  "Otroci bodo potrebovali več prostora": ["wardrobe", "living-room", "entry-hall", "bedroom", "children-room"],
+  "Rast družine": [
+    "kitchen",
+    "wardrobe",
+    "living-room",
+    "entry-hall",
+    "bathroom",
+    "bedroom",
+    "children-room",
+  ],
+  "Otroci bodo potrebovali več prostora": [
+    "wardrobe",
+    "living-room",
+    "entry-hall",
+    "bedroom",
+    "children-room",
+  ],
   "Več dela od doma": ["living-room", "bedroom"],
-  "Novi hobiji ali športna oprema": ["wardrobe", "living-room", "entry-hall", "utility-room", "children-room"],
+  "Novi hobiji ali športna oprema": [
+    "wardrobe",
+    "living-room",
+    "entry-hall",
+    "utility-room",
+    "children-room",
+  ],
   "Več obiskov in druženja": ["kitchen", "living-room"],
   "Prilagoditev za staranje": ["kitchen", "living-room", "entry-hall", "bathroom", "bedroom"],
   "Brez večjih sprememb": individualRoomKeys,
@@ -169,7 +213,8 @@ export const cookingOptions = [
   {
     value: "weekly" as const,
     label: "Večkrat na teden",
-    description: "Potrebujete dobro organizacijo, dovolj delovne površine in intuitiven potek dela.",
+    description:
+      "Potrebujete dobro organizacijo, dovolj delovne površine in intuitiven potek dela.",
   },
   {
     value: "daily" as const,
@@ -223,6 +268,61 @@ export const kitchenLayoutOptions: VisualOption<NonNullable<KitchenState["layout
     description: "Osrednji otok za kuhanje, druženje in dodatno površino.",
     image: kitchenLayoutIsland,
   },
+];
+
+export const kitchenFrontMaterialOptions: Array<{
+  value: KitchenFrontMaterial;
+  label: string;
+  description: string;
+}> = [
+  {
+    value: "decorative-board",
+    label: "Iveral oziroma dekorativna plošča",
+    description:
+      "Trpežna, preprosta za vzdrževanje in cenovno uravnotežena rešitev z veliko izbiro dekorjev.",
+  },
+  {
+    value: "lacquered-mdf-matt",
+    label: "Lakiran MDF – mat",
+    description:
+      "Umirjena enobarvna površina, prijeten otip in možnost natančnega usklajevanja barve.",
+  },
+  {
+    value: "lacquered-mdf-gloss",
+    label: "Lakiran MDF – visoki sijaj",
+    description: "Gladka odsevna površina za izrazitejši, bolj eleganten videz kuhinje.",
+  },
+  {
+    value: "supermatt-antifingerprint",
+    label: "Supermat površina – anti-fingerprint",
+    description:
+      "Zelo mat površina z manj vidnimi prstnimi odtisi, primerna za pogosto uporabljeno kuhinjo.",
+  },
+  {
+    value: "wood-veneer",
+    label: "Furnir oziroma naravni les",
+    description:
+      "Naravna struktura in topel videz; vsaka fronta ima nekoliko drugačen značaj lesa.",
+  },
+  {
+    value: "recommend",
+    label: "Ne vem – želim priporočilo",
+    description:
+      "Material bomo predlagali glede na vaš način uporabe, videz, vzdrževanje in raven investicije.",
+  },
+];
+
+export const kitchenFrontMaterialLabels: Record<KitchenFrontMaterial, string> = Object.fromEntries(
+  kitchenFrontMaterialOptions.map((option) => [option.value, option.label]),
+) as Record<KitchenFrontMaterial, string>;
+
+export const kitchenFrontPriorityOptions: KitchenFrontPriority[] = [
+  "Enostavno čiščenje",
+  "Čim manj prstnih odtisov",
+  "Odpornost na vsakodnevno uporabo",
+  "Naraven videz in otip",
+  "Čim večja izbira barv",
+  "Cenovno uravnotežena rešitev",
 ];
 
 export const worktopOptions: VisualOption<NonNullable<KitchenState["worktop"]>>[] = [
@@ -285,7 +385,10 @@ export const wardrobeStorageOptions = [
   "Sezonske stvari",
 ];
 
-export const wardrobeHangingLabels = ["Srajce in krajša obešena oblačila", "Dolge obleke in plašči"];
+export const wardrobeHangingLabels = [
+  "Srajce in krajša obešena oblačila",
+  "Dolge obleke in plašči",
+];
 export const wardrobeFoldedLabel = "Zložena oblačila";
 export const wardrobeShoesLabel = "Čevlji";
 

@@ -7,6 +7,8 @@ import projectBathroom from "@/assets/project-bathroom.jpg";
 import projectBedroom from "@/assets/project-bedroom.jpg";
 import projectChildRoom from "@/assets/project-child-room.jpg";
 import {
+  kitchenFrontMaterialOptions,
+  kitchenFrontPriorityOptions,
   kitchenLayoutOptions,
   wardrobeDoorOptions,
   wardrobeFoldedLabel,
@@ -16,7 +18,13 @@ import {
   worktopOptions,
 } from "./discoveryData";
 import { priorityLevels, setRoom, type ScreenDef } from "./screenDef";
-import type { HomeDnaState, Priority, RoomKey } from "./homeDnaTypes";
+import type {
+  HomeDnaState,
+  KitchenFrontMaterial,
+  KitchenFrontPriority,
+  Priority,
+  RoomKey,
+} from "./homeDnaTypes";
 
 const noKitchenFeatures = "Brez dodatkov";
 const kitchenLedFeature = "Delovna LED osvetlitev";
@@ -81,13 +89,18 @@ const childAdaptableFeature = "Pohištvo, prilagodljivo starosti";
 const childLedFeature = "Integrirana LED osvetlitev";
 const childDisplayFeature = "Magnetna ali razstavna stena";
 
-function selectedFeatures(entries: Array<[label: string, value: boolean | undefined]>, noneLabel: string): string[] {
+function selectedFeatures(
+  entries: Array<[label: string, value: boolean | undefined]>,
+  noneLabel: string,
+): string[] {
   const selected = entries.filter(([, value]) => value === true).map(([label]) => label);
   if (selected.length > 0) return selected;
   return entries.every(([, value]) => value !== undefined) ? [noneLabel] : [];
 }
 
-function selectedBooleanOptions(entries: Array<[label: string, value: boolean | undefined]>): string[] {
+function selectedBooleanOptions(
+  entries: Array<[label: string, value: boolean | undefined]>,
+): string[] {
   return entries.filter(([, value]) => value === true).map(([label]) => label);
 }
 
@@ -222,6 +235,28 @@ function kitchenScreens(state: HomeDnaState): ScreenDef[] {
       exclusive: noKitchenAppliances,
       selected: k.appliances ?? [],
       apply: (s, appliances) => setRoom(s, "kitchen", { appliances }),
+    },
+    {
+      kind: "choice",
+      key: "kitchen-front-material",
+      headline: "Kakšne fronte si želite?",
+      support:
+        "Izberite najbližjo možnost. Če še niste odločeni, vam bomo material priporočili glede na uporabo in želeni videz.",
+      options: kitchenFrontMaterialOptions,
+      value: k.frontMaterial,
+      apply: (s, v) => setRoom(s, "kitchen", { frontMaterial: v as KitchenFrontMaterial }),
+    },
+    {
+      kind: "multi",
+      key: "kitchen-front-priorities",
+      headline: "Kaj vam je pri kuhinjskih frontah najpomembnejše?",
+      support: "Izberite največ dve lastnosti, ki naj imata pri priporočilu prednost.",
+      options: kitchenFrontPriorityOptions,
+      max: 2,
+      limitNotice: "Izberete lahko največ dve lastnosti.",
+      selected: k.frontPriorities ?? [],
+      apply: (s, frontPriorities) =>
+        setRoom(s, "kitchen", { frontPriorities: frontPriorities as KitchenFrontPriority[] }),
     },
     {
       kind: "visual",
@@ -398,7 +433,8 @@ function wardrobeScreens(state: HomeDnaState): ScreenDef[] {
         { value: "60+", label: "Več kot 60 cm" },
       ],
       value: w.depth === undefined ? undefined : w.depthPlus ? "60+" : String(w.depth),
-      apply: (s, v) => setRoom(s, "wardrobe", { depth: v === "60+" ? 60 : Number(v), depthPlus: v === "60+" }),
+      apply: (s, v) =>
+        setRoom(s, "wardrobe", { depth: v === "60+" ? 60 : Number(v), depthPlus: v === "60+" }),
     },
     {
       kind: "visual",
@@ -604,7 +640,13 @@ function entryHallScreens(state: HomeDnaState): ScreenDef[] {
       key: "entry-features",
       headline: "Kaj še potrebuje vaša predsoba?",
       support: "Izberite vse želene rešitve ali možnost brez dodatkov.",
-      options: [entryLongCoatsFeature, entryUmbrellaFeature, entryBenchFeature, entryMirrorFeature, noEntryFeatures],
+      options: [
+        entryLongCoatsFeature,
+        entryUmbrellaFeature,
+        entryBenchFeature,
+        entryMirrorFeature,
+        noEntryFeatures,
+      ],
       exclusive: noEntryFeatures,
       selected: selectedFeatures(
         [
@@ -746,7 +788,8 @@ function bathroomScreens(state: HomeDnaState): ScreenDef[] {
       kind: "choice",
       key: "bathroom-users",
       headline: "Koliko oseb redno uporablja to kopalnico?",
-      support: "To vpliva na količino shranjevanja, širino umivalniškega sestava in organizacijo predalov.",
+      support:
+        "To vpliva na količino shranjevanja, širino umivalniškega sestava in organizacijo predalov.",
       options: [
         { value: "1", label: "1 oseba" },
         { value: "2", label: "2 osebi" },
@@ -835,7 +878,13 @@ function bedroomScreens(state: HomeDnaState): ScreenDef[] {
       key: "bedroom-furniture",
       headline: "Katere elemente želite vključiti v spalnico?",
       support: "Izberite vse elemente, ki naj bodo del celostne rešitve po meri.",
-      options: [bedroomWardrobe, bedroomBedFrame, bedroomBedsideTables, bedroomDressingTable, bedroomTvWall],
+      options: [
+        bedroomWardrobe,
+        bedroomBedFrame,
+        bedroomBedsideTables,
+        bedroomDressingTable,
+        bedroomTvWall,
+      ],
       selected: selectedBooleanOptions([
         [bedroomWardrobe, b.wardrobe],
         [bedroomBedFrame, b.bedFrame],
@@ -856,7 +905,8 @@ function bedroomScreens(state: HomeDnaState): ScreenDef[] {
       kind: "number",
       key: "bedroom-furniture-width",
       headline: "Kolikšna je skupna dolžina pohištva po meri?",
-      support: "Seštejte približno dolžino omare, posteljnega sestava in drugih izbranih elementov.",
+      support:
+        "Seštejte približno dolžino omare, posteljnega sestava in drugih izbranih elementov.",
       unit: "cm",
       min: 100,
       max: 1200,
@@ -878,7 +928,8 @@ function bedroomScreens(state: HomeDnaState): ScreenDef[] {
         { value: "200", label: "200 cm" },
       ],
       value: b.bedWidth,
-      apply: (s, bedWidth) => setRoom(s, "bedroom", { bedWidth: bedWidth as NonNullable<typeof b.bedWidth> }),
+      apply: (s, bedWidth) =>
+        setRoom(s, "bedroom", { bedWidth: bedWidth as NonNullable<typeof b.bedWidth> }),
     });
   }
 
@@ -887,7 +938,12 @@ function bedroomScreens(state: HomeDnaState): ScreenDef[] {
     key: "bedroom-features",
     headline: "Katere dodatke želite v spalnici?",
     support: "Izberite vse želene dodatke ali možnost brez dodatkov.",
-    options: [bedroomLedFeature, bedroomMirrorFeature, bedroomUpholsteredFeature, noBedroomFeatures],
+    options: [
+      bedroomLedFeature,
+      bedroomMirrorFeature,
+      bedroomUpholsteredFeature,
+      noBedroomFeatures,
+    ],
     exclusive: noBedroomFeatures,
     selected: selectedFeatures(
       [
@@ -930,7 +986,8 @@ function childrenRoomScreens(state: HomeDnaState): ScreenDef[] {
       kind: "multi",
       key: "children-room-ages",
       headline: "Katerim starostnim skupinam so sobe namenjene?",
-      support: "Izberite vse ustrezne skupine. Tako lahko predvidimo varnost, višine in kasnejše prilagoditve.",
+      support:
+        "Izberite vse ustrezne skupine. Tako lahko predvidimo varnost, višine in kasnejše prilagoditve.",
       options: ["0–3 leta", "4–6 let", "7–12 let", "13 let ali več"],
       selected: c.ageGroups ?? [],
       apply: (s, ageGroups) => setRoom(s, "childrenRoom", { ageGroups }),
@@ -959,7 +1016,8 @@ function childrenRoomScreens(state: HomeDnaState): ScreenDef[] {
       kind: "number",
       key: "children-room-furniture-width",
       headline: "Kolikšna je skupna dolžina pohištva po meri v eni sobi?",
-      support: "Vnesite približno skupno dolžino omare, postelje, mize in shranjevalnih elementov v posamezni sobi.",
+      support:
+        "Vnesite približno skupno dolžino omare, postelje, mize in shranjevalnih elementov v posamezni sobi.",
       unit: "cm",
       min: 100,
       max: 1000,

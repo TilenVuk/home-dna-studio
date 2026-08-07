@@ -1,5 +1,5 @@
 import { roomOptions, styleOptions, colourDirectionOptions } from "./homeDnaData";
-import { executionLevelOptions } from "./discoveryData";
+import { executionLevelOptions, kitchenFrontMaterialLabels } from "./discoveryData";
 import { buildReportImageCandidates } from "./reportImages";
 import { kitchenWallLengthCm } from "./pricing";
 import type { HomeDnaState, ReportImageCandidates, RoomKey } from "./homeDnaTypes";
@@ -50,7 +50,8 @@ export function roomLabelForState(key: RoomKey, state: HomeDnaState): string {
 
 const styleLabel = (value: string) => styleOptions.find((s) => s.value === value)?.title ?? value;
 
-const colourLabel = (value: string) => colourDirectionOptions.find((c) => c.value === value)?.title ?? value;
+const colourLabel = (value: string) =>
+  colourDirectionOptions.find((c) => c.value === value)?.title ?? value;
 
 export const executionLevelLabel = (value: string) =>
   executionLevelOptions.find((o) => o.value === value)?.title ?? value;
@@ -87,7 +88,10 @@ export function buildReportInput(state: HomeDnaState): ReportInput {
     home.householdSize ? `${home.householdSize}${home.householdSizePlus ? "+" : ""}` : undefined,
   );
   push("Otroci", home.children ? childrenLabels[home.children] : undefined);
-  push("Število otrok", home.childrenCount ? `${home.childrenCount}${home.childrenCountPlus ? "+" : ""}` : undefined);
+  push(
+    "Število otrok",
+    home.childrenCount ? `${home.childrenCount}${home.childrenCountPlus ? "+" : ""}` : undefined,
+  );
   push("Hišni ljubljenčki", home.pets.join(", "));
   push("Izbrani prostori", selected.map((key) => roomLabelForState(key, state)).join(", "));
   push("Slogi", style.selectedStyles.map(styleLabel).join(", "));
@@ -100,13 +104,25 @@ export function buildReportInput(state: HomeDnaState): ReportInput {
   );
   push(
     "Delo od doma",
-    lifestyle.workFromHomeFrequency ? workFromHomeFrequencyLabels[lifestyle.workFromHomeFrequency] : undefined,
+    lifestyle.workFromHomeFrequency
+      ? workFromHomeFrequencyLabels[lifestyle.workFromHomeFrequency]
+      : undefined,
   );
-  push("Pogostost gostov", lifestyle.hostingFrequency ? hostingFrequencyLabels[lifestyle.hostingFrequency] : undefined);
+  push(
+    "Pogostost gostov",
+    lifestyle.hostingFrequency ? hostingFrequencyLabels[lifestyle.hostingFrequency] : undefined,
+  );
   push("Hobiji in oprema", lifestyle.hobbies.join(", "));
   push("Trenutni izzivi", lifestyle.currentChallenges.join(", "));
   push("Opomba o izzivih", lifestyle.challengeNote);
   push("Prihodnje potrebe", lifestyle.futureNeeds.join(", "));
+  push(
+    "Material kuhinjskih front",
+    rooms.kitchen?.frontMaterial
+      ? kitchenFrontMaterialLabels[rooms.kitchen.frontMaterial]
+      : undefined,
+  );
+  push("Prioritete kuhinjskih front", rooms.kitchen?.frontPriorities?.join(", "));
 
   const roomDetails = selected
     .map((key) => {
@@ -131,8 +147,13 @@ export function buildReportInput(state: HomeDnaState): ReportInput {
       const reportData = kitchenData
         ? {
             ...kitchenData,
+            ...(kitchenData.frontMaterial
+              ? { frontMaterial: kitchenFrontMaterialLabels[kitchenData.frontMaterial] }
+              : {}),
             ...(kitchenData.hasLed ? { ledLength: kitchenWallLengthCm(kitchenData) } : {}),
-            ...(kitchenData.hasGlassFronts ? { glassFrontLength: kitchenWallLengthCm(kitchenData) } : {}),
+            ...(kitchenData.hasGlassFronts
+              ? { glassFrontLength: kitchenWallLengthCm(kitchenData) }
+              : {}),
           }
         : data;
       const entries = Object.entries(reportData)
