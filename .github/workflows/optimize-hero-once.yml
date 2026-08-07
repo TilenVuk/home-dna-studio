@@ -47,7 +47,7 @@ jobs:
 
       - name: Commit generated assets
         run: |
-          if git diff --quiet -- src/assets/hero-interior-768.webp src/assets/hero-interior-1280.webp src/assets/hero-interior-1920.webp; then
+          if [ -z "$(git status --porcelain -- src/assets/hero-interior-768.webp src/assets/hero-interior-1280.webp src/assets/hero-interior-1920.webp)" ]; then
             echo 'Hero WebP assets already up to date.'
             exit 0
           fi
