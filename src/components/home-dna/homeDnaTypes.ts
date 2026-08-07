@@ -22,6 +22,22 @@ export type CookingFrequency = "rarely" | "weekly" | "daily";
 export type WorkFromHomeFrequency = "never" | "sometimes" | "frequently";
 export type HostingFrequency = "rarely" | "occasionally" | "often";
 
+export type KitchenFrontMaterial =
+  | "decorative-board"
+  | "lacquered-mdf-matt"
+  | "lacquered-mdf-gloss"
+  | "supermatt-antifingerprint"
+  | "wood-veneer"
+  | "recommend";
+
+export type KitchenFrontPriority =
+  | "Enostavno čiščenje"
+  | "Čim manj prstnih odtisov"
+  | "Odpornost na vsakodnevno uporabo"
+  | "Naraven videz in otip"
+  | "Čim večja izbira barv"
+  | "Cenovno uravnotežena rešitev";
+
 export interface HomeContextState {
   projectStage?: ProjectStage;
   propertyType?: PropertyType;
@@ -61,6 +77,8 @@ export interface KitchenState {
   islandWidth?: number;
   islandSeats?: string;
   appliances?: string[];
+  frontMaterial?: KitchenFrontMaterial;
+  frontPriorities?: KitchenFrontPriority[];
   worktop?: "classic-laminate" | "premium-laminate" | "quartz" | "natural-stone";
   ledLength?: number;
   glassFrontLength?: number;
@@ -260,6 +278,7 @@ export type ReportImageId =
 export interface ReportImageChoice {
   id: ReportImageId;
   label: string;
+  matchReasons?: string[];
 }
 
 export interface ReportImageCandidates {
