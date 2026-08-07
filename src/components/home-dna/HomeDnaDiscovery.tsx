@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { HomeDnaLayout } from "./HomeDnaLayout";
 import { ScreenDefRenderer } from "./ScreenDefRenderer";
 import { buildDiscoveryFlow } from "./discoveryFlow";
@@ -19,6 +19,12 @@ export function HomeDnaDiscovery() {
   useLayoutEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }, [def?.key]);
+
+  useEffect(() => {
+    if (def?.kind === "contact") {
+      void import("./SuccessScreen");
+    }
+  }, [def?.kind]);
 
   const step = useCallback((direction: 1 | -1, mutate?: (state: HomeDnaState) => HomeDnaState) => {
     setState((prev) => {
