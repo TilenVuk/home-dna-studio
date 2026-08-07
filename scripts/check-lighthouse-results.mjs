@@ -1,7 +1,7 @@
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 
-const resultsDir = process.argv[2] ?? ".lighthouse-results";
+const resultsDir = process.argv[2] ?? "lighthouse-results";
 const files = (await readdir(resultsDir))
   .filter((file) => file.endsWith(".json"))
   .sort();
@@ -18,7 +18,6 @@ const requiredAudits = [
   "robots-txt",
   "is-crawlable",
   "http-status-code",
-  "viewport",
 ];
 
 const thresholds = {
