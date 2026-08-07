@@ -2,18 +2,30 @@ import { Link } from "@tanstack/react-router";
 import { ArrowDownRight } from "lucide-react";
 
 import heroImage from "@/assets/hero-interior.jpg";
+import heroWebp768 from "@/assets/hero-interior-768.webp";
+import heroWebp1280 from "@/assets/hero-interior-1280.webp";
+import heroWebp1920 from "@/assets/hero-interior-1920.webp";
 import { hero } from "@/content/site";
 
 export function Hero() {
   return (
     <section id="top" className="relative min-h-[100svh] w-full overflow-hidden">
-      <img
-        src={heroImage}
-        alt="Sodoben skandinavski interjer s hrastovim pohištvom po meri"
-        width={1920}
-        height={1200}
-        className="absolute inset-0 h-full w-full object-cover"
-      />
+      <picture className="absolute inset-0 block h-full w-full">
+        <source
+          type="image/webp"
+          srcSet={`${heroWebp768} 768w, ${heroWebp1280} 1280w, ${heroWebp1920} 1920w`}
+          sizes="100vw"
+        />
+        <img
+          src={heroImage}
+          alt="Sodoben skandinavski interjer s hrastovim pohištvom po meri"
+          width={1920}
+          height={1200}
+          fetchPriority="high"
+          decoding="async"
+          className="h-full w-full object-cover"
+        />
+      </picture>
       <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/25 to-foreground/30" />
 
       <div className="relative mx-auto flex min-h-[100svh] max-w-[1400px] flex-col justify-end px-6 pb-16 pt-32 md:px-10 md:pb-20">
