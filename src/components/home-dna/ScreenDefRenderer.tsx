@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { ChoiceScreen } from "./ChoiceScreen";
 import { ContactScreen } from "./ContactScreen";
 import { EditorialScreen } from "./EditorialScreen";
@@ -9,9 +10,12 @@ import { NumberScreen } from "./NumberScreen";
 import { RoomSelection } from "./RoomSelection";
 import { SingleVisualChoiceScreen } from "./SingleVisualChoiceScreen";
 import { StyleSelection } from "./StyleSelection";
-import { SuccessScreen } from "./SuccessScreen";
 import { pruneRooms, type ScreenDef } from "./screenDef";
 import type { HomeDnaState, RoomKey } from "./homeDnaTypes";
+
+const SuccessScreen = lazy(() =>
+  import("./SuccessScreen").then((module) => ({ default: module.SuccessScreen })),
+);
 
 export function ScreenDefRenderer({
   def,
@@ -160,11 +164,13 @@ export function ScreenDefRenderer({
 
     case "success":
       return (
-        <SuccessScreen
-          state={state}
-          onBack={onBack}
-          {...(state.contact.name ? { name: state.contact.name } : {})}
-        />
+        <Suspense fallback={null}>
+          <SuccessScreen
+            state={state}
+            onBack={onBack}
+            {...(state.contact.name ? { name: state.contact.name } : {})}
+          />
+        </Suspense>
       );
 
     default:
