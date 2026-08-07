@@ -19,11 +19,16 @@ jobs:
   lighthouse:
     name: Audit production site
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
 
       - name: Allow production deployment to settle
         if: github.event_name == 'push'
@@ -44,9 +49,36 @@ jobs:
           echo "Production site was not reachable in time."
           exit 1
 
-      - name: Run Lighthouse CI
-        uses: treosh/lighthouse-ci-action@v12
+      - name: Run Lighthouse 13 audits
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .lighthouse-results
+
+          for run in 1 2; do
+            npx --yes lighthouse@13.3.0 https://nuvelistudio.com/ \
+              --output=json \
+              --output-path=".lighthouse-results/home-${run}.json" \
+              --only-categories=performance,accessibility,best-practices,seo \
+              --chrome-flags="--headless --no-sandbox" \
+              --quiet
+
+            npx --yes lighthouse@13.3.0 https://nuvelistudio.com/home-dna \
+              --output=json \
+              --output-path=".lighthouse-results/home-dna-${run}.json" \
+              --only-categories=performance,accessibility,best-practices,seo \
+              --chrome-flags="--headless --no-sandbox" \
+              --quiet
+          done
+
+      - name: Check Lighthouse thresholds
+        run: node scripts/check-lighthouse-results.mjs .lighthouse-results
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          configPath: ./lighthouserc.cjs
-          uploadArtifacts: true
-          temporaryPublicStorage: false
+          name: lighthouse-results
+          path: .lighthouse-results/*.json
+          if-no-files-found: warn
+          retention-days: 14
