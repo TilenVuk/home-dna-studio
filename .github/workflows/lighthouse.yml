@@ -1,0 +1,52 @@
+name: Lighthouse SEO audit
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  schedule:
+    - cron: "0 5 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lighthouse-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lighthouse:
+    name: Audit production site
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Allow production deployment to settle
+        if: github.event_name == 'push'
+        run: sleep 90
+
+      - name: Verify production site is reachable
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in {1..10}; do
+            if curl --fail --silent --show-error --location --max-time 20 https://nuvelistudio.com/ > /dev/null; then
+              echo "Production site is reachable."
+              exit 0
+            fi
+            echo "Attempt ${attempt}/10 failed; retrying in 15 seconds..."
+            sleep 15
+          done
+          echo "Production site was not reachable in time."
+          exit 1
+
+      - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          configPath: ./lighthouserc.cjs
+          uploadArtifacts: true
+          temporaryPublicStorage: false
