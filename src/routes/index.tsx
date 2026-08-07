@@ -12,7 +12,7 @@ import { Footer } from "@/components/nuveli/Footer";
 
 const title = "Nuveli Studio — metodologija interjerja Home DNA™";
 const description =
-  "Nuveli Studio oblikuje domove okoli načina, kako ljudje živijo. Home DNA™ je naša metodologija za razumevanje življenjskega sloga, navad in stvari, preden karkoli oblikujemo.";
+  "Nuveli Studio oblikuje celovite interierje po meri. Home DNA™ prilagodi prostor vašemu življenjskemu slogu, navadam in potrebam.";
 const canonicalUrl = "https://nuvelistudio.com/";
 
 export const Route = createFileRoute("/")({
