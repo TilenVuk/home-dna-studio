@@ -51,6 +51,9 @@ export function Hero() {
             {hero.secondaryCta}
           </a>
         </div>
+        <p className="mt-4 max-w-[54ch] text-sm leading-relaxed text-background/80">
+          Brezplačen osebni Home DNA™ Report + okvirna ponudba za izbrani obseg projekta.
+        </p>
       </div>
     </section>
   );
