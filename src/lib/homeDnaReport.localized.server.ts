@@ -18,16 +18,16 @@ export async function createLocalizedHomeDnaReport(
   if (locale === "sl") return baseReport;
 
   const apiKey = options.apiKey?.trim();
-  if (!apiKey) return baseReport;
+  if (!apiKey) throw new Error("HOME_DNA_LOCALIZATION_UNAVAILABLE");
 
   try {
     return await translateReport(baseReport, locale, apiKey, normalizeModelName(options.model));
   } catch (error) {
-    console.error("HomeDnaReport: localization failed; returning base report", {
+    console.error("HomeDnaReport: localization failed", {
       locale,
       reason: error instanceof Error ? error.message : String(error),
     });
-    return baseReport;
+    throw new Error("HOME_DNA_LOCALIZATION_FAILED");
   }
 }
 
