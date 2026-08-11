@@ -74,6 +74,7 @@ export async function reserveConsultation(input: ReservationData) {
     slotEnd: data.slot_end,
     consultationType: data.consultation_type,
     source: input.source,
+    locale: input.locale,
     customerName: input.contact.name,
     customerEmail,
     customerPhone: input.contact.phone,
