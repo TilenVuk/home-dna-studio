@@ -5,10 +5,33 @@ import { buildLocalizedDiscoveryFlow } from "./localizedDiscoveryFlow";
 import { initialHomeDnaState, type HomeDnaState } from "./homeDnaTypes";
 import type { Locale } from "@/lib/i18n";
 
+const householdQuestion = {
+  sl: {
+    headline: "Koliko ljudi bo uporabljalo ta dom?",
+    support: "Dom mora delovati za vsakogar, ki v njem živi.",
+  },
+  hr: {
+    headline: "Koliko će ljudi koristiti ovaj dom?",
+    support: "Dom treba funkcionirati za svakoga tko u njemu živi.",
+  },
+  en: {
+    headline: "How many people will use this home?",
+    support: "The home should work for everyone who lives in it.",
+  },
+} as const;
+
 export function HomeDnaDiscovery({ locale = "sl" }: { locale?: Locale }) {
   const [state, setState] = useState<HomeDnaState>(initialHomeDnaState);
 
-  const flow = useMemo(() => buildLocalizedDiscoveryFlow(state, locale), [locale, state]);
+  const flow = useMemo(() => {
+    const localized = buildLocalizedDiscoveryFlow(state, locale);
+    const copy = householdQuestion[locale];
+    return localized.map((screen) =>
+      screen.key === "household-size"
+        ? { ...screen, headline: copy.headline, support: copy.support }
+        : screen,
+    );
+  }, [locale, state]);
   const index = Math.max(
     flow.findIndex((s) => s.key === state.currentScreen),
     0,

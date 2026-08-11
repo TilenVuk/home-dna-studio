@@ -15,16 +15,16 @@ const copy = {
     eyebrow: "Zadnji korak",
     headline: "Kam naj pošljemo vaš Home DNA™ Report?",
     support:
-      "Po oddaji prejmete osebni Home DNA™ Report in okvirno oceno investicije za izbrani obseg projekta. Ocena je informativna; končna ponudba sledi po posvetu, izmerah in potrditvi materialov.",
+      "Po oddaji prejmete osebni Home DNA™ Report in okvirno ponudbo glede na izbrane prostore, obseg, materiale in nivo izvedbe. Okvirna ponudba je informativna; končna ponudba sledi po posvetu, izmerah in potrditvi specifikacije.",
     what: "Kaj prejmete:",
     whatBody:
-      "osebni PDF z vašimi priporočili, okvirno investicijsko območje in jasno osnovo za nadaljnji posvet z Nuveli Studio.",
+      "osebni PDF z vašimi priporočili, okvirno ponudbo in jasno osnovo za nadaljnji posvet z Nuveli Studio.",
     name: "Ime in priimek",
     email: "E-naslov",
     phone: "Telefon (neobvezno)",
     consent:
       "Strinjam se, da Nuveli Studio moje podatke uporabi za pripravo in dostavo Home DNA™ Reporta ter stik v zvezi z mojim projektom.",
-    next: "Pripravi report in oceno",
+    next: "Pripravi report in okvirno ponudbo",
     errors: {
       name: "Vpišite svoje ime.",
       email: "Vpišite veljaven e-naslov.",
@@ -38,16 +38,16 @@ const copy = {
     eyebrow: "Posljednji korak",
     headline: "Gdje da pošaljemo vaš Home DNA™ Report?",
     support:
-      "Nakon slanja dobivate osobni Home DNA™ Report i okvirnu procjenu investicije za odabrani opseg projekta. Procjena je informativna; konačna ponuda slijedi nakon konzultacija, izmjera i potvrde materijala.",
+      "Nakon slanja dobivate osobni Home DNA™ Report i okvirnu ponudu prema odabranim prostorima, opsegu, materijalima i razini izvedbe. Okvirna ponuda je informativna; konačna ponuda slijedi nakon konzultacija, izmjera i potvrde specifikacije.",
     what: "Što dobivate:",
     whatBody:
-      "osobni PDF s preporukama, okvirni raspon investicije i jasnu osnovu za daljnje konzultacije s Nuveli Studio.",
+      "osobni PDF s preporukama, okvirnu ponudu i jasnu osnovu za daljnje konzultacije s Nuveli Studio.",
     name: "Ime i prezime",
     email: "E-mail",
     phone: "Telefon (neobavezno)",
     consent:
       "Slažem se da Nuveli Studio koristi moje podatke za pripremu i dostavu Home DNA™ Reporta te kontakt vezan uz moj projekt.",
-    next: "Pripremi report i procjenu",
+    next: "Pripremi report i okvirnu ponudu",
     errors: {
       name: "Unesite svoje ime.",
       email: "Unesite valjanu e-mail adresu.",
@@ -61,16 +61,16 @@ const copy = {
     eyebrow: "Final step",
     headline: "Where should we send your Home DNA™ Report?",
     support:
-      "After submitting, you receive a personal Home DNA™ Report and an indicative investment estimate for the selected project scope. The estimate is informative; the final quotation follows consultation, measurements and material confirmation.",
+      "After submitting, you receive a personal Home DNA™ Report and an indicative proposal based on the selected rooms, scope, materials and execution level. The indicative proposal is informative; the final quotation follows consultation, measurements and confirmed specifications.",
     what: "What you receive:",
     whatBody:
-      "a personal PDF with recommendations, an indicative investment range and a clear basis for the next consultation with Nuveli Studio.",
+      "a personal PDF with recommendations, an indicative proposal and a clear basis for the next consultation with Nuveli Studio.",
     name: "Full name",
     email: "Email",
     phone: "Phone (optional)",
     consent:
       "I agree that Nuveli Studio may use my data to prepare and deliver the Home DNA™ Report and contact me about my project.",
-    next: "Prepare report and estimate",
+    next: "Prepare report and indicative proposal",
     errors: {
       name: "Enter your name.",
       email: "Enter a valid email address.",

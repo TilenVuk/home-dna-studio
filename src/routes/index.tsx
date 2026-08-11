@@ -6,6 +6,7 @@ import { Process } from "@/components/nuveli/Process";
 import { Services } from "@/components/nuveli/Services";
 import { Gallery } from "@/components/nuveli/Gallery";
 import { Journey } from "@/components/nuveli/Journey";
+import { AiSearchQuestions } from "@/components/nuveli/AiSearchQuestions";
 import { Contact } from "@/components/nuveli/Contact";
 import { Footer } from "@/components/nuveli/Footer";
 
@@ -63,6 +64,7 @@ function Index() {
         <Services />
         <Gallery />
         <Journey />
+        <AiSearchQuestions />
         <Contact />
       </main>
       <Footer />

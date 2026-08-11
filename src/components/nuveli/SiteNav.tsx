@@ -8,6 +8,7 @@ const links = [
   { label: "Proces", href: "#process" },
   { label: "Storitve", href: "#services" },
   { label: "Projekti", href: "#projects" },
+  { label: "Vsebine", href: "/vsebine" },
   { label: "Kontakt", href: "#contact" },
 ];
 

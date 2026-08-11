@@ -6,15 +6,27 @@ import heroWebp1920 from "@/assets/hero-interior-1920.webp";
 import { welcomeCopy } from "./homeDnaData";
 import type { Locale } from "@/lib/i18n";
 
-const localizedWelcome: Record<Exclude<Locale, "sl">, typeof welcomeCopy> = {
+const localizedWelcome: Record<Locale, typeof welcomeCopy> = {
+  sl: {
+    eyebrow: "Home DNA™",
+    headline: "Vsak izjemen dom se začne z razumevanjem ljudi, ki bodo v njem živeli.",
+    body: "V nekaj minutah bomo spoznali vaš dom, življenjski slog in želje. Na koncu prejmete brezplačen osebni Home DNA™ Report in okvirno ponudbo za izbrani obseg projekta.",
+    benefits: [
+      "Analiza doma, prilagojena vašemu načinu življenja",
+      "Osebne funkcionalne in oblikovne smernice",
+      "Okvirna ponudba glede na izbrane prostore, materiale in nivo izvedbe",
+    ],
+    time: "Približno 3–10 minut, odvisno od obsega projekta.",
+    cta: "Začni Home DNA™ Discovery",
+  },
   hr: {
     eyebrow: "Home DNA™",
     headline: "Svaki izniman dom počinje razumijevanjem ljudi koji će u njemu živjeti.",
-    body: "U nekoliko minuta upoznat ćemo vaš dom, životni stil i želje. Na kraju dobivate osobni Home DNA™ Report i okvirnu procjenu investicije za odabrani opseg projekta.",
+    body: "U nekoliko minuta upoznat ćemo vaš dom, životni stil i želje. Na kraju dobivate osobni Home DNA™ Report i okvirnu ponudu za odabrani opseg projekta.",
     benefits: [
       "Analiza doma prilagođena vašem načinu života",
       "Osobne funkcionalne i oblikovne smjernice",
-      "Okvirna procjena investicije i osnova za ponudu",
+      "Okvirna ponuda prema odabranim prostorima, materijalima i razini izvedbe",
     ],
     time: "Približno 3–10 minuta, ovisno o opsegu projekta.",
     cta: "Pokreni Home DNA™ Discovery",
@@ -22,11 +34,11 @@ const localizedWelcome: Record<Exclude<Locale, "sl">, typeof welcomeCopy> = {
   en: {
     eyebrow: "Home DNA™",
     headline: "Every exceptional home starts with understanding the people who will live in it.",
-    body: "In a few minutes we will learn about your home, lifestyle and priorities. At the end you receive a personal Home DNA™ Report and an indicative investment estimate for your selected project scope.",
+    body: "In a few minutes we will learn about your home, lifestyle and priorities. At the end you receive a personal Home DNA™ Report and an indicative proposal for your selected project scope.",
     benefits: [
       "A home analysis tailored to your lifestyle",
       "Personal functional and design priorities",
-      "Indicative investment estimate and basis for a proposal",
+      "Indicative proposal based on selected rooms, materials and execution level",
     ],
     time: "About 3–10 minutes, depending on the project scope.",
     cta: "Start Home DNA™ Discovery",
@@ -40,7 +52,7 @@ export function HomeDnaWelcome({
   onStart: () => void;
   locale?: Locale;
 }) {
-  const copy = locale === "sl" ? welcomeCopy : localizedWelcome[locale];
+  const copy = localizedWelcome[locale];
   const alt =
     locale === "hr"
       ? "Suvremen interijer s namještajem po mjeri u hrastovom dekoru"
