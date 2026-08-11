@@ -146,14 +146,19 @@ const roomTranslations: Record<Locale, Partial<Record<RoomKey, string>>> = {
 export const roomLabel = (key: RoomKey, locale: Locale = "sl") =>
   roomTranslations[locale][key] ?? roomOptions.find((r) => r.key === key)?.title ?? key;
 
-export function roomLabelForState(key: RoomKey, state: HomeDnaState, locale: Locale = "sl"): string {
+export function roomLabelForState(
+  key: RoomKey,
+  state: HomeDnaState,
+  locale: Locale = "sl",
+): string {
   if (key !== "children-room") return roomLabel(key, locale);
   const count = state.home.childrenCount ?? 1;
   return `${roomLabel(key, locale)} (${count}${state.home.childrenCountPlus ? "+" : ""})`;
 }
 
 const styleLabel = (value: string) => styleOptions.find((s) => s.value === value)?.title ?? value;
-const colourLabel = (value: string) => colourDirectionOptions.find((c) => c.value === value)?.title ?? value;
+const colourLabel = (value: string) =>
+  colourDirectionOptions.find((c) => c.value === value)?.title ?? value;
 export const executionLevelLabel = (value: string) =>
   executionLevelOptions.find((o) => o.value === value)?.title ?? value;
 
@@ -200,16 +205,27 @@ export function buildReportInput(state: HomeDnaState, locale: Locale = "sl"): Re
   push(t.fields.atmosphere, style.atmosphere.join(", "));
   push(t.fields.colour, style.colourDirection ? colourLabel(style.colourDirection) : undefined);
   push(t.fields.priorities, lifestyle.priorities.join(", "));
-  push(t.fields.cooking, lifestyle.cookingFrequency ? t.cooking[lifestyle.cookingFrequency] : undefined);
-  push(t.fields.work, lifestyle.workFromHomeFrequency ? t.work[lifestyle.workFromHomeFrequency] : undefined);
-  push(t.fields.hosting, lifestyle.hostingFrequency ? t.hosting[lifestyle.hostingFrequency] : undefined);
+  push(
+    t.fields.cooking,
+    lifestyle.cookingFrequency ? t.cooking[lifestyle.cookingFrequency] : undefined,
+  );
+  push(
+    t.fields.work,
+    lifestyle.workFromHomeFrequency ? t.work[lifestyle.workFromHomeFrequency] : undefined,
+  );
+  push(
+    t.fields.hosting,
+    lifestyle.hostingFrequency ? t.hosting[lifestyle.hostingFrequency] : undefined,
+  );
   push(t.fields.hobbies, lifestyle.hobbies.join(", "));
   push(t.fields.challenges, lifestyle.currentChallenges.join(", "));
   push(t.fields.challengeNote, lifestyle.challengeNote);
   push(t.fields.future, lifestyle.futureNeeds.join(", "));
   push(
     t.fields.fronts,
-    rooms.kitchen?.frontMaterial ? kitchenFrontMaterialLabels[rooms.kitchen.frontMaterial] : undefined,
+    rooms.kitchen?.frontMaterial
+      ? kitchenFrontMaterialLabels[rooms.kitchen.frontMaterial]
+      : undefined,
   );
   push(t.fields.frontPriorities, rooms.kitchen?.frontPriorities?.join(", "));
 
@@ -240,13 +256,17 @@ export function buildReportInput(state: HomeDnaState, locale: Locale = "sl"): Re
               ? { frontMaterial: kitchenFrontMaterialLabels[kitchenData.frontMaterial] }
               : {}),
             ...(kitchenData.hasLed ? { ledLength: kitchenWallLengthCm(kitchenData) } : {}),
-            ...(kitchenData.hasGlassFronts ? { glassFrontLength: kitchenWallLengthCm(kitchenData) } : {}),
+            ...(kitchenData.hasGlassFronts
+              ? { glassFrontLength: kitchenWallLengthCm(kitchenData) }
+              : {}),
           }
         : data;
       const entries = Object.entries(reportData)
         .filter(([, v]) => v !== undefined && v !== null && v !== "" && v !== false)
         .map(([k, v]) => `${k}=${Array.isArray(v) ? v.join("/") : String(v)}`);
-      return entries.length ? `${roomLabelForState(key, state, locale)}: ${entries.join(", ")}` : null;
+      return entries.length
+        ? `${roomLabelForState(key, state, locale)}: ${entries.join(", ")}`
+        : null;
     })
     .filter(Boolean) as string[];
 

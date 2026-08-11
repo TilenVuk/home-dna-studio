@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AiSearchHub } from "@/components/content/AiSearchHub";
 
 const title = "Vodiči za dizajn interijera i namještaj po mjeri — Nuveli Studio";
-const description = "Praktični vodiči Nuveli Studija o Home DNA™, kuhinjama po mjeri, materijalima, spremanju, novogradnjama i investiciji u interijer.";
+const description =
+  "Praktični vodiči Nuveli Studija o Home DNA™, kuhinjama po mjeri, materijalima, spremanju, novogradnjama i investiciji u interijer.";
 
 export const Route = createFileRoute("/hr/vsebine/")({
   head: () => ({

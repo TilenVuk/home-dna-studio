@@ -68,7 +68,10 @@ async function translateReport(
     const payload = (await response.json()) as {
       candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
     };
-    const text = payload.candidates?.[0]?.content?.parts?.map((part) => part.text ?? "").join("").trim();
+    const text = payload.candidates?.[0]?.content?.parts
+      ?.map((part) => part.text ?? "")
+      .join("")
+      .trim();
     if (!text) throw new Error("Gemini translation returned an empty response");
     const translated = JSON.parse(text) as HomeDnaReportData;
     return preserveStableIds(report, translated);
@@ -77,7 +80,10 @@ async function translateReport(
   }
 }
 
-function preserveStableIds(source: HomeDnaReportData, translated: HomeDnaReportData): HomeDnaReportData {
+function preserveStableIds(
+  source: HomeDnaReportData,
+  translated: HomeDnaReportData,
+): HomeDnaReportData {
   return {
     ...translated,
     images: source.images,

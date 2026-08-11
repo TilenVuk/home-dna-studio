@@ -234,7 +234,8 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
       setFont(doc, BODY_FONT, "normal", 10.2, COLORS.muted);
       const roomTextLines = wrapText(doc, room.text, CONTENT_WIDTH);
       const imageHeight = loadedRoomImage ? 58 : 0;
-      const requiredHeight = 10 + imageHeight + (loadedRoomImage ? 8 : 0) + roomTextLines.length * 6 + 13;
+      const requiredHeight =
+        10 + imageHeight + (loadedRoomImage ? 8 : 0) + roomTextLines.length * 6 + 13;
       ensureSpace(requiredHeight);
 
       if (index > 0) {
@@ -273,19 +274,36 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
 
   ensureSpace(investmentBlockHeight + 8);
   if (investmentImage) {
-    drawImageCover(doc, investmentImage, MARGIN_LEFT, y, investmentImageWidth, investmentBlockHeight);
+    drawImageCover(
+      doc,
+      investmentImage,
+      MARGIN_LEFT,
+      y,
+      investmentImageWidth,
+      investmentBlockHeight,
+    );
   }
 
   setFont(doc, BODY_FONT, "normal", 8, COLORS.muted);
   doc.text(t.estimated, investmentMetaX, y + 4);
   setFont(doc, DISPLAY_FONT, "bold", 14, COLORS.ink);
-  const investmentLines = wrapText(doc, data.investmentRange || t.consultation, investmentMetaWidth);
-  investmentLines.slice(0, 2).forEach((line, index) => doc.text(line, investmentMetaX, y + 13 + index * 6.5));
+  const investmentLines = wrapText(
+    doc,
+    data.investmentRange || t.consultation,
+    investmentMetaWidth,
+  );
+  investmentLines
+    .slice(0, 2)
+    .forEach((line, index) => doc.text(line, investmentMetaX, y + 13 + index * 6.5));
 
   setFont(doc, BODY_FONT, "normal", 8, COLORS.muted);
   doc.text(t.execution, investmentMetaX, y + 34);
   setFont(doc, DISPLAY_FONT, "bold", 14, COLORS.ink);
-  doc.text(wrapText(doc, data.executionLevel || "Premium", investmentMetaWidth).slice(0, 2), investmentMetaX, y + 43);
+  doc.text(
+    wrapText(doc, data.executionLevel || "Premium", investmentMetaWidth).slice(0, 2),
+    investmentMetaX,
+    y + 43,
+  );
 
   y += investmentBlockHeight + 8;
   addParagraph(data.report.investment);
@@ -342,10 +360,16 @@ async function registerPdfFonts(doc: PdfDocument) {
   doc.addFont("DejaVuSans-Bold.ttf", DISPLAY_FONT, "bold");
 }
 
-async function loadReportImages(images: ResolvedReportImages): Promise<Map<ReportImageId, LoadedPdfImage>> {
-  const assets = [images.cover, images.lifestyle, ...images.style, ...Object.values(images.rooms), images.investment].filter(
-    (asset): asset is ReportImageAsset => Boolean(asset),
-  );
+async function loadReportImages(
+  images: ResolvedReportImages,
+): Promise<Map<ReportImageId, LoadedPdfImage>> {
+  const assets = [
+    images.cover,
+    images.lifestyle,
+    ...images.style,
+    ...Object.values(images.rooms),
+    images.investment,
+  ].filter((asset): asset is ReportImageAsset => Boolean(asset));
   const uniqueAssets = Array.from(new Map(assets.map((asset) => [asset.id, asset])).values());
 
   const loaded = await Promise.all(
@@ -359,7 +383,11 @@ async function loadReportImages(images: ResolvedReportImages): Promise<Map<Repor
     }),
   );
 
-  return new Map(loaded.filter((image): image is LoadedPdfImage => Boolean(image)).map((image) => [image.id, image] as const));
+  return new Map(
+    loaded
+      .filter((image): image is LoadedPdfImage => Boolean(image))
+      .map((image) => [image.id, image] as const),
+  );
 }
 
 async function loadPdfImage(asset: ReportImageAsset): Promise<LoadedPdfImage> {
@@ -379,12 +407,17 @@ function blobToDataUrl(blob: Blob): Promise<string> {
   });
 }
 
-function optimizePdfImage(src: string): Promise<{ dataUrl: string; width: number; height: number }> {
+function optimizePdfImage(
+  src: string,
+): Promise<{ dataUrl: string; width: number; height: number }> {
   return new Promise((resolve, reject) => {
     const image = new Image();
     image.onload = () => {
       const maximumDimension = 1_600;
-      const scale = Math.min(1, maximumDimension / Math.max(image.naturalWidth, image.naturalHeight));
+      const scale = Math.min(
+        1,
+        maximumDimension / Math.max(image.naturalWidth, image.naturalHeight),
+      );
       const width = Math.max(1, Math.round(image.naturalWidth * scale));
       const height = Math.max(1, Math.round(image.naturalHeight * scale));
       const canvas = document.createElement("canvas");
@@ -403,7 +436,14 @@ function optimizePdfImage(src: string): Promise<{ dataUrl: string; width: number
   });
 }
 
-function drawImageCover(doc: PdfDocument, image: LoadedPdfImage, x: number, y: number, width: number, height: number) {
+function drawImageCover(
+  doc: PdfDocument,
+  image: LoadedPdfImage,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+) {
   const scale = Math.max(width / image.width, height / image.height);
   const drawWidth = image.width * scale;
   const drawHeight = image.height * scale;
@@ -417,7 +457,12 @@ function drawImageCover(doc: PdfDocument, image: LoadedPdfImage, x: number, y: n
   doc.restoreGraphicsState();
 }
 
-function addCoverPage(doc: PdfDocument, data: ReportPdfData, coverImage: LoadedPdfImage | undefined, locale: Locale) {
+function addCoverPage(
+  doc: PdfDocument,
+  data: ReportPdfData,
+  coverImage: LoadedPdfImage | undefined,
+  locale: Locale,
+) {
   const t = pdfCopy[locale];
   doc.setFillColor(...COLORS.cover);
   doc.rect(0, 0, PAGE_WIDTH, PAGE_HEIGHT, "F");
@@ -447,7 +492,13 @@ function addCoverPage(doc: PdfDocument, data: ReportPdfData, coverImage: LoadedP
   doc.text(formatDate(new Date(), locale), MARGIN_LEFT, titleY + (customerName ? 25 : 14));
 }
 
-function setFont(doc: PdfDocument, family: string, style: FontStyle, size: number, color: readonly [number, number, number]) {
+function setFont(
+  doc: PdfDocument,
+  family: string,
+  style: FontStyle,
+  size: number,
+  color: readonly [number, number, number],
+) {
   doc.setCharSpace(0);
   doc.setFont(family, style);
   doc.setFontSize(size);
@@ -455,7 +506,11 @@ function setFont(doc: PdfDocument, family: string, style: FontStyle, size: numbe
 }
 
 function normalizeText(text: string): string {
-  return text.replace(/\r\n/g, "\n").replace(/\r/g, "\n").replace(/[ \t]+/g, " ").trim();
+  return text
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n")
+    .replace(/[ \t]+/g, " ")
+    .trim();
 }
 
 function wrapText(doc: PdfDocument, text: string, maxWidth: number): string[] {
@@ -516,7 +571,9 @@ function addFooters(doc: PdfDocument) {
     setFont(doc, BODY_FONT, "normal", 8, COLORS.muted);
     doc.text("NUVELI", MARGIN_LEFT, PAGE_HEIGHT - 11);
     doc.text("Home DNA™", PAGE_WIDTH / 2, PAGE_HEIGHT - 11, { align: "center" });
-    doc.text(String(page - 1).padStart(2, "0"), CONTENT_RIGHT, PAGE_HEIGHT - 11, { align: "right" });
+    doc.text(String(page - 1).padStart(2, "0"), CONTENT_RIGHT, PAGE_HEIGHT - 11, {
+      align: "right",
+    });
   }
 }
 
@@ -529,7 +586,8 @@ function formatDate(date: Date, locale: Locale): string {
 }
 
 export function downloadBlob(blob: Blob, filename: string) {
-  if (!(blob instanceof Blob) || blob.size === 0) throw new Error("File is empty and cannot be downloaded.");
+  if (!(blob instanceof Blob) || blob.size === 0)
+    throw new Error("File is empty and cannot be downloaded.");
   const objectUrl = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = objectUrl;

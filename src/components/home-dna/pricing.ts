@@ -98,7 +98,10 @@ export function kitchenWallLengthCm(kitchen: KitchenState): number {
         : layout === "u-shape"
           ? [kitchen.wallA, kitchen.wallB, kitchen.wallC]
           : [kitchen.wallA, kitchen.wallB];
-  const measuredLength = walls.reduce<number>((total, wall) => total + (wall && wall > 0 ? wall : 0), 0);
+  const measuredLength = walls.reduce<number>(
+    (total, wall) => total + (wall && wall > 0 ? wall : 0),
+    0,
+  );
 
   return measuredLength > 0 ? measuredLength : defaultLengths.kitchen * 100;
 }
@@ -194,16 +197,17 @@ function childrenRoomUnitPrice(rooms: RoomsState, level: ExecutionLevel): number
   return total;
 }
 
-const calculators: { room: RoomKey; calc: (rooms: RoomsState, level: ExecutionLevel) => number }[] = [
-  { room: "kitchen", calc: kitchenPrice },
-  { room: "wardrobe", calc: wardrobePrice },
-  { room: "living-room", calc: livingRoomPrice },
-  { room: "entry-hall", calc: entryHallPrice },
-  { room: "utility-room", calc: utilityPrice },
-  { room: "bathroom", calc: bathroomPrice },
-  { room: "bedroom", calc: bedroomPrice },
-  { room: "children-room", calc: childrenRoomUnitPrice },
-];
+const calculators: { room: RoomKey; calc: (rooms: RoomsState, level: ExecutionLevel) => number }[] =
+  [
+    { room: "kitchen", calc: kitchenPrice },
+    { room: "wardrobe", calc: wardrobePrice },
+    { room: "living-room", calc: livingRoomPrice },
+    { room: "entry-hall", calc: entryHallPrice },
+    { room: "utility-room", calc: utilityPrice },
+    { room: "bathroom", calc: bathroomPrice },
+    { room: "bedroom", calc: bedroomPrice },
+    { room: "children-room", calc: childrenRoomUnitPrice },
+  ];
 
 const round500 = (n: number) => Math.round(n / 500) * 500;
 
@@ -222,7 +226,8 @@ export function calculateInvestment(state: HomeDnaState): PricingResult {
       const quantityLabel = `${quantity}${room === "children-room" && state.home.childrenCountPlus ? "+" : ""}`;
       return {
         room,
-        label: room === "children-room" ? `${roomLabels[room]} (${quantityLabel})` : roomLabels[room],
+        label:
+          room === "children-room" ? `${roomLabels[room]} (${quantityLabel})` : roomLabels[room],
         amount: Math.round(calc(state.rooms, level) * quantity),
       };
     });

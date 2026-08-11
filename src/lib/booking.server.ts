@@ -106,4 +106,3 @@ export async function reserveConsultation(input: ReservationData) {
     internalEmailStatus: outcome.internalStatus,
   };
 }
-

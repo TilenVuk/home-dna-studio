@@ -111,8 +111,17 @@ export function Contact() {
                   placeholder="+386"
                 />
               </Field>
-              <Field label="Vrsta projekta" htmlFor="contact-project-type" error={errors["projectType"]}>
-                <select id="contact-project-type" name="projectType" defaultValue="" className={fieldClass}>
+              <Field
+                label="Vrsta projekta"
+                htmlFor="contact-project-type"
+                error={errors["projectType"]}
+              >
+                <select
+                  id="contact-project-type"
+                  name="projectType"
+                  defaultValue=""
+                  className={fieldClass}
+                >
                   <option value="" disabled>
                     Izberite
                   </option>

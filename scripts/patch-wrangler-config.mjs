@@ -17,9 +17,7 @@ for (const configUrl of candidateConfigUrls) {
 }
 
 if (existingConfigUrls.length === 0) {
-  throw new Error(
-    "Generated Wrangler config was not found in .output/server or dist/server.",
-  );
+  throw new Error("Generated Wrangler config was not found in .output/server or dist/server.");
 }
 
 for (const configUrl of existingConfigUrls) {

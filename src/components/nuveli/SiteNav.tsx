@@ -25,7 +25,9 @@ export function SiteNav() {
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
-        scrolled ? "bg-background/85 backdrop-blur-xl border-b border-border" : "border-b border-transparent"
+        scrolled
+          ? "bg-background/85 backdrop-blur-xl border-b border-border"
+          : "border-b border-transparent"
       }`}
     >
       <nav className="mx-auto flex max-w-[1400px] items-center justify-between px-6 py-5 md:px-10">
@@ -36,14 +38,30 @@ export function SiteNav() {
 
         <div className="hidden items-center gap-7 lg:flex">
           {links.map((l) => (
-            <a key={l.href} href={l.href} className="text-[13px] text-muted-foreground transition-colors hover:text-foreground">
+            <a
+              key={l.href}
+              href={l.href}
+              className="text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+            >
               {l.label}
             </a>
           ))}
           <div className="flex items-center gap-1 text-[11px]" aria-label="Jezik">
             <span className="rounded-full border border-foreground px-2.5 py-1.5">SL</span>
-            <a href="/hr/" hrefLang="hr" className="rounded-full border border-border px-2.5 py-1.5 text-muted-foreground hover:text-foreground">HR</a>
-            <a href="/en/" hrefLang="en" className="rounded-full border border-border px-2.5 py-1.5 text-muted-foreground hover:text-foreground">EN</a>
+            <a
+              href="/hr/"
+              hrefLang="hr"
+              className="rounded-full border border-border px-2.5 py-1.5 text-muted-foreground hover:text-foreground"
+            >
+              HR
+            </a>
+            <a
+              href="/en/"
+              hrefLang="en"
+              className="rounded-full border border-border px-2.5 py-1.5 text-muted-foreground hover:text-foreground"
+            >
+              EN
+            </a>
           </div>
           <Link
             to="/home-dna"
@@ -61,14 +79,23 @@ export function SiteNav() {
       {open && (
         <div className="border-t border-border bg-background px-6 pb-8 pt-4 lg:hidden">
           {links.map((l) => (
-            <a key={l.href} href={l.href} onClick={() => setOpen(false)} className="block py-3 text-lg text-foreground">
+            <a
+              key={l.href}
+              href={l.href}
+              onClick={() => setOpen(false)}
+              className="block py-3 text-lg text-foreground"
+            >
               {l.label}
             </a>
           ))}
           <div className="my-4 flex gap-2 text-xs" aria-label="Jezik">
             <span className="rounded-full border border-foreground px-3 py-2">SL</span>
-            <a href="/hr/" hrefLang="hr" className="rounded-full border border-border px-3 py-2">HR</a>
-            <a href="/en/" hrefLang="en" className="rounded-full border border-border px-3 py-2">EN</a>
+            <a href="/hr/" hrefLang="hr" className="rounded-full border border-border px-3 py-2">
+              HR
+            </a>
+            <a href="/en/" hrefLang="en" className="rounded-full border border-border px-3 py-2">
+              EN
+            </a>
           </div>
           <Link
             to="/home-dna"

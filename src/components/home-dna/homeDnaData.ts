@@ -23,7 +23,14 @@ import colourLight from "@/assets/colour-light.jpg";
 import colourEarthy from "@/assets/colour-earthy.jpg";
 import colourNeutral from "@/assets/colour-neutral.jpg";
 import colourDark from "@/assets/colour-dark.jpg";
-import type { PetKey, ProjectStage, PropertyType, RoomKey, RoomOption, VisualOption } from "./homeDnaTypes";
+import type {
+  PetKey,
+  ProjectStage,
+  PropertyType,
+  RoomKey,
+  RoomOption,
+  VisualOption,
+} from "./homeDnaTypes";
 
 export const completeHomeKey: RoomKey = "complete-home";
 export const childrenRoomKey: RoomKey = "children-room";

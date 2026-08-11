@@ -43,7 +43,6 @@ interface Confirmation {
   internalEmailStatus: "pending" | "sent" | "failed";
 }
 
-
 const dateFormatter = new Intl.DateTimeFormat("sl-SI", {
   weekday: "short",
   day: "numeric",
@@ -179,7 +178,6 @@ export function BookingCalendar({
         customerEmailStatus: result.customerEmailStatus,
         internalEmailStatus: result.internalEmailStatus,
       });
-
     } catch (reservationError) {
       console.error(reservationError);
       setSelectedStart(null);
@@ -221,7 +219,6 @@ export function BookingCalendar({
               ? `Potrditev smo poslali na ${contact.email}. Obvestila studiu ni bilo mogoče dostaviti, zato vas bomo kontaktirali tudi neposredno. Vaš termin ostaja potrjen.`
               : "Termin je potrjen in shranjen, potrditvenega e-sporočila pa trenutno ni bilo mogoče dostaviti. Kontaktirali vas bomo neposredno."}
         </p>
-
       </section>
     );
   }

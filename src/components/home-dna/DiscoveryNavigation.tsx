@@ -18,8 +18,10 @@ export function DiscoveryNavigation({
   nextDisabled?: boolean;
   showNext?: boolean;
 }) {
-  const resolvedNext = nextLabel ?? (locale === "hr" ? "Dalje" : locale === "en" ? "Next" : "Naprej");
-  const resolvedBack = backLabel ?? (locale === "hr" ? "Natrag" : locale === "en" ? "Back" : "Nazaj");
+  const resolvedNext =
+    nextLabel ?? (locale === "hr" ? "Dalje" : locale === "en" ? "Next" : "Naprej");
+  const resolvedBack =
+    backLabel ?? (locale === "hr" ? "Natrag" : locale === "en" ? "Back" : "Nazaj");
 
   return (
     <div className="mt-14 flex flex-col-reverse gap-4 border-t border-border pt-8 sm:flex-row sm:items-center sm:justify-between">

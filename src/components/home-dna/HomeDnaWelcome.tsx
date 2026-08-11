@@ -10,8 +10,7 @@ const localizedWelcome: Record<Exclude<Locale, "sl">, typeof welcomeCopy> = {
   hr: {
     eyebrow: "Home DNA™",
     headline: "Svaki izniman dom počinje razumijevanjem ljudi koji će u njemu živjeti.",
-    body:
-      "U nekoliko minuta upoznat ćemo vaš dom, životni stil i želje. Na kraju dobivate osobni Home DNA™ Report i okvirnu procjenu investicije za odabrani opseg projekta.",
+    body: "U nekoliko minuta upoznat ćemo vaš dom, životni stil i želje. Na kraju dobivate osobni Home DNA™ Report i okvirnu procjenu investicije za odabrani opseg projekta.",
     benefits: [
       "Analiza doma prilagođena vašem načinu života",
       "Osobne funkcionalne i oblikovne smjernice",
@@ -23,8 +22,7 @@ const localizedWelcome: Record<Exclude<Locale, "sl">, typeof welcomeCopy> = {
   en: {
     eyebrow: "Home DNA™",
     headline: "Every exceptional home starts with understanding the people who will live in it.",
-    body:
-      "In a few minutes we will learn about your home, lifestyle and priorities. At the end you receive a personal Home DNA™ Report and an indicative investment estimate for your selected project scope.",
+    body: "In a few minutes we will learn about your home, lifestyle and priorities. At the end you receive a personal Home DNA™ Report and an indicative investment estimate for your selected project scope.",
     benefits: [
       "A home analysis tailored to your lifestyle",
       "Personal functional and design priorities",
@@ -35,7 +33,13 @@ const localizedWelcome: Record<Exclude<Locale, "sl">, typeof welcomeCopy> = {
   },
 };
 
-export function HomeDnaWelcome({ onStart, locale = "sl" }: { onStart: () => void; locale?: Locale }) {
+export function HomeDnaWelcome({
+  onStart,
+  locale = "sl",
+}: {
+  onStart: () => void;
+  locale?: Locale;
+}) {
   const copy = locale === "sl" ? welcomeCopy : localizedWelcome[locale];
   const alt =
     locale === "hr"

@@ -8,7 +8,9 @@ export function Journey() {
         <div className="lg:col-span-5">
           <Reveal>
             <p className="eyebrow">Pot</p>
-            <h2 className="display-lg mt-6 max-w-[14ch]">Od prvega pogovora do vsakdanjega življenja</h2>
+            <h2 className="display-lg mt-6 max-w-[14ch]">
+              Od prvega pogovora do vsakdanjega življenja
+            </h2>
             <p className="mt-8 max-w-[42ch] text-sm leading-relaxed text-muted-foreground">
               En studio, ena ekipa, eno razumevanje vašega doma — skozi vse faze.
             </p>
@@ -17,9 +19,16 @@ export function Journey() {
 
         <ol className="lg:col-span-7">
           {journey.map((s, i) => (
-            <Reveal key={s.title} delay={i * 60} as="li" className="border-t border-border py-7 last:border-b">
+            <Reveal
+              key={s.title}
+              delay={i * 60}
+              as="li"
+              className="border-t border-border py-7 last:border-b"
+            >
               <div className="flex gap-8">
-                <span className="font-display text-sm text-oak">{String(i + 1).padStart(2, "0")}</span>
+                <span className="font-display text-sm text-oak">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
                 <div>
                   <h3 className="text-xl">{s.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.text}</p>

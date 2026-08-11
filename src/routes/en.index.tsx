@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { LocalizedLanding } from "@/components/nuveli/LocalizedLanding";
 
 const title = "Nuveli Studio — bespoke interiors and Home DNA™";
-const description = "Nuveli Studio designs complete interiors and custom furniture around your lifestyle, needs and investment range.";
+const description =
+  "Nuveli Studio designs complete interiors and custom furniture around your lifestyle, needs and investment range.";
 
 export const Route = createFileRoute("/en/")({
   head: () => ({

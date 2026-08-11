@@ -41,9 +41,15 @@ export function HomeDnaDiscovery({ locale = "sl" }: { locale?: Locale }) {
     [locale],
   );
 
-  const advance = useCallback((mutate?: (state: HomeDnaState) => HomeDnaState) => step(1, mutate), [step]);
+  const advance = useCallback(
+    (mutate?: (state: HomeDnaState) => HomeDnaState) => step(1, mutate),
+    [step],
+  );
   const back = useCallback(() => step(-1), [step]);
-  const update = useCallback((mutate: (state: HomeDnaState) => HomeDnaState) => setState((prev) => mutate(prev)), []);
+  const update = useCallback(
+    (mutate: (state: HomeDnaState) => HomeDnaState) => setState((prev) => mutate(prev)),
+    [],
+  );
 
   if (!def) return null;
 

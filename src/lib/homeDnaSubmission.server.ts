@@ -1,6 +1,9 @@
 import { createHmac } from "node:crypto";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import type { HomeDnaSubmissionInput, HomeDnaSubmissionResult } from "./homeDnaSubmission.functions";
+import type {
+  HomeDnaSubmissionInput,
+  HomeDnaSubmissionResult,
+} from "./homeDnaSubmission.functions";
 import type { Locale } from "./i18n";
 
 const CUSTOMER_FROM = "Home DNA™ <porocila@obvestila.nuvelistudio.com>";
@@ -45,21 +48,24 @@ const customerCopy = {
     greeting: "Pozdravljeni",
     heading: "Vaš Home DNA™ Report",
     thankYou: "Hvala, ker ste z nami delili svoj način življenja, potrebe in želje za dom.",
-    attachment: "Vaše osebno poročilo in okvirna ocena investicije sta priložena temu sporočilu v obliki PDF.",
+    attachment:
+      "Vaše osebno poročilo in okvirna ocena investicije sta priložena temu sporočilu v obliki PDF.",
   },
   hr: {
     subject: "Vaš Home DNA™ izvještaj – Nuveli Studio",
     greeting: "Pozdrav",
     heading: "Vaš Home DNA™ Report",
     thankYou: "Hvala što ste s nama podijelili svoj način života, potrebe i želje za dom.",
-    attachment: "Vaš osobni izvještaj i okvirna procjena investicije priloženi su ovoj poruci u PDF obliku.",
+    attachment:
+      "Vaš osobni izvještaj i okvirna procjena investicije priloženi su ovoj poruci u PDF obliku.",
   },
   en: {
     subject: "Your Home DNA™ Report – Nuveli Studio",
     greeting: "Hello",
     heading: "Your Home DNA™ Report",
     thankYou: "Thank you for sharing your lifestyle, needs and priorities for your home with us.",
-    attachment: "Your personal report and indicative investment estimate are attached to this email as a PDF.",
+    attachment:
+      "Your personal report and indicative investment estimate are attached to this email as a PDF.",
   },
 } as const;
 
@@ -116,7 +122,10 @@ export async function processHomeDnaSubmission(
         `home-dna-${submission.id}-customer`,
       );
       customerStatus = "sent";
-      await updateSubmission(submission.id, { customer_email_status: "sent", customer_resend_id: customerResendId });
+      await updateSubmission(submission.id, {
+        customer_email_status: "sent",
+        customer_resend_id: customerResendId,
+      });
     } catch (error) {
       customerStatus = "failed";
       errors.push(`customer: ${safeErrorMessage(error)}`);
@@ -132,7 +141,10 @@ export async function processHomeDnaSubmission(
         `home-dna-${submission.id}-internal`,
       );
       internalStatus = "sent";
-      await updateSubmission(submission.id, { internal_email_status: "sent", internal_resend_id: internalResendId });
+      await updateSubmission(submission.id, {
+        internal_email_status: "sent",
+        internal_resend_id: internalResendId,
+      });
     } catch (error) {
       internalStatus = "failed";
       errors.push(`internal: ${safeErrorMessage(error)}`);
@@ -141,7 +153,11 @@ export async function processHomeDnaSubmission(
   }
 
   const delivered = customerStatus === "sent" && internalStatus === "sent";
-  const sendStatus = delivered ? "sent" : customerStatus === "sent" || internalStatus === "sent" ? "partial" : "failed";
+  const sendStatus = delivered
+    ? "sent"
+    : customerStatus === "sent" || internalStatus === "sent"
+      ? "partial"
+      : "failed";
 
   await updateSubmission(submission.id, {
     send_status: sendStatus,
@@ -209,7 +225,10 @@ async function createSubmission(
       const existing = await findSubmission(input.submissionId);
       if (existing) return existing;
     }
-    console.error("Home DNA submission insert failed", { id: input.submissionId, code: error.code });
+    console.error("Home DNA submission insert failed", {
+      id: input.submissionId,
+      code: error.code,
+    });
     throw new Error("HOME_DNA_STORAGE_UNAVAILABLE");
   }
   return data as SubmissionRow;
@@ -218,12 +237,23 @@ async function createSubmission(
 async function enforceRateLimit(email: string, ipHash: string): Promise<void> {
   const since = new Date(Date.now() - RATE_LIMIT_WINDOW_MS).toISOString();
   const [emailResult, ipResult] = await Promise.all([
-    supabaseAdmin.from("home_dna_submissions").select("id", { count: "exact", head: true }).eq("customer_email", email).gte("created_at", since),
-    supabaseAdmin.from("home_dna_submissions").select("id", { count: "exact", head: true }).eq("request_ip_hash", ipHash).gte("created_at", since),
+    supabaseAdmin
+      .from("home_dna_submissions")
+      .select("id", { count: "exact", head: true })
+      .eq("customer_email", email)
+      .gte("created_at", since),
+    supabaseAdmin
+      .from("home_dna_submissions")
+      .select("id", { count: "exact", head: true })
+      .eq("request_ip_hash", ipHash)
+      .gte("created_at", since),
   ]);
 
   if (emailResult.error || ipResult.error) {
-    console.error("Home DNA rate-limit query failed", { emailCode: emailResult.error?.code, ipCode: ipResult.error?.code });
+    console.error("Home DNA rate-limit query failed", {
+      emailCode: emailResult.error?.code,
+      ipCode: ipResult.error?.code,
+    });
     throw new Error("HOME_DNA_STORAGE_UNAVAILABLE");
   }
 
@@ -253,7 +283,11 @@ async function updateSubmission(id: string, patch: Record<string, unknown>): Pro
   }
 }
 
-function buildCustomerEmail(submission: SubmissionRow, filename: string, pdfBase64: string): ResendPayload {
+function buildCustomerEmail(
+  submission: SubmissionRow,
+  filename: string,
+  pdfBase64: string,
+): ResendPayload {
   const copy = customerCopy[submission.locale] ?? customerCopy.sl;
   const name = escapeHtml(submission.customer_name);
   return {
@@ -275,7 +309,11 @@ function buildCustomerEmail(submission: SubmissionRow, filename: string, pdfBase
   };
 }
 
-function buildInternalEmail(submission: SubmissionRow, filename: string, pdfBase64: string): ResendPayload {
+function buildInternalEmail(
+  submission: SubmissionRow,
+  filename: string,
+  pdfBase64: string,
+): ResendPayload {
   const safeName = escapeHtml(submission.customer_name);
   const safeEmail = escapeHtml(submission.customer_email);
   const safePhone = escapeHtml(submission.customer_phone || "Ni naveden");
@@ -307,13 +345,25 @@ function buildInternalEmail(submission: SubmissionRow, filename: string, pdfBase
   };
 }
 
-async function sendResendEmail(apiKey: string, payload: ResendPayload, idempotencyKey: string): Promise<string> {
+async function sendResendEmail(
+  apiKey: string,
+  payload: ResendPayload,
+  idempotencyKey: string,
+): Promise<string> {
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
-    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json", "Idempotency-Key": idempotencyKey },
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+      "Idempotency-Key": idempotencyKey,
+    },
     body: JSON.stringify(payload),
   });
-  const body = (await response.json().catch(() => null)) as { id?: string; message?: string; name?: string } | null;
+  const body = (await response.json().catch(() => null)) as {
+    id?: string;
+    message?: string;
+    name?: string;
+  } | null;
   if (!response.ok || !body?.id) {
     const detail = body?.message || body?.name || `HTTP ${response.status}`;
     throw new Error(`Resend ${detail}`.slice(0, 500));
@@ -324,7 +374,8 @@ async function sendResendEmail(apiKey: string, payload: ResendPayload, idempoten
 function resultFor(submission: SubmissionRow): HomeDnaSubmissionResult {
   return {
     submissionId: submission.id,
-    delivered: submission.customer_email_status === "sent" && submission.internal_email_status === "sent",
+    delivered:
+      submission.customer_email_status === "sent" && submission.internal_email_status === "sent",
     customerEmailStatus: submission.customer_email_status,
     internalEmailStatus: submission.internal_email_status,
   };
@@ -345,13 +396,23 @@ function submissionTags(id: string, recipient: "customer" | "internal", locale: 
 
 function escapeHtml(value: string): string {
   return value.replace(/[&<>'"]/g, (character) => {
-    const entities: Record<string, string> = { "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" };
+    const entities: Record<string, string> = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      "'": "&#39;",
+      '"': "&quot;",
+    };
     return entities[character] ?? character;
   });
 }
 
 function sanitizeSubject(value: string): string {
-  return value.replace(/[\r\n]+/g, " ").replace(/\s+/g, " ").trim().slice(0, 100);
+  return value
+    .replace(/[\r\n]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 100);
 }
 
 function estimateBase64Bytes(value: string): number {
@@ -360,7 +421,10 @@ function estimateBase64Bytes(value: string): number {
 }
 
 function hashIp(ip: string): string {
-  const secret = process.env["HOME_DNA_RATE_LIMIT_SALT"] || process.env["SUPABASE_SERVICE_ROLE_KEY"] || "nuveli-home-dna";
+  const secret =
+    process.env["HOME_DNA_RATE_LIMIT_SALT"] ||
+    process.env["SUPABASE_SERVICE_ROLE_KEY"] ||
+    "nuveli-home-dna";
   return createHmac("sha256", secret).update(ip).digest("hex");
 }
 

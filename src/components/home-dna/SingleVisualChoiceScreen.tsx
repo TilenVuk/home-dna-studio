@@ -39,7 +39,11 @@ export function SingleVisualChoiceScreen<T extends string>({
   const localizedHeadline = uiText(locale, headline) ?? headline;
 
   return (
-    <ScreenShell screenKey={screenKey} headline={localizedHeadline} support={uiText(locale, support)}>
+    <ScreenShell
+      screenKey={screenKey}
+      headline={localizedHeadline}
+      support={uiText(locale, support)}
+    >
       <div role="radiogroup" aria-label={localizedHeadline} className={`mt-12 grid gap-5 ${grid}`}>
         {options.map((option) => (
           <VisualChoiceCard

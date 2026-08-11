@@ -46,7 +46,12 @@ export function MultiSelectScreen({
       return;
     }
     if (max && base.length >= max) {
-      const fallback = locale === "hr" ? `Možete odabrati najviše ${max}.` : locale === "en" ? `You can select up to ${max}.` : `Izberete lahko največ ${max}.`;
+      const fallback =
+        locale === "hr"
+          ? `Možete odabrati najviše ${max}.`
+          : locale === "en"
+            ? `You can select up to ${max}.`
+            : `Izberete lahko največ ${max}.`;
       setNotice(uiText(locale, limitNotice) ?? fallback);
       return;
     }
@@ -55,7 +60,11 @@ export function MultiSelectScreen({
 
   const localizedHeadline = uiText(locale, headline) ?? headline;
   return (
-    <ScreenShell screenKey={screenKey} headline={localizedHeadline} support={uiText(locale, support)}>
+    <ScreenShell
+      screenKey={screenKey}
+      headline={localizedHeadline}
+      support={uiText(locale, support)}
+    >
       <div role="group" aria-label={localizedHeadline} className="mt-12 flex flex-wrap gap-3">
         {options.map((option) => (
           <PillChoice
@@ -66,8 +75,15 @@ export function MultiSelectScreen({
           />
         ))}
       </div>
-      <p role="status" aria-live="polite" className="mt-6 min-h-6 text-sm text-muted-foreground">{notice}</p>
-      <DiscoveryNavigation locale={locale} onBack={onBack} onNext={onNext} nextDisabled={selected.length === 0} />
+      <p role="status" aria-live="polite" className="mt-6 min-h-6 text-sm text-muted-foreground">
+        {notice}
+      </p>
+      <DiscoveryNavigation
+        locale={locale}
+        onBack={onBack}
+        onNext={onNext}
+        nextDisabled={selected.length === 0}
+      />
     </ScreenShell>
   );
 }

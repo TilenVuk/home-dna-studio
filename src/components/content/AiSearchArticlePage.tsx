@@ -2,12 +2,39 @@ import type { Locale } from "@/lib/i18n";
 import { articlePath, type AiSearchArticle } from "@/content/aiSearchArticles";
 
 const ui = {
-  sl: { back: "Nuveli Studio", label: "Vsebine", cta: "Odkrijte svoj Home DNA™", estimate: "Osebni report + okvirna ocena investicije", faq: "Pogosta vprašanja", languages: "Jezik" },
-  hr: { back: "Nuveli Studio", label: "Sadržaj", cta: "Otkrijte svoj Home DNA™", estimate: "Osobni izvještaj + okvirna procjena investicije", faq: "Česta pitanja", languages: "Jezik" },
-  en: { back: "Nuveli Studio", label: "Guides", cta: "Discover your Home DNA™", estimate: "Personal report + indicative investment estimate", faq: "Frequently asked questions", languages: "Language" },
+  sl: {
+    back: "Nuveli Studio",
+    label: "Vsebine",
+    cta: "Odkrijte svoj Home DNA™",
+    estimate: "Osebni report + okvirna ocena investicije",
+    faq: "Pogosta vprašanja",
+    languages: "Jezik",
+  },
+  hr: {
+    back: "Nuveli Studio",
+    label: "Sadržaj",
+    cta: "Otkrijte svoj Home DNA™",
+    estimate: "Osobni izvještaj + okvirna procjena investicije",
+    faq: "Česta pitanja",
+    languages: "Jezik",
+  },
+  en: {
+    back: "Nuveli Studio",
+    label: "Guides",
+    cta: "Discover your Home DNA™",
+    estimate: "Personal report + indicative investment estimate",
+    faq: "Frequently asked questions",
+    languages: "Language",
+  },
 } as const;
 
-export function AiSearchArticlePage({ article, locale }: { article: AiSearchArticle; locale: Locale }) {
+export function AiSearchArticlePage({
+  article,
+  locale,
+}: {
+  article: AiSearchArticle;
+  locale: Locale;
+}) {
   const content = article.localized[locale];
   const prefix = locale === "sl" ? "" : `/${locale}`;
   const homeDnaPath = `${prefix}/home-dna`;
@@ -37,7 +64,9 @@ export function AiSearchArticlePage({ article, locale }: { article: AiSearchArti
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-6 px-6 py-5 md:px-10">
-          <a href={`${prefix}/`} className="font-display text-lg font-medium tracking-[-0.04em]">NUVELI <span className="eyebrow ml-1">Studio</span></a>
+          <a href={`${prefix}/`} className="font-display text-lg font-medium tracking-[-0.04em]">
+            NUVELI <span className="eyebrow ml-1">Studio</span>
+          </a>
           <nav aria-label={ui[locale].languages} className="flex items-center gap-2 text-xs">
             {(["sl", "hr", "en"] as const).map((target) => (
               <a
@@ -56,7 +85,9 @@ export function AiSearchArticlePage({ article, locale }: { article: AiSearchArti
       <main className="mx-auto max-w-4xl px-6 py-16 md:px-10 md:py-24">
         <p className="eyebrow">{ui[locale].label} · Home DNA™</p>
         <h1 className="display-lg mt-6 max-w-[22ch]">{content.title}</h1>
-        <p className="mt-8 max-w-3xl text-lg leading-relaxed text-muted-foreground">{content.intro}</p>
+        <p className="mt-8 max-w-3xl text-lg leading-relaxed text-muted-foreground">
+          {content.intro}
+        </p>
 
         <div className="mt-16 space-y-14">
           {content.sections.map((section) => (
@@ -84,14 +115,25 @@ export function AiSearchArticlePage({ article, locale }: { article: AiSearchArti
         <aside className="mt-20 rounded-2xl border border-border bg-muted/40 p-8 md:p-10">
           <p className="eyebrow">Home DNA™ Discovery</p>
           <h2 className="mt-4 font-display text-3xl">{ui[locale].estimate}</h2>
-          <a href={homeDnaPath} className="mt-8 inline-flex min-h-12 items-center rounded-full bg-primary px-7 py-4 text-sm text-primary-foreground">
+          <a
+            href={homeDnaPath}
+            className="mt-8 inline-flex min-h-12 items-center rounded-full bg-primary px-7 py-4 text-sm text-primary-foreground"
+          >
             {ui[locale].cta}
           </a>
         </aside>
       </main>
 
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
-      {faqSchema ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} /> : null}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      />
+      {faqSchema ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
+      ) : null}
     </div>
   );
 }

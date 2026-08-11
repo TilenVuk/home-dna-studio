@@ -59,7 +59,9 @@ function shouldAskPets(selectedRooms: RoomKey[]): boolean {
 }
 
 function shouldAskFloorArea(selectedRooms: RoomKey[]): boolean {
-  return selectedRooms.includes("complete-home") || selectedIndividualRooms(selectedRooms).length > 1;
+  return (
+    selectedRooms.includes("complete-home") || selectedIndividualRooms(selectedRooms).length > 1
+  );
 }
 
 function shouldAskHobbies(selectedRooms: RoomKey[]): boolean {
@@ -73,12 +75,15 @@ function applyRoomScope(state: HomeDnaState, selectedRooms: RoomKey[]): HomeDnaS
   const challenges = challengeOptionsForRooms(selectedRooms);
   const futureNeeds = futureNeedsOptionsForRooms(selectedRooms).filter(
     (value) =>
-      state.home.children !== "none" || (value !== "Rast družine" && value !== "Otroci bodo potrebovali več prostora"),
+      state.home.children !== "none" ||
+      (value !== "Rast družine" && value !== "Otroci bodo potrebovali več prostora"),
   );
   const lifestyle = {
     ...state.lifestyle,
     priorities: state.lifestyle.priorities.filter((value) => priorities.includes(value)),
-    currentChallenges: state.lifestyle.currentChallenges.filter((value) => challenges.includes(value)),
+    currentChallenges: state.lifestyle.currentChallenges.filter((value) =>
+      challenges.includes(value),
+    ),
     futureNeeds: state.lifestyle.futureNeeds.filter((value) => futureNeeds.includes(value)),
   };
 
@@ -104,7 +109,8 @@ function homeScreens(state: HomeDnaState): ScreenDef[] {
       kind: "visual",
       key: "project-stage",
       headline: "V kateri fazi je vaš projekt?",
-      support: "Kontekst projekta nam pomaga pripraviti priporočila, primerna za vaš prostor in časovni okvir.",
+      support:
+        "Kontekst projekta nam pomaga pripraviti priporočila, primerna za vaš prostor in časovni okvir.",
       options: projectStageOptions,
       value: home.projectStage,
       apply: (s, v) => ({ ...s, home: { ...s.home, projectStage: v as ProjectStage } }),
@@ -129,7 +135,12 @@ function homeScreens(state: HomeDnaState): ScreenDef[] {
       headline: "Koliko ljudi bo uporabljalo ta dom?",
       support: "Dom mora delovati za vsakogar, ki v njem živi.",
       options: householdSizeOptions.map((o) => ({ value: o, label: o })),
-      value: home.householdSize === undefined ? undefined : home.householdSizePlus ? "5+" : String(home.householdSize),
+      value:
+        home.householdSize === undefined
+          ? undefined
+          : home.householdSizePlus
+            ? "5+"
+            : String(home.householdSize),
       apply: (s, value) => ({
         ...s,
         home: {
@@ -272,7 +283,8 @@ function lifestyleScreens(state: HomeDnaState): ScreenDef[] {
   const challenges = challengeOptionsForRooms(state.selectedRooms);
   const futureNeeds = futureNeedsOptionsForRooms(state.selectedRooms).filter(
     (value) =>
-      state.home.children !== "none" || (value !== "Rast družine" && value !== "Otroci bodo potrebovali več prostora"),
+      state.home.children !== "none" ||
+      (value !== "Rast družine" && value !== "Otroci bodo potrebovali več prostora"),
   );
   const screens: ScreenDef[] = [
     {
@@ -300,11 +312,15 @@ function lifestyleScreens(state: HomeDnaState): ScreenDef[] {
         description: option.description,
       })),
       value: life.cookingFrequency,
-      apply: (s, cookingFrequency) => setLife(s, { cookingFrequency: cookingFrequency as CookingFrequency }),
+      apply: (s, cookingFrequency) =>
+        setLife(s, { cookingFrequency: cookingFrequency as CookingFrequency }),
     });
   }
 
-  if (scopeIncludes(state.selectedRooms, "kitchen") || scopeIncludes(state.selectedRooms, "living-room")) {
+  if (
+    scopeIncludes(state.selectedRooms, "kitchen") ||
+    scopeIncludes(state.selectedRooms, "living-room")
+  ) {
     screens.push({
       kind: "choice",
       key: "hosting-frequency",
@@ -315,11 +331,15 @@ function lifestyleScreens(state: HomeDnaState): ScreenDef[] {
         label: option.label,
       })),
       value: life.hostingFrequency,
-      apply: (s, hostingFrequency) => setLife(s, { hostingFrequency: hostingFrequency as HostingFrequency }),
+      apply: (s, hostingFrequency) =>
+        setLife(s, { hostingFrequency: hostingFrequency as HostingFrequency }),
     });
   }
 
-  if (scopeIncludes(state.selectedRooms, "living-room") || scopeIncludes(state.selectedRooms, "bedroom")) {
+  if (
+    scopeIncludes(state.selectedRooms, "living-room") ||
+    scopeIncludes(state.selectedRooms, "bedroom")
+  ) {
     screens.push({
       kind: "choice",
       key: "work-from-home-frequency",

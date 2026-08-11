@@ -33,23 +33,27 @@ for (const page of pages) {
   const html = await response.text();
 
   const viewportTag = findMeta(html, "viewport");
-  const viewportContent = viewportTag ? getAttr(viewportTag, "content") ?? "" : "";
+  const viewportContent = viewportTag ? (getAttr(viewportTag, "content") ?? "") : "";
   if (!viewportTag || !/\bwidth\s*=\s*device-width\b/i.test(viewportContent)) {
     errors.push(`${page.url}: missing valid viewport meta tag with width=device-width.`);
   }
 
   const descriptionTag = findMeta(html, "description");
-  const description = descriptionTag ? getAttr(descriptionTag, "content") ?? "" : "";
+  const description = descriptionTag ? (getAttr(descriptionTag, "content") ?? "") : "";
   if (!description) {
     errors.push(`${page.url}: missing meta description.`);
   } else if (description.length > 160) {
-    errors.push(`${page.url}: meta description is ${description.length} characters; maximum is 160.`);
+    errors.push(
+      `${page.url}: meta description is ${description.length} characters; maximum is 160.`,
+    );
   }
 
   const canonicalTag = findCanonical(html);
   const canonical = canonicalTag ? getAttr(canonicalTag, "href") : null;
   if (canonical !== page.canonical) {
-    errors.push(`${page.url}: canonical is '${canonical ?? "missing"}', expected '${page.canonical}'.`);
+    errors.push(
+      `${page.url}: canonical is '${canonical ?? "missing"}', expected '${page.canonical}'.`,
+    );
   }
 
   if (!/<html\b[^>]*\blang\s*=\s*["']sl["']/i.test(html)) {

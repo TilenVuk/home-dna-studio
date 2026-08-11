@@ -65,7 +65,9 @@ export function ChoiceScreen({
                 {uiText(locale, option.label) ?? option.label}
               </span>
               {option.description && (
-                <span className={`mt-2 block max-w-[60ch] text-sm leading-relaxed ${selected ? "text-primary-foreground/75" : "text-muted-foreground"}`}>
+                <span
+                  className={`mt-2 block max-w-[60ch] text-sm leading-relaxed ${selected ? "text-primary-foreground/75" : "text-muted-foreground"}`}
+                >
                   {uiText(locale, option.description) ?? option.description}
                 </span>
               )}

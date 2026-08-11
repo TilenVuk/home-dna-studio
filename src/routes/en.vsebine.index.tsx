@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AiSearchHub } from "@/components/content/AiSearchHub";
 
 const title = "Interior design and custom furniture guides — Nuveli Studio";
-const description = "Practical Nuveli Studio guides to Home DNA™, custom kitchens, materials, storage, new builds and interior investment planning.";
+const description =
+  "Practical Nuveli Studio guides to Home DNA™, custom kitchens, materials, storage, new builds and interior investment planning.";
 
 export const Route = createFileRoute("/en/vsebine/")({
   head: () => ({

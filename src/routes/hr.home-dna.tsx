@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { HomeDnaDiscovery } from "@/components/home-dna/HomeDnaDiscovery";
 
 const title = "Home DNA™ Discovery — Nuveli Studio";
-const description = "Upoznajte svoj Home DNA™. Dobivate osobni Home DNA™ Report i okvirnu procjenu investicije za svoj projekt.";
+const description =
+  "Upoznajte svoj Home DNA™. Dobivate osobni Home DNA™ Report i okvirnu procjenu investicije za svoj projekt.";
 
 export const Route = createFileRoute("/hr/home-dna")({
   head: () => ({
