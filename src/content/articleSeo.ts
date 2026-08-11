@@ -44,9 +44,7 @@ export function buildArticleSeo(article: AiSearchArticle, locale: Locale) {
     canonicalUrl,
     scripts: [
       { type: "application/ld+json", children: JSON.stringify(articleSchema) },
-      ...(faqSchema
-        ? [{ type: "application/ld+json", children: JSON.stringify(faqSchema) }]
-        : []),
+      ...(faqSchema ? [{ type: "application/ld+json", children: JSON.stringify(faqSchema) }] : []),
     ],
   };
 }
