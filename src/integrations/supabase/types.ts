@@ -1,311 +1,55 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[]
+Resolving dependencies
+Resolved, downloaded and extracted [48]
+Saved lockfile
+DESCRIPTION
+  Generate types from Postgres schema.
 
-export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "14.15"
-  }
-  public: {
-    Tables: {
-      consultation_bookings: {
-        Row: {
-          consultation_type: string
-          created_at: string
-          customer_email: string
-          customer_email_status: string
-          customer_name: string
-          customer_phone: string
-          customer_resend_id: string | null
-          email_attempt_count: number
-          email_last_error: string | null
-          id: string
-          internal_email_status: string
-          internal_resend_id: string | null
-          message: string
-          project_type: string
-          slot_end: string
-          slot_start: string
-          source: string
-          status: string
-          updated_at: string
-        }
-        Insert: {
-          consultation_type: string
-          created_at?: string
-          customer_email: string
-          customer_email_status?: string
-          customer_name: string
-          customer_phone?: string
-          customer_resend_id?: string | null
-          email_attempt_count?: number
-          email_last_error?: string | null
-          id?: string
-          internal_email_status?: string
-          internal_resend_id?: string | null
-          message?: string
-          project_type?: string
-          slot_end: string
-          slot_start: string
-          source: string
-          status?: string
-          updated_at?: string
-        }
-        Update: {
-          consultation_type?: string
-          created_at?: string
-          customer_email?: string
-          customer_email_status?: string
-          customer_name?: string
-          customer_phone?: string
-          customer_resend_id?: string | null
-          email_attempt_count?: number
-          email_last_error?: string | null
-          id?: string
-          internal_email_status?: string
-          internal_resend_id?: string | null
-          message?: string
-          project_type?: string
-          slot_end?: string
-          slot_start?: string
-          source?: string
-          status?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      home_dna_report_attempts: {
-        Row: {
-          created_at: string
-          id: number
-          request_ip_hash: string
-        }
-        Insert: {
-          created_at?: string
-          id?: never
-          request_ip_hash: string
-        }
-        Update: {
-          created_at?: string
-          id?: never
-          request_ip_hash?: string
-        }
-        Relationships: []
-      }
-      home_dna_submissions: {
-        Row: {
-          answers: Json
-          attempt_count: number
-          consent: boolean
-          consent_at: string
-          created_at: string
-          customer_email: string
-          customer_email_status: string
-          customer_name: string
-          customer_phone: string
-          customer_resend_id: string | null
-          id: string
-          internal_email_status: string
-          internal_resend_id: string | null
-          last_error: string | null
-          report: Json
-          request_ip_hash: string
-          send_status: string
-          summary: string
-          updated_at: string
-        }
-        Insert: {
-          answers: Json
-          attempt_count?: number
-          consent: boolean
-          consent_at: string
-          created_at?: string
-          customer_email: string
-          customer_email_status?: string
-          customer_name: string
-          customer_phone?: string
-          customer_resend_id?: string | null
-          id: string
-          internal_email_status?: string
-          internal_resend_id?: string | null
-          last_error?: string | null
-          report: Json
-          request_ip_hash: string
-          send_status?: string
-          summary: string
-          updated_at?: string
-        }
-        Update: {
-          answers?: Json
-          attempt_count?: number
-          consent?: boolean
-          consent_at?: string
-          created_at?: string
-          customer_email?: string
-          customer_email_status?: string
-          customer_name?: string
-          customer_phone?: string
-          customer_resend_id?: string | null
-          id?: string
-          internal_email_status?: string
-          internal_resend_id?: string | null
-          last_error?: string | null
-          report?: Json
-          request_ip_hash?: string
-          send_status?: string
-          summary?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      consume_home_dna_report_quota: {
-        Args: {
-          p_max_requests?: number
-          p_request_ip_hash: string
-          p_window_seconds?: number
-        }
-        Returns: boolean
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
-}
+USAGE
+  supabase gen types [flags] [<language>]
 
-type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+ARGUMENTS
+  language string     (optional)
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+FLAGS
+  --local                          Generate types from the local dev database.
+  --linked                         Generate types from the linked project.
+  --db-url string                  Generate types from a database url.
+  --project-id string              Generate types from a project ID.
+  --lang choice                    Output language of the generated types. (default typescript) (choices: typescript, go, swift, python)
+  --schema, -s string              Comma separated list of schema to include.
+  --swift-access-control choice    Access control for Swift generated types. (default internal) (choices: internal, public)
+  --postgrest-v9-compat            Generate types compatible with PostgREST v9 and below.
+  --query-timeout string           Maximum timeout allowed for the database query. (default 15s)
 
-export type Tables<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
-      Row: infer R
-    }
-    ? R
-    : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-        Row: infer R
-      }
-      ? R
-      : never
-    : never
+GLOBAL FLAGS
+  --help, -h                                                          Show help information
+  --version, -v                                                       Show version information
+  --wizard                                                            Start wizard mode for a command
+  --completions <bash|zsh|fish|sh>                                    Print shell completion script (choices: bash, zsh, fish, sh)
+  --log-level <all|trace|debug|info|warn|warning|error|fatal|none>    Sets the minimum log level (choices: all, trace, debug, info, warn, warning, error, fatal, none)
+  --output-format choice                                              Output format: text (default), json, or stream-json (NDJSON) (choices: text, json, stream-json)
+  --output, -o choice                                                 output format of status variables (choices: env, pretty, json, toml, yaml, table, csv)
+  --profile string                                                    use a specific profile for connecting to Supabase API
+  --debug                                                             output debug logs to stderr
+  --workdir string                                                    path to a Supabase project directory
+  --experimental                                                      enable experimental features
+  --network-id string                                                 use the specified docker network instead of a generated one
+  --yes                                                               answer yes to all prompts
+  --dns-resolver choice                                               lookup domain names using the specified resolver (choices: native, https)
+  --create-ticket                                                     create a support ticket for any CLI error
+  --agent choice                                                      Override agent detection: yes, no, or auto (default auto) (choices: auto, yes, no)
 
-export type TablesInsert<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Insert: infer I
-    }
-    ? I
-    : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Insert: infer I
-      }
-      ? I
-      : never
-    : never
+EXAMPLES
+  # Generate types from the local dev database
+  supabase gen types --local
 
-export type TablesUpdate<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Update: infer U
-    }
-    ? U
-    : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Update: infer U
-      }
-      ? U
-      : never
-    : never
+  # Generate Go types from the linked project
+  supabase gen types --linked --lang=go
 
-export type Enums<
-  DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema["Enums"]
-    | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
-> = DefaultSchemaEnumNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-    : never
+  # Generate types from a project ID with specific schemas
+  supabase gen types --project-id abc-def-123 --schema public --schema private
 
-export type CompositeTypes<
-  PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
-> = PublicCompositeTypeNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-    : never
-
-export const Constants = {
-  public: {
-    Enums: {},
-  },
-} as const
+  # Generate types from a database URL
+  supabase gen types --db-url 'postgresql://...' --schema public --schema auth
+[31mUnrecognized flag: --project-ref in command supabase gen types[39m
+Try rerunning the command with --debug to troubleshoot the error.
