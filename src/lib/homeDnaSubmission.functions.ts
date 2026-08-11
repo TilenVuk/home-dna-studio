@@ -58,6 +58,7 @@ const ReportInput = z.object({
 
 const SubmissionInput = z.object({
   submissionId: z.string().uuid(),
+  locale: z.enum(["sl", "hr", "en"]),
   contact: ContactInput,
   answers: z.record(JsonValueSchema).refine((value) => JSON.stringify(value).length <= MAX_ANSWERS_LENGTH, {
     message: "Home DNA answers are too large",
