@@ -3,7 +3,6 @@ import { SiteNav } from "@/components/nuveli/SiteNav";
 import { Hero } from "@/components/nuveli/Hero";
 import { Concept } from "@/components/nuveli/Concept";
 import { Process } from "@/components/nuveli/Process";
-
 import { Services } from "@/components/nuveli/Services";
 import { Gallery } from "@/components/nuveli/Gallery";
 import { Journey } from "@/components/nuveli/Journey";
@@ -26,7 +25,13 @@ export const Route = createFileRoute("/")({
       { property: "og:url", content: canonicalUrl },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: canonicalUrl }],
+    links: [
+      { rel: "canonical", href: canonicalUrl },
+      { rel: "alternate", hrefLang: "sl", href: canonicalUrl },
+      { rel: "alternate", hrefLang: "hr", href: "https://nuvelistudio.com/hr/" },
+      { rel: "alternate", hrefLang: "en", href: "https://nuvelistudio.com/en/" },
+      { rel: "alternate", hrefLang: "x-default", href: canonicalUrl },
+    ],
     scripts: [
       {
         type: "application/ld+json",
@@ -55,7 +60,6 @@ function Index() {
         <Hero />
         <Concept />
         <Process />
-
         <Services />
         <Gallery />
         <Journey />
