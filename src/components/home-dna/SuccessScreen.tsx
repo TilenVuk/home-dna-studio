@@ -4,14 +4,17 @@ import heroInterior from "@/assets/hero-interior.jpg";
 import { BookingCalendar } from "@/components/booking/BookingCalendar";
 import { HomeDnaReport, type HomeDnaDeliveryState } from "./HomeDnaReport";
 import type { HomeDnaState } from "./homeDnaTypes";
+import type { Locale } from "@/lib/i18n";
 
 export function SuccessScreen({
   name,
   state,
+  locale = "sl",
   onBack,
 }: {
   name?: string;
   state: HomeDnaState;
+  locale?: Locale;
   onBack: () => void;
 }) {
   const [deliveryState, setDeliveryState] = useState<HomeDnaDeliveryState>("processing");
@@ -40,9 +43,7 @@ export function SuccessScreen({
         <div className="order-2 lg:order-1 lg:col-span-6">
           <p className="eyebrow">Home DNA™</p>
           <h1 className="display-lg mt-6 max-w-[20ch]">{heading}</h1>
-          <p className="mt-7 max-w-[52ch] text-base leading-relaxed text-muted-foreground">
-            {body}
-          </p>
+          <p className="mt-7 max-w-[52ch] text-base leading-relaxed text-muted-foreground">{body}</p>
 
           {deliveryState === "processing" && (
             <p className="mt-10 flex items-center gap-3 text-sm text-muted-foreground">
@@ -66,19 +67,13 @@ export function SuccessScreen({
                   "Osebni PDF je poslan na vaš e-naslov",
                   "Nuveli Studio je prejel povzetek projekta",
                 ].map((item) => (
-                  <li
-                    key={item}
-                    className="flex items-start gap-4 border-t border-border py-4 text-sm last:border-b"
-                  >
+                  <li key={item} className="flex items-start gap-4 border-t border-border py-4 text-sm last:border-b">
                     <Check size={16} className="mt-0.5 shrink-0 text-oak" />
                     {item}
                   </li>
                 ))}
               </ul>
-
-              <p className="mt-10 text-sm text-muted-foreground">
-                Če želite, lahko termin za pogovor izberete takoj.
-              </p>
+              <p className="mt-10 text-sm text-muted-foreground">Če želite, lahko termin za pogovor izberete takoj.</p>
             </>
           )}
         </div>
@@ -110,6 +105,7 @@ export function SuccessScreen({
 
       <HomeDnaReport
         state={state}
+        locale={locale}
         onDeliveryStateChange={setDeliveryState}
         onRequireNewVerification={onBack}
       />
