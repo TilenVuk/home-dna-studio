@@ -18,6 +18,50 @@ permissions:
   contents: read
 
 jobs:
+  format:
+    name: Format feature branch
+    if: github.event_name == 'push' && github.ref == 'refs/heads/feature/ai-search-i18n-home-dna'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - name: Check out feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/ai-search-i18n-home-dna
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Format repository
+        run: pnpm exec prettier --write .
+
+      - name: Commit formatting changes
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "No formatting changes required."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git ls-files -m -z | xargs -0 git add --
+          git commit -m "style: format booking locale changes"
+          git push origin HEAD:feature/ai-search-i18n-home-dna
+
   build:
     name: Build and lint
     runs-on: ubuntu-latest
