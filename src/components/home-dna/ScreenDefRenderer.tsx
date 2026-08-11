@@ -12,6 +12,7 @@ import { SingleVisualChoiceScreen } from "./SingleVisualChoiceScreen";
 import { StyleSelection } from "./StyleSelection";
 import { pruneRooms, type ScreenDef } from "./screenDef";
 import type { HomeDnaState, RoomKey } from "./homeDnaTypes";
+import type { Locale } from "@/lib/i18n";
 
 const SuccessScreen = lazy(() =>
   import("./SuccessScreen").then((module) => ({ default: module.SuccessScreen })),
@@ -20,19 +21,21 @@ const SuccessScreen = lazy(() =>
 export function ScreenDefRenderer({
   def,
   state,
+  locale,
   onUpdate,
   onAdvance,
   onBack,
 }: {
   def: ScreenDef;
   state: HomeDnaState;
+  locale: Locale;
   onUpdate: (mutate: (state: HomeDnaState) => HomeDnaState) => void;
   onAdvance: (mutate?: (state: HomeDnaState) => HomeDnaState) => void;
   onBack: () => void;
 }) {
   switch (def.kind) {
     case "welcome":
-      return <HomeDnaWelcome onStart={() => onAdvance()} />;
+      return <HomeDnaWelcome locale={locale} onStart={() => onAdvance()} />;
 
     case "editorial":
       return (
@@ -167,6 +170,7 @@ export function ScreenDefRenderer({
         <Suspense fallback={null}>
           <SuccessScreen
             state={state}
+            locale={locale}
             onBack={onBack}
             {...(state.contact.name ? { name: state.contact.name } : {})}
           />
