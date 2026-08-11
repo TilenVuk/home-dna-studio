@@ -1,5 +1,6 @@
 import { createHmac } from "node:crypto";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import type { TablesInsert } from "@/integrations/supabase/types";
 import type {
   HomeDnaSubmissionInput,
   HomeDnaSubmissionResult,
@@ -30,6 +31,8 @@ type SubmissionRow = {
   internal_resend_id: string | null;
   attempt_count: number;
 };
+
+type SubmissionInsert = TablesInsert<"home_dna_submissions"> & { locale: Locale };
 
 type ResendPayload = {
   from: string;
@@ -214,7 +217,7 @@ async function createSubmission(
       send_status: "processing",
       customer_email_status: "pending",
       internal_email_status: "pending",
-    } as any)
+    } as unknown as SubmissionInsert)
     .select(
       "id, locale, customer_name, customer_email, customer_phone, answers, summary, report, customer_email_status, internal_email_status, customer_resend_id, internal_resend_id, attempt_count",
     )
