@@ -11,6 +11,7 @@ const ImageChoiceInput = z.object({
 
 const ReportInput = z
   .object({
+    locale: z.enum(["sl", "hr", "en"]),
     projectSummary: z.string().trim().min(1).max(30_000),
     turnstileToken: z.string().trim().min(10).max(2_048),
     rooms: z
