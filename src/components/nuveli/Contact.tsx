@@ -112,7 +112,11 @@ export function Contact({ locale = "sl" }: { locale?: Locale }) {
                   placeholder="+386"
                 />
               </Field>
-              <Field label={t.projectType} htmlFor="contact-project-type" error={errors["projectType"]}>
+              <Field
+                label={t.projectType}
+                htmlFor="contact-project-type"
+                error={errors["projectType"]}
+              >
                 <select
                   id="contact-project-type"
                   name="projectType"
