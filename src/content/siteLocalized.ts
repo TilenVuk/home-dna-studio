@@ -40,7 +40,7 @@ export const siteCopy = {
         { step: "01", title: "Razumemo", line: "Vsak projekt se začne s Home DNA™.", text: "Preden karkoli oblikujemo, analiziramo vaš življenjski slog, navade, potrebe po shranjevanju in načrte za prihodnost." },
         { step: "02", title: "Oblikujemo", line: "Vaše potrebe prevedemo v inteligenten prostor.", text: "Vsak centimeter dobi svojo nalogo, prikazan v natančni 3D vizualizaciji pred izdelavo." },
         { step: "03", title: "Izdelamo", line: "Natančna izdelava in profesionalna montaža.", text: "Izdelano do milimetra natančno, montirano s strani iste ekipe, ki je projekt zasnovala." },
-        { step: "04", title: "Živite", line: "Dom, kjer ima vsaka stvar svoje mesto in vsak trenutek svoj prostor.", text: "Rezultat je tih: nič ne manjka, nič ni napoti." },
+        { step: "04", title: "Živite", line: "Dom, kjer ima vsaka stvar svoje mesto in vsak trenutek svoj prostor.", text: "Rezultat je tih in premišljen: vsaka stvar ima svoje mesto, vsak trenutek ima svoj prostor, in dom začne delovati za vas, še preden se zavedate." },
       ],
     },
     services: {
