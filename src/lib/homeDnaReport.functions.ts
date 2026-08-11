@@ -11,6 +11,7 @@ const ImageChoiceInput = z.object({
 
 const ReportInput = z
   .object({
+    locale: z.enum(["sl", "hr", "en"]),
     projectSummary: z.string().trim().min(1).max(30_000),
     turnstileToken: z.string().trim().min(10).max(2_048),
     rooms: z
@@ -43,13 +44,11 @@ export const generateHomeDnaReport = createServerFn({ method: "POST" })
     const { getRequest, getRequestIP } = await import("@tanstack/react-start/server");
     const request = getRequest();
     const origin = request.headers.get("origin");
-    if (origin && !isAllowedRequestOrigin(request, origin)) {
+    if (origin && !isAllowedRequestOrigin(request, origin))
       throw new Error("HOME_DNA_INVALID_ORIGIN");
-    }
 
     const requestIp =
       request.headers.get("cf-connecting-ip") ?? getRequestIP({ xForwardedFor: true }) ?? "unknown";
-
     const { authorizeHomeDnaReport } = await import("./homeDnaReportSecurity.server");
     await authorizeHomeDnaReport({ turnstileToken: data.turnstileToken, requestIp });
 
@@ -58,8 +57,8 @@ export const generateHomeDnaReport = createServerFn({ method: "POST" })
     const model = process.env["GEMINI_MODEL"]?.trim();
 
     try {
-      const { createHomeDnaReport } = await import("./homeDnaReport.server");
-      return await createHomeDnaReport(reportData, { apiKey, model });
+      const { createLocalizedHomeDnaReport } = await import("./homeDnaReport.localized.server");
+      return await createLocalizedHomeDnaReport(reportData, { apiKey, model });
     } catch (error) {
       console.error(
         "HomeDnaReport: generation failed",

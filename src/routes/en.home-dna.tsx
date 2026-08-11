@@ -3,10 +3,9 @@ import { HomeDnaDiscovery } from "@/components/home-dna/HomeDnaDiscovery";
 
 const title = "Home DNA™ Discovery — Nuveli Studio";
 const description =
-  "Spoznajte svoj Home DNA™. V nekaj minutah razumemo vaš dom in življenjski slog ter pripravimo osebni report in okvirno oceno investicije.";
-const canonicalUrl = "https://nuvelistudio.com/home-dna";
+  "Discover your Home DNA™. Receive a personal Home DNA™ Report and an indicative investment estimate for your project.";
 
-export const Route = createFileRoute("/home-dna")({
+export const Route = createFileRoute("/en/home-dna")({
   head: () => ({
     meta: [
       { title },
@@ -14,20 +13,15 @@ export const Route = createFileRoute("/home-dna")({
       { property: "og:title", content: title },
       { property: "og:description", content: description },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: canonicalUrl },
-      { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:url", content: "https://nuvelistudio.com/en/home-dna" },
     ],
     links: [
-      { rel: "canonical", href: canonicalUrl },
-      { rel: "alternate", hrefLang: "sl", href: canonicalUrl },
+      { rel: "canonical", href: "https://nuvelistudio.com/en/home-dna" },
+      { rel: "alternate", hrefLang: "sl", href: "https://nuvelistudio.com/home-dna" },
       { rel: "alternate", hrefLang: "hr", href: "https://nuvelistudio.com/hr/home-dna" },
       { rel: "alternate", hrefLang: "en", href: "https://nuvelistudio.com/en/home-dna" },
-      { rel: "alternate", hrefLang: "x-default", href: canonicalUrl },
+      { rel: "alternate", hrefLang: "x-default", href: "https://nuvelistudio.com/home-dna" },
     ],
   }),
-  component: HomeDnaPage,
+  component: () => <HomeDnaDiscovery locale="en" />,
 });
-
-function HomeDnaPage() {
-  return <HomeDnaDiscovery locale="sl" />;
-}

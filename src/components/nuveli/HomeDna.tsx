@@ -49,11 +49,31 @@ const storageGroups: Record<string, string[]> = {
 };
 
 const styles: { key: StyleKey; note: string; swatch: string[] }[] = [
-  { key: "Modern minimalist", note: "Handleless, quiet, matte", swatch: ["var(--sand)", "var(--foreground)", "var(--oak-soft)"] },
-  { key: "Classic", note: "Framed fronts, timeless proportion", swatch: ["var(--stone)", "var(--oak)", "var(--muted-foreground)"] },
-  { key: "Rustic / natural", note: "Solid oak, visible grain", swatch: ["var(--oak)", "var(--oak-soft)", "var(--forest)"] },
-  { key: "Luxury", note: "Stone, brass, deep tones", swatch: ["var(--forest)", "var(--oak)", "var(--foreground)"] },
-  { key: "Industrial", note: "Steel, dark surfaces, raw edges", swatch: ["var(--foreground)", "var(--stone)", "var(--muted-foreground)"] },
+  {
+    key: "Modern minimalist",
+    note: "Handleless, quiet, matte",
+    swatch: ["var(--sand)", "var(--foreground)", "var(--oak-soft)"],
+  },
+  {
+    key: "Classic",
+    note: "Framed fronts, timeless proportion",
+    swatch: ["var(--stone)", "var(--oak)", "var(--muted-foreground)"],
+  },
+  {
+    key: "Rustic / natural",
+    note: "Solid oak, visible grain",
+    swatch: ["var(--oak)", "var(--oak-soft)", "var(--forest)"],
+  },
+  {
+    key: "Luxury",
+    note: "Stone, brass, deep tones",
+    swatch: ["var(--forest)", "var(--oak)", "var(--foreground)"],
+  },
+  {
+    key: "Industrial",
+    note: "Steel, dark surfaces, raw edges",
+    swatch: ["var(--foreground)", "var(--stone)", "var(--muted-foreground)"],
+  },
 ];
 
 const investments = [
@@ -107,9 +127,15 @@ export function HomeDna() {
             : "Compact individual home";
 
     const recs: string[] = [];
-    if (storage.some((s) => ["Jackets", "Coats", "Shirts", "Dresses", "Shoes", "Boots"].includes(s)))
+    if (
+      storage.some((s) => ["Jackets", "Coats", "Shirts", "Dresses", "Shoes", "Boots"].includes(s))
+    )
       recs.push("Optimized wardrobe system with zoned hanging heights");
-    if (storage.some((s) => ["Pots", "Pans", "Appliances", "Baking equipment", "Cook daily"].includes(s)))
+    if (
+      storage.some((s) =>
+        ["Pots", "Pans", "Appliances", "Baking equipment", "Cook daily"].includes(s),
+      )
+    )
       recs.push("Kitchen with high storage capacity and deep drawer logic");
     if (storage.some((s) => ["Coffee machine", "Appliances"].includes(s)))
       recs.push("Hidden appliance storage behind pocket doors");
@@ -141,7 +167,11 @@ export function HomeDna() {
           <p className="eyebrow text-background/60">Our methodology</p>
           <h2 className="display-lg mt-6">Why Home DNA™ exists</h2>
           <p className="mt-6 text-base leading-relaxed text-background/75">
-            Most furniture companies begin with measurements. We begin with people. Before designing a single cabinet, we take the time to understand how you live, what you own and how your home should support your everyday life. We don't ask how large your wardrobe should be. We ask what your wardrobe needs to hold. Because great interiors aren't measured only in millimetres. They're measured by how naturally they fit your life.
+            Most furniture companies begin with measurements. We begin with people. Before designing
+            a single cabinet, we take the time to understand how you live, what you own and how your
+            home should support your everyday life. We don't ask how large your wardrobe should be.
+            We ask what your wardrobe needs to hold. Because great interiors aren't measured only in
+            millimetres. They're measured by how naturally they fit your life.
           </p>
         </Reveal>
 
@@ -292,7 +322,9 @@ export function HomeDna() {
                 <button
                   type="button"
                   disabled={!canContinue}
-                  onClick={() => (step === STEPS.length - 1 ? setDone(true) : setStep((s) => s + 1))}
+                  onClick={() =>
+                    step === STEPS.length - 1 ? setDone(true) : setStep((s) => s + 1)
+                  }
                   className="inline-flex items-center gap-2 rounded-full bg-background px-7 py-3.5 text-sm text-foreground transition-all hover:-translate-y-0.5 disabled:pointer-events-none disabled:opacity-35"
                 >
                   {step === STEPS.length - 1 ? "See your Home DNA™" : "Continue"}
@@ -317,7 +349,10 @@ export function HomeDna() {
                 <p className="eyebrow text-background/60">How we would design it</p>
                 <ul className="mt-5">
                   {result.recs.map((r) => (
-                    <li key={r} className="flex gap-4 border-t border-background/20 py-4 text-base last:border-b">
+                    <li
+                      key={r}
+                      className="flex gap-4 border-t border-background/20 py-4 text-base last:border-b"
+                    >
                       <Check size={16} className="mt-1 shrink-0 text-oak" />
                       {r}
                     </li>
@@ -330,7 +365,8 @@ export function HomeDna() {
                     {result.lo} – {result.hi} €
                   </p>
                   <p className="mt-4 max-w-[46ch] text-sm leading-relaxed text-background/60">
-                    This estimate is just the beginning. Because Home DNA™ starts with your life, the final design is always tailored — never templated.
+                    This estimate is just the beginning. Because Home DNA™ starts with your life,
+                    the final design is always tailored — never templated.
                   </p>
                 </div>
 

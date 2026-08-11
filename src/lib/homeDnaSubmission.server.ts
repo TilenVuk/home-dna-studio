@@ -4,6 +4,7 @@ import type {
   HomeDnaSubmissionInput,
   HomeDnaSubmissionResult,
 } from "./homeDnaSubmission.functions";
+import type { Locale } from "./i18n";
 
 const CUSTOMER_FROM = "Home DNA™ <porocila@obvestila.nuvelistudio.com>";
 const INTERNAL_RECIPIENT = "info@nuvelistudio.com";
@@ -16,6 +17,7 @@ type EmailStatus = HomeDnaSubmissionResult["customerEmailStatus"];
 
 type SubmissionRow = {
   id: string;
+  locale: Locale;
   customer_name: string;
   customer_email: string;
   customer_phone: string;
@@ -39,6 +41,33 @@ type ResendPayload = {
   attachments: Array<{ filename: string; content: string }>;
   tags: Array<{ name: string; value: string }>;
 };
+
+const customerCopy = {
+  sl: {
+    subject: "Vaše Home DNA™ poročilo – Nuveli Studio",
+    greeting: "Pozdravljeni",
+    heading: "Vaš Home DNA™ Report",
+    thankYou: "Hvala, ker ste z nami delili svoj način življenja, potrebe in želje za dom.",
+    attachment:
+      "Vaše osebno poročilo in okvirna ocena investicije sta priložena temu sporočilu v obliki PDF.",
+  },
+  hr: {
+    subject: "Vaš Home DNA™ izvještaj – Nuveli Studio",
+    greeting: "Pozdrav",
+    heading: "Vaš Home DNA™ Report",
+    thankYou: "Hvala što ste s nama podijelili svoj način života, potrebe i želje za dom.",
+    attachment:
+      "Vaš osobni izvještaj i okvirna procjena investicije priloženi su ovoj poruci u PDF obliku.",
+  },
+  en: {
+    subject: "Your Home DNA™ Report – Nuveli Studio",
+    greeting: "Hello",
+    heading: "Your Home DNA™ Report",
+    thankYou: "Thank you for sharing your lifestyle, needs and priorities for your home with us.",
+    attachment:
+      "Your personal report and indicative investment estimate are attached to this email as a PDF.",
+  },
+} as const;
 
 export async function processHomeDnaSubmission(
   input: HomeDnaSubmissionInput,
@@ -151,7 +180,7 @@ async function findSubmission(id: string): Promise<SubmissionRow | null> {
   const { data, error } = await supabaseAdmin
     .from("home_dna_submissions")
     .select(
-      "id, customer_name, customer_email, customer_phone, answers, summary, report, customer_email_status, internal_email_status, customer_resend_id, internal_resend_id, attempt_count",
+      "id, locale, customer_name, customer_email, customer_phone, answers, summary, report, customer_email_status, internal_email_status, customer_resend_id, internal_resend_id, attempt_count",
     )
     .eq("id", id)
     .maybeSingle();
@@ -160,7 +189,6 @@ async function findSubmission(id: string): Promise<SubmissionRow | null> {
     console.error("Home DNA submission lookup failed", { id, code: error.code });
     throw new Error("HOME_DNA_STORAGE_UNAVAILABLE");
   }
-
   return data as SubmissionRow | null;
 }
 
@@ -173,6 +201,7 @@ async function createSubmission(
     .from("home_dna_submissions")
     .insert({
       id: input.submissionId,
+      locale: input.locale,
       customer_name: input.contact.name,
       customer_email: email,
       customer_phone: input.contact.phone,
@@ -187,7 +216,7 @@ async function createSubmission(
       internal_email_status: "pending",
     })
     .select(
-      "id, customer_name, customer_email, customer_phone, answers, summary, report, customer_email_status, internal_email_status, customer_resend_id, internal_resend_id, attempt_count",
+      "id, locale, customer_name, customer_email, customer_phone, answers, summary, report, customer_email_status, internal_email_status, customer_resend_id, internal_resend_id, attempt_count",
     )
     .single();
 
@@ -202,7 +231,6 @@ async function createSubmission(
     });
     throw new Error("HOME_DNA_STORAGE_UNAVAILABLE");
   }
-
   return data as SubmissionRow;
 }
 
@@ -249,7 +277,6 @@ async function updateSubmission(id: string, patch: Record<string, unknown>): Pro
     .from("home_dna_submissions")
     .update({ ...patch, updated_at: new Date().toISOString() })
     .eq("id", id);
-
   if (error) {
     console.error("Home DNA submission update failed", { id, code: error.code });
     throw new Error("HOME_DNA_STORAGE_UNAVAILABLE");
@@ -261,22 +288,24 @@ function buildCustomerEmail(
   filename: string,
   pdfBase64: string,
 ): ResendPayload {
+  const copy = customerCopy[submission.locale] ?? customerCopy.sl;
   const name = escapeHtml(submission.customer_name);
   return {
     from: CUSTOMER_FROM,
     to: [submission.customer_email],
     reply_to: INTERNAL_RECIPIENT,
-    subject: "Vaše Home DNA™ poročilo – Nuveli Studio",
-    html: emailLayout(`
-      <p style="margin:0 0 18px">Pozdravljeni, ${name}.</p>
-      <h1 style="font-size:28px;line-height:1.2;margin:0 0 18px;color:#1a1a18">Vaš Home DNA™ Report</h1>
-      <p style="margin:0 0 16px">Hvala, ker ste z nami delili svoj način življenja, potrebe in želje za dom.</p>
-      <p style="margin:0 0 16px">Vaše osebno poročilo je priloženo temu sporočilu v obliki PDF.</p>
-      <p style="margin:28px 0 0">Nuveli Studio<br><a href="mailto:${INTERNAL_RECIPIENT}" style="color:#76624b">${INTERNAL_RECIPIENT}</a></p>
-    `),
-    text: `Pozdravljeni, ${submission.customer_name}.\n\nHvala za oddajo Home DNA™. Vaše osebno poročilo je priloženo temu sporočilu v obliki PDF.\n\nNuveli Studio\n${INTERNAL_RECIPIENT}`,
+    subject: copy.subject,
+    html: emailLayout(
+      submission.locale,
+      `<p style="margin:0 0 18px">${copy.greeting}, ${name}.</p>
+       <h1 style="font-size:28px;line-height:1.2;margin:0 0 18px;color:#1a1a18">${copy.heading}</h1>
+       <p style="margin:0 0 16px">${copy.thankYou}</p>
+       <p style="margin:0 0 16px">${copy.attachment}</p>
+       <p style="margin:28px 0 0">Nuveli Studio<br><a href="mailto:${INTERNAL_RECIPIENT}" style="color:#76624b">${INTERNAL_RECIPIENT}</a></p>`,
+    ),
+    text: `${copy.greeting}, ${submission.customer_name}.\n\n${copy.thankYou}\n${copy.attachment}\n\nNuveli Studio\n${INTERNAL_RECIPIENT}`,
     attachments: [{ filename, content: pdfBase64 }],
-    tags: submissionTags(submission.id, "customer"),
+    tags: submissionTags(submission.id, "customer", submission.locale),
   };
 }
 
@@ -295,22 +324,24 @@ function buildInternalEmail(
     from: CUSTOMER_FROM,
     to: [INTERNAL_RECIPIENT],
     reply_to: submission.customer_email,
-    subject: `Nov Home DNA™ – ${sanitizeSubject(submission.customer_name)}`,
-    html: emailLayout(`
-      <h1 style="font-size:28px;line-height:1.2;margin:0 0 22px;color:#1a1a18">Nov Home DNA™</h1>
-      <table role="presentation" style="border-collapse:collapse;width:100%;margin-bottom:26px">
-        <tr><td style="padding:7px 12px 7px 0;color:#6c6862;width:120px">Ime</td><td style="padding:7px 0">${safeName}</td></tr>
-        <tr><td style="padding:7px 12px 7px 0;color:#6c6862">E-pošta</td><td style="padding:7px 0"><a href="mailto:${safeEmail}" style="color:#76624b">${safeEmail}</a></td></tr>
-        <tr><td style="padding:7px 12px 7px 0;color:#6c6862">Telefon</td><td style="padding:7px 0">${safePhone}</td></tr>
-      </table>
-      <h2 style="font-size:18px;margin:0 0 10px;color:#1a1a18">Povzetek projekta</h2>
-      <pre style="white-space:pre-wrap;overflow-wrap:anywhere;background:#f3f0ea;padding:18px;border-radius:8px;font:14px/1.55 Arial,sans-serif;margin:0 0 26px">${summary}</pre>
-      <h2 style="font-size:18px;margin:0 0 10px;color:#1a1a18">Vsi odgovori</h2>
-      <pre style="white-space:pre-wrap;overflow-wrap:anywhere;background:#f3f0ea;padding:18px;border-radius:8px;font:13px/1.5 monospace;margin:0">${answers}</pre>
-    `),
-    text: `NOV HOME DNA™\n\nIme: ${submission.customer_name}\nE-pošta: ${submission.customer_email}\nTelefon: ${submission.customer_phone || "Ni naveden"}\n\nPOVZETEK PROJEKTA\n${submission.summary}\n\nVSI ODGOVORI\n${JSON.stringify(submission.answers, null, 2)}`,
+    subject: `Nov Home DNA™ [${submission.locale.toUpperCase()}] – ${sanitizeSubject(submission.customer_name)}`,
+    html: emailLayout(
+      "sl",
+      `<h1 style="font-size:28px;line-height:1.2;margin:0 0 22px;color:#1a1a18">Nov Home DNA™</h1>
+       <table role="presentation" style="border-collapse:collapse;width:100%;margin-bottom:26px">
+         <tr><td style="padding:7px 12px 7px 0;color:#6c6862;width:120px">Jezik</td><td style="padding:7px 0">${submission.locale.toUpperCase()}</td></tr>
+         <tr><td style="padding:7px 12px 7px 0;color:#6c6862">Ime</td><td style="padding:7px 0">${safeName}</td></tr>
+         <tr><td style="padding:7px 12px 7px 0;color:#6c6862">E-pošta</td><td style="padding:7px 0"><a href="mailto:${safeEmail}" style="color:#76624b">${safeEmail}</a></td></tr>
+         <tr><td style="padding:7px 12px 7px 0;color:#6c6862">Telefon</td><td style="padding:7px 0">${safePhone}</td></tr>
+       </table>
+       <h2 style="font-size:18px;margin:0 0 10px;color:#1a1a18">Povzetek projekta</h2>
+       <pre style="white-space:pre-wrap;overflow-wrap:anywhere;background:#f3f0ea;padding:18px;border-radius:8px;font:14px/1.55 Arial,sans-serif;margin:0 0 26px">${summary}</pre>
+       <h2 style="font-size:18px;margin:0 0 10px;color:#1a1a18">Vsi odgovori</h2>
+       <pre style="white-space:pre-wrap;overflow-wrap:anywhere;background:#f3f0ea;padding:18px;border-radius:8px;font:13px/1.5 monospace;margin:0">${answers}</pre>`,
+    ),
+    text: `NOV HOME DNA™\n\nJezik: ${submission.locale.toUpperCase()}\nIme: ${submission.customer_name}\nE-pošta: ${submission.customer_email}\nTelefon: ${submission.customer_phone || "Ni naveden"}\n\nPOVZETEK PROJEKTA\n${submission.summary}\n\nVSI ODGOVORI\n${JSON.stringify(submission.answers, null, 2)}`,
     attachments: [{ filename, content: pdfBase64 }],
-    tags: submissionTags(submission.id, "internal"),
+    tags: submissionTags(submission.id, "internal", submission.locale),
   };
 }
 
@@ -328,18 +359,15 @@ async function sendResendEmail(
     },
     body: JSON.stringify(payload),
   });
-
   const body = (await response.json().catch(() => null)) as {
     id?: string;
     message?: string;
     name?: string;
   } | null;
-
   if (!response.ok || !body?.id) {
     const detail = body?.message || body?.name || `HTTP ${response.status}`;
     throw new Error(`Resend ${detail}`.slice(0, 500));
   }
-
   return body.id;
 }
 
@@ -353,14 +381,15 @@ function resultFor(submission: SubmissionRow): HomeDnaSubmissionResult {
   };
 }
 
-function emailLayout(content: string): string {
-  return `<!doctype html><html lang="sl"><head><meta charset="utf-8"></head><body style="margin:0;background:#f6f4ef;color:#2d2b28;font-family:Arial,sans-serif"><div style="max-width:640px;margin:0 auto;padding:34px 20px"><div style="background:#fff;padding:34px;border-radius:12px;line-height:1.6">${content}</div></div></body></html>`;
+function emailLayout(locale: Locale, content: string): string {
+  return `<!doctype html><html lang="${locale}"><head><meta charset="utf-8"></head><body style="margin:0;background:#f6f4ef;color:#2d2b28;font-family:Arial,sans-serif"><div style="max-width:640px;margin:0 auto;padding:34px 20px"><div style="background:#fff;padding:34px;border-radius:12px;line-height:1.6">${content}</div></div></body></html>`;
 }
 
-function submissionTags(id: string, recipient: "customer" | "internal") {
+function submissionTags(id: string, recipient: "customer" | "internal", locale: Locale) {
   return [
     { name: "type", value: "home-dna" },
     { name: "recipient", value: recipient },
+    { name: "locale", value: locale },
     { name: "submission_id", value: id },
   ];
 }

@@ -2,6 +2,7 @@ import { jsPDF } from "jspdf";
 import { PDF_FONT_REGULAR_BASE64, PDF_FONT_BOLD_BASE64 } from "./pdfFonts";
 import type { HomeDnaReportData, ReportImageId } from "./homeDnaTypes";
 import type { ReportImageAsset, ResolvedReportImages } from "./reportImages";
+import type { Locale } from "@/lib/i18n";
 
 const PAGE_WIDTH = 210;
 const PAGE_HEIGHT = 297;
@@ -24,6 +25,51 @@ const COLORS = {
   white: [255, 255, 255] as const,
 };
 
+const pdfCopy = {
+  sl: {
+    cover: "Vaš osebni Home DNA™ Report",
+    intro: "Dobrodošli v vašem Home DNA™",
+    lifestyle: "Vaš življenjski slog",
+    style: "Vaš slog",
+    why: "Zakaj bo ta dom deloval za vas",
+    rooms: "Priporočila za izbrane prostore",
+    investment: "Okvirna investicija",
+    estimated: "OCENJENA INVESTICIJA",
+    execution: "RAVEN IZVEDBE",
+    consultation: "Po posvetu",
+    next: "Naslednji koraki",
+    dateLocale: "sl-SI",
+  },
+  hr: {
+    cover: "Vaš osobni Home DNA™ Report",
+    intro: "Dobrodošli u vaš Home DNA™",
+    lifestyle: "Vaš životni stil",
+    style: "Vaš stil",
+    why: "Zašto će ovaj dom funkcionirati za vas",
+    rooms: "Preporuke za odabrane prostore",
+    investment: "Okvirna investicija",
+    estimated: "PROCJENJENA INVESTICIJA",
+    execution: "RAZINA IZVEDBE",
+    consultation: "Nakon konzultacija",
+    next: "Sljedeći koraci",
+    dateLocale: "hr-HR",
+  },
+  en: {
+    cover: "Your personal Home DNA™ Report",
+    intro: "Welcome to your Home DNA™",
+    lifestyle: "Your lifestyle",
+    style: "Your style",
+    why: "Why this home will work for you",
+    rooms: "Recommendations for selected spaces",
+    investment: "Indicative investment",
+    estimated: "ESTIMATED INVESTMENT",
+    execution: "EXECUTION LEVEL",
+    consultation: "After consultation",
+    next: "Next steps",
+    dateLocale: "en-GB",
+  },
+} as const;
+
 type PdfDocument = jsPDF;
 type FontStyle = "normal" | "bold";
 
@@ -40,9 +86,12 @@ export interface ReportPdfData {
   customerName: string;
   investmentRange: string;
   executionLevel: string;
+  locale?: Locale;
 }
 
 export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
+  const locale = data.locale ?? "sl";
+  const t = pdfCopy[locale];
   const doc = new jsPDF({
     unit: "mm",
     format: "a4",
@@ -53,7 +102,7 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
 
   const [loadedImages] = await Promise.all([loadReportImages(data.images), registerPdfFonts(doc)]);
 
-  addCoverPage(doc, data, loadedImages.get(data.images.cover.id));
+  addCoverPage(doc, data, loadedImages.get(data.images.cover.id), locale);
   doc.addPage();
 
   let y = MARGIN_TOP;
@@ -155,28 +204,28 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
     y += height + 9;
   };
 
-  addSectionHeading("01", "Dobrodošli v vašem Home DNA™");
+  addSectionHeading("01", t.intro);
   addParagraph(data.report.intro, { color: COLORS.ink });
   addFullWidthImage(data.images.lifestyle, 70);
 
   ensureSpace(70);
-  addSectionHeading("02", "Vaš življenjski slog");
+  addSectionHeading("02", t.lifestyle);
   addParagraph(data.report.lifestyle);
   addDivider();
 
   ensureSpace(130);
-  addSectionHeading("03", "Vaš slog");
+  addSectionHeading("03", t.style);
   addImagePair(data.images.style, 58);
   addParagraph(data.report.style);
 
   ensureSpace(80);
-  addSectionHeading("04", "Zakaj bo ta dom deloval za vas");
+  addSectionHeading("04", t.why);
   addParagraph(data.report.why);
   addDivider();
 
   if (data.report.rooms.length > 0) {
     ensureSpace(140);
-    addSectionHeading("05", "Priporočila za izbrane prostore");
+    addSectionHeading("05", t.rooms);
 
     data.report.rooms.forEach((room, index) => {
       const roomImage = data.images.rooms[room.key];
@@ -215,7 +264,7 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
   }
 
   ensureSpace(130);
-  addSectionHeading("06", "Okvirna investicija");
+  addSectionHeading("06", t.investment);
   const investmentImage = loadedImages.get(data.images.investment.id);
   const investmentImageWidth = investmentImage ? 70 : 0;
   const investmentGap = investmentImage ? 10 : 0;
@@ -236,15 +285,19 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
   }
 
   setFont(doc, BODY_FONT, "normal", 8, COLORS.muted);
-  doc.text("OCENJENA INVESTICIJA", investmentMetaX, y + 4);
+  doc.text(t.estimated, investmentMetaX, y + 4);
   setFont(doc, DISPLAY_FONT, "bold", 14, COLORS.ink);
-  const investmentLines = wrapText(doc, data.investmentRange || "Po posvetu", investmentMetaWidth);
+  const investmentLines = wrapText(
+    doc,
+    data.investmentRange || t.consultation,
+    investmentMetaWidth,
+  );
   investmentLines
     .slice(0, 2)
     .forEach((line, index) => doc.text(line, investmentMetaX, y + 13 + index * 6.5));
 
   setFont(doc, BODY_FONT, "normal", 8, COLORS.muted);
-  doc.text("RAVEN IZVEDBE", investmentMetaX, y + 34);
+  doc.text(t.execution, investmentMetaX, y + 34);
   setFont(doc, DISPLAY_FONT, "bold", 14, COLORS.ink);
   doc.text(
     wrapText(doc, data.executionLevel || "Premium", investmentMetaWidth).slice(0, 2),
@@ -253,12 +306,11 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
   );
 
   y += investmentBlockHeight + 8;
-
   addParagraph(data.report.investment);
   addDivider();
 
   ensureSpace(145);
-  addSectionHeading("07", "Naslednji koraki");
+  addSectionHeading("07", t.next);
   data.report.nextSteps.forEach((step, index) => {
     const numberWidth = 13;
     const stepX = MARGIN_LEFT + numberWidth;
@@ -297,7 +349,7 @@ export async function generateHomeDnaPdf(data: ReportPdfData): Promise<Blob> {
   addFooters(doc);
 
   const blob = doc.output("blob");
-  if (!(blob instanceof Blob) || blob.size === 0) throw new Error("Ustvarjeni PDF je prazen.");
+  if (!(blob instanceof Blob) || blob.size === 0) throw new Error("Generated PDF is empty.");
   return blob;
 }
 
@@ -325,7 +377,7 @@ async function loadReportImages(
       try {
         return await loadPdfImage(asset);
       } catch (error) {
-        console.warn(`Home DNA PDF: slike ${asset.id} ni bilo mogoče naložiti.`, error);
+        console.warn(`Home DNA PDF: image ${asset.id} could not be loaded.`, error);
         return null;
       }
     }),
@@ -341,7 +393,6 @@ async function loadReportImages(
 async function loadPdfImage(asset: ReportImageAsset): Promise<LoadedPdfImage> {
   const response = await fetch(asset.src);
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
   const sourceUrl = await blobToDataUrl(await response.blob());
   const optimized = await optimizePdfImage(sourceUrl);
   return { id: asset.id, ...optimized };
@@ -351,7 +402,7 @@ function blobToDataUrl(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(String(reader.result));
-    reader.onerror = () => reject(reader.error ?? new Error("Slike ni bilo mogoče prebrati."));
+    reader.onerror = () => reject(reader.error ?? new Error("Image could not be read."));
     reader.readAsDataURL(blob);
   });
 }
@@ -372,17 +423,15 @@ function optimizePdfImage(
       const canvas = document.createElement("canvas");
       canvas.width = width;
       canvas.height = height;
-
       const context = canvas.getContext("2d");
       if (!context) {
-        reject(new Error("Slike ni bilo mogoče pripraviti za PDF."));
+        reject(new Error("Image could not be prepared for PDF."));
         return;
       }
-
       context.drawImage(image, 0, 0, width, height);
       resolve({ dataUrl: canvas.toDataURL("image/jpeg", 0.82), width, height });
     };
-    image.onerror = () => reject(new Error("Dimenzij slike ni bilo mogoče prebrati."));
+    image.onerror = () => reject(new Error("Image dimensions could not be read."));
     image.src = src;
   });
 }
@@ -400,7 +449,6 @@ function drawImageCover(
   const drawHeight = image.height * scale;
   const drawX = x + (width - drawWidth) / 2;
   const drawY = y + (height - drawHeight) / 2;
-
   doc.saveGraphicsState();
   doc.rect(x, y, width, height, null);
   doc.clip();
@@ -409,20 +457,23 @@ function drawImageCover(
   doc.restoreGraphicsState();
 }
 
-function addCoverPage(doc: PdfDocument, data: ReportPdfData, coverImage?: LoadedPdfImage) {
+function addCoverPage(
+  doc: PdfDocument,
+  data: ReportPdfData,
+  coverImage: LoadedPdfImage | undefined,
+  locale: Locale,
+) {
+  const t = pdfCopy[locale];
   doc.setFillColor(...COLORS.cover);
   doc.rect(0, 0, PAGE_WIDTH, PAGE_HEIGHT, "F");
-
   if (coverImage) drawImageCover(doc, coverImage, 0, 0, PAGE_WIDTH, 184);
-
   doc.setFillColor(...COLORS.cover);
   doc.rect(0, 184, PAGE_WIDTH, PAGE_HEIGHT - 184, "F");
 
   setFont(doc, BODY_FONT, "normal", 8.5, COLORS.muted);
   doc.text("NUVELI  ·  HOME DNA™", MARGIN_LEFT, 204);
-
   setFont(doc, DISPLAY_FONT, "bold", 27, COLORS.ink);
-  const titleLines = wrapText(doc, "Vaš osebni Home DNA™ Report", CONTENT_WIDTH);
+  const titleLines = wrapText(doc, t.cover, CONTENT_WIDTH);
   let titleY = 222;
   for (const line of titleLines) {
     doc.text(line, MARGIN_LEFT, titleY);
@@ -438,7 +489,7 @@ function addCoverPage(doc: PdfDocument, data: ReportPdfData, coverImage?: Loaded
   if (customerName) doc.text(wrapText(doc, customerName, CONTENT_WIDTH), MARGIN_LEFT, titleY + 13);
 
   setFont(doc, BODY_FONT, "normal", 9, COLORS.muted);
-  doc.text(formatDate(new Date()), MARGIN_LEFT, titleY + (customerName ? 25 : 14));
+  doc.text(formatDate(new Date(), locale), MARGIN_LEFT, titleY + (customerName ? 25 : 14));
 }
 
 function setFont(
@@ -465,46 +516,38 @@ function normalizeText(text: string): string {
 function wrapText(doc: PdfDocument, text: string, maxWidth: number): string[] {
   const normalizedText = normalizeText(text);
   if (!normalizedText) return [];
-
   const safeWidth = Math.max(20, maxWidth - 1.5);
   const result: string[] = [];
 
   for (const paragraph of normalizedText.split("\n")) {
     const words = paragraph.trim().split(/\s+/).filter(Boolean);
     let line = "";
-
     for (const word of words) {
       const candidate = line ? `${line} ${word}` : word;
       if (doc.getTextWidth(candidate) <= safeWidth) {
         line = candidate;
         continue;
       }
-
       if (line) {
         result.push(line);
         line = "";
       }
-
       if (doc.getTextWidth(word) <= safeWidth) {
         line = word;
         continue;
       }
-
       const fragments = splitLongWord(doc, word, safeWidth);
       result.push(...fragments.slice(0, -1));
       line = fragments.at(-1) ?? "";
     }
-
     if (line) result.push(line);
   }
-
   return result;
 }
 
 function splitLongWord(doc: PdfDocument, word: string, maxWidth: number): string[] {
   const result: string[] = [];
   let fragment = "";
-
   for (const character of Array.from(word)) {
     const candidate = fragment + character;
     if (fragment && doc.getTextWidth(candidate) > maxWidth) {
@@ -514,7 +557,6 @@ function splitLongWord(doc: PdfDocument, word: string, maxWidth: number): string
       fragment = candidate;
     }
   }
-
   if (fragment) result.push(fragment);
   return result;
 }
@@ -526,7 +568,6 @@ function addFooters(doc: PdfDocument) {
     doc.setDrawColor(...COLORS.line);
     doc.setLineWidth(0.2);
     doc.line(MARGIN_LEFT, PAGE_HEIGHT - 18, CONTENT_RIGHT, PAGE_HEIGHT - 18);
-
     setFont(doc, BODY_FONT, "normal", 8, COLORS.muted);
     doc.text("NUVELI", MARGIN_LEFT, PAGE_HEIGHT - 11);
     doc.text("Home DNA™", PAGE_WIDTH / 2, PAGE_HEIGHT - 11, { align: "center" });
@@ -536,8 +577,8 @@ function addFooters(doc: PdfDocument) {
   }
 }
 
-function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat("sl-SI", {
+function formatDate(date: Date, locale: Locale): string {
+  return new Intl.DateTimeFormat(pdfCopy[locale].dateLocale, {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -545,10 +586,8 @@ function formatDate(date: Date): string {
 }
 
 export function downloadBlob(blob: Blob, filename: string) {
-  if (!(blob instanceof Blob) || blob.size === 0) {
-    throw new Error("Datoteke ni mogoče prenesti, ker je prazna.");
-  }
-
+  if (!(blob instanceof Blob) || blob.size === 0)
+    throw new Error("File is empty and cannot be downloaded.");
   const objectUrl = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = objectUrl;
@@ -557,6 +596,5 @@ export function downloadBlob(blob: Blob, filename: string) {
   document.body.appendChild(anchor);
   anchor.click();
   anchor.remove();
-
   window.setTimeout(() => URL.revokeObjectURL(objectUrl), 2_000);
 }

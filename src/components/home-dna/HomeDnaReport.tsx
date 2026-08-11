@@ -8,20 +8,109 @@ import { generateHomeDnaPdf, downloadBlob } from "./reportPdf";
 import { resolveReportImages, type ReportImageAsset } from "./reportImages";
 import { formatEuro } from "./pricing";
 import type { HomeDnaState } from "./homeDnaTypes";
-
-const PDF_FILENAME = "Nuveli-Studio-Home-DNA-Report.pdf";
+import type { Locale } from "@/lib/i18n";
 
 export type HomeDnaDeliveryState = "processing" | "sent" | "generation-error" | "delivery-error";
 
+const copy = {
+  sl: {
+    studioDelivery:
+      "Poročilo smo poslali na vaš e-naslov, obvestila studiu pa trenutno ni bilo mogoče dostaviti.",
+    delivery: "Poročilo je pripravljeno, vendar ga trenutno ni bilo mogoče poslati po e-pošti.",
+    generation: "Poročila trenutno ni bilo mogoče pripraviti.",
+    pdfGeneration: "PDF-ja trenutno ni bilo mogoče pripraviti.",
+    pdfCreate: "PDF-ja trenutno ni bilo mogoče ustvariti.",
+    verify: "Nazaj na varnostno preverjanje",
+    preparing: "Pripravljamo vaš Home DNA™ Report in e-pošto …",
+    sending: (email: string) => `Poročilo pošiljamo na ${email} …`,
+    retryInfo:
+      "PDF lahko prenesete takoj. Ponovni poskus ne bo ustvaril podvojene oddaje ali podvojenih sporočil.",
+    retry: "Ponovno pošlji",
+    preparingPdf: "Pripravljamo PDF ...",
+    download: "Prenesi Home DNA™ Report (PDF)",
+    consultation: "Po posvetu",
+    sections: [
+      "Dobrodošli v vašem Home DNA™",
+      "Vaš življenjski slog",
+      "Vaš slog",
+      "Zakaj bo ta dom deloval za vas",
+      "Priporočila za izbrane prostore",
+      "Okvirna investicija",
+      "Naslednji koraki",
+    ],
+    estimated: "Ocenjena investicija",
+    level: "Raven izvedbe",
+  },
+  hr: {
+    studioDelivery:
+      "Izvještaj smo poslali na vaš e-mail, ali obavijest studiju trenutačno nije bilo moguće dostaviti.",
+    delivery: "Izvještaj je pripremljen, ali ga trenutačno nije moguće poslati e-mailom.",
+    generation: "Izvještaj trenutačno nije moguće pripremiti.",
+    pdfGeneration: "PDF trenutačno nije moguće pripremiti.",
+    pdfCreate: "PDF trenutačno nije moguće izraditi.",
+    verify: "Natrag na sigurnosnu provjeru",
+    preparing: "Pripremamo vaš Home DNA™ Report i e-mail …",
+    sending: (email: string) => `Izvještaj šaljemo na ${email} …`,
+    retryInfo:
+      "PDF možete odmah preuzeti. Ponovni pokušaj neće stvoriti dvostruku prijavu ili dvostruke poruke.",
+    retry: "Pošalji ponovno",
+    preparingPdf: "Pripremamo PDF ...",
+    download: "Preuzmi Home DNA™ Report (PDF)",
+    consultation: "Nakon konzultacija",
+    sections: [
+      "Dobro došli u vaš Home DNA™",
+      "Vaš životni stil",
+      "Vaš stil",
+      "Zašto će ovaj dom funkcionirati za vas",
+      "Preporuke za odabrane prostore",
+      "Okvirna investicija",
+      "Sljedeći koraci",
+    ],
+    estimated: "Procijenjena investicija",
+    level: "Razina izvedbe",
+  },
+  en: {
+    studioDelivery:
+      "We sent the report to your email, but the studio notification could not be delivered right now.",
+    delivery: "Your report is ready, but it could not be sent by email right now.",
+    generation: "We could not prepare the report right now.",
+    pdfGeneration: "We could not prepare the PDF right now.",
+    pdfCreate: "We could not create the PDF right now.",
+    verify: "Back to security verification",
+    preparing: "Preparing your Home DNA™ Report and email …",
+    sending: (email: string) => `Sending the report to ${email} …`,
+    retryInfo:
+      "You can download the PDF immediately. Retrying will not create a duplicate submission or duplicate emails.",
+    retry: "Send again",
+    preparingPdf: "Preparing PDF ...",
+    download: "Download Home DNA™ Report (PDF)",
+    consultation: "After consultation",
+    sections: [
+      "Welcome to your Home DNA™",
+      "Your lifestyle",
+      "Your style",
+      "Why this home will work for you",
+      "Recommendations for selected spaces",
+      "Indicative investment",
+      "Next steps",
+    ],
+    estimated: "Estimated investment",
+    level: "Execution level",
+  },
+} as const;
+
 export function HomeDnaReport({
   state,
+  locale = "sl",
   onDeliveryStateChange,
   onRequireNewVerification,
 }: {
   state: HomeDnaState;
+  locale?: Locale;
   onDeliveryStateChange?: (status: HomeDnaDeliveryState) => void;
   onRequireNewVerification: () => void;
 }) {
+  const t = copy[locale];
   const generate = useServerFn(generateHomeDnaReport);
   const submit = useServerFn(submitHomeDna);
   const [report, setReport] = useState<Report | null>(null);
@@ -33,33 +122,34 @@ export function HomeDnaReport({
   const [pdfError, setPdfError] = useState<string | null>(null);
   const started = useRef(false);
   const submissionId = useRef<string | null>(null);
+  const pdfFilename = `Nuveli-Studio-Home-DNA-Report-${locale}.pdf`;
 
   const prepareAndSubmit = useCallback(async () => {
     if (preparing) return;
-
     let reportReady = Boolean(report);
     let pdfReady = Boolean(pdfBlob);
-
     setPreparing(true);
     setGenerationError(null);
     setDeliveryError(null);
     onDeliveryStateChange?.("processing");
 
     try {
-      const reportInput = buildReportInput(state);
+      const reportInput = buildReportInput(state, locale);
       const currentReport = report ?? (await generate({ data: reportInput }));
       reportReady = true;
       if (!report) setReport(currentReport);
 
-      const currentPdf = pdfBlob ?? (await withTimeout(createPdfBlob(state, currentReport), 120_000, "PDF timeout"));
+      const currentPdf =
+        pdfBlob ??
+        (await withTimeout(createPdfBlob(state, currentReport, locale), 120_000, "PDF timeout"));
       pdfReady = true;
       if (!pdfBlob) setPdfBlob(currentPdf);
-
       if (!submissionId.current) submissionId.current = crypto.randomUUID();
 
       const result = await submit({
         data: {
           submissionId: submissionId.current,
+          locale,
           contact: {
             name: state.contact.name,
             email: state.contact.email,
@@ -70,16 +160,12 @@ export function HomeDnaReport({
           summary: reportInput.projectSummary,
           report: currentReport,
           pdfBase64: await blobToBase64(currentPdf),
-          pdfFilename: PDF_FILENAME,
+          pdfFilename,
         },
       });
 
       if (!result.delivered) {
-        setDeliveryError(
-          result.customerEmailStatus === "sent"
-            ? "Poročilo smo poslali na vaš e-naslov, obvestila studiu pa trenutno ni bilo mogoče dostaviti."
-            : "Poročilo je pripravljeno, vendar ga trenutno ni bilo mogoče poslati po e-pošti.",
-        );
+        setDeliveryError(result.customerEmailStatus === "sent" ? t.studioDelivery : t.delivery);
         onDeliveryStateChange?.("delivery-error");
         return;
       }
@@ -87,19 +173,30 @@ export function HomeDnaReport({
     } catch (error) {
       console.error("Home DNA preparation or delivery failed", error);
       if (!reportReady) {
-        setGenerationError("Poročila trenutno ni bilo mogoče pripraviti.");
+        setGenerationError(t.generation);
         onDeliveryStateChange?.("generation-error");
       } else if (!pdfReady) {
-        setGenerationError("PDF-ja trenutno ni bilo mogoče pripraviti.");
+        setGenerationError(t.pdfGeneration);
         onDeliveryStateChange?.("generation-error");
       } else {
-        setDeliveryError("Poročilo je pripravljeno, vendar ga trenutno ni bilo mogoče poslati po e-pošti.");
+        setDeliveryError(t.delivery);
         onDeliveryStateChange?.("delivery-error");
       }
     } finally {
       setPreparing(false);
     }
-  }, [generate, onDeliveryStateChange, pdfBlob, preparing, report, state, submit]);
+  }, [
+    generate,
+    locale,
+    onDeliveryStateChange,
+    pdfBlob,
+    pdfFilename,
+    preparing,
+    report,
+    state,
+    submit,
+    t,
+  ]);
 
   useEffect(() => {
     if (started.current) return;
@@ -109,17 +206,17 @@ export function HomeDnaReport({
 
   const handleDownload = async () => {
     if (downloadBusy || !report) return;
-
     setDownloadBusy(true);
     setPdfError(null);
-
     try {
-      const blob = pdfBlob ?? (await withTimeout(createPdfBlob(state, report), 120_000, "PDF timeout"));
+      const blob =
+        pdfBlob ??
+        (await withTimeout(createPdfBlob(state, report, locale), 120_000, "PDF timeout"));
       if (!pdfBlob) setPdfBlob(blob);
-      downloadBlob(blob, PDF_FILENAME);
+      downloadBlob(blob, pdfFilename);
     } catch (error) {
       console.error(error);
-      setPdfError("PDF-ja trenutno ni bilo mogoče ustvariti.");
+      setPdfError(t.pdfCreate);
     } finally {
       setDownloadBusy(false);
     }
@@ -137,7 +234,7 @@ export function HomeDnaReport({
           className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full border border-border px-6 py-3 text-sm"
         >
           <RotateCcw size={16} />
-          Nazaj na varnostno preverjanje
+          {t.verify}
         </button>
       </div>
     );
@@ -147,14 +244,14 @@ export function HomeDnaReport({
     return (
       <p className="mt-16 flex items-center gap-3 text-sm text-muted-foreground">
         <Loader2 size={16} className="animate-spin" />
-        Pripravljamo vaš Home DNA™ Report in e-pošto …
+        {t.preparing}
       </p>
     );
   }
 
   const est = state.investment.estimatedInvestment;
-  const { executionLevel } = buildReportInput(state);
-  const investmentRange = est ? `${formatEuro(est.min)} – ${formatEuro(est.max)}` : "Po posvetu";
+  const { executionLevel } = buildReportInput(state, locale);
+  const investmentRange = est ? `${formatEuro(est.min)} – ${formatEuro(est.max)}` : t.consultation;
   const images = resolveReportImages(state, report);
 
   return (
@@ -166,21 +263,17 @@ export function HomeDnaReport({
           className="aspect-[16/9] w-full object-cover sm:aspect-[2/1]"
         />
       </div>
-
       <div className="mb-16">
         {preparing && (
           <p className="mb-5 flex items-center gap-3 text-sm text-muted-foreground">
             <Loader2 size={16} className="animate-spin" />
-            Poročilo pošiljamo na {state.contact.email} …
+            {t.sending(state.contact.email)}
           </p>
         )}
-
         {deliveryError && (
           <div role="alert" className="mb-6 max-w-2xl border-l-2 border-destructive pl-5">
             <p className="text-sm text-destructive">{deliveryError}</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              PDF lahko prenesete takoj. Ponovni poskus ne bo ustvaril podvojene oddaje ali podvojenih sporočil.
-            </p>
+            <p className="mt-2 text-sm text-muted-foreground">{t.retryInfo}</p>
             <button
               type="button"
               disabled={preparing}
@@ -188,11 +281,10 @@ export function HomeDnaReport({
               className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-full border border-border px-6 py-3 text-sm disabled:opacity-60"
             >
               {preparing ? <Loader2 size={16} className="animate-spin" /> : <RotateCcw size={16} />}
-              Ponovno pošlji
+              {t.retry}
             </button>
           </div>
         )}
-
         <button
           type="button"
           disabled={downloadBusy}
@@ -202,37 +294,32 @@ export function HomeDnaReport({
           {downloadBusy ? (
             <>
               <Loader2 size={16} className="animate-spin" />
-              Pripravljamo PDF ...
+              {t.preparingPdf}
             </>
           ) : (
             <>
               <Download size={16} />
-              Prenesi Home DNA™ Report (PDF)
+              {t.download}
             </>
           )}
         </button>
-
         {pdfError && <p className="mt-4 text-sm text-destructive">{pdfError}</p>}
       </div>
 
-      <Section index="01" title="Dobrodošli v vašem Home DNA™" body={report.intro} />
-
-      <Section index="02" title="Vaš življenjski slog" body={report.lifestyle}>
+      <Section index="01" title={t.sections[0]} body={report.intro} />
+      <Section index="02" title={t.sections[1]} body={report.lifestyle}>
         <ReportImage image={images.lifestyle} className="mt-8 aspect-[16/7]" />
       </Section>
-
-      <Section index="03" title="Vaš slog" body={report.style}>
+      <Section index="03" title={t.sections[2]} body={report.style}>
         <div className={`mt-8 grid gap-4 ${images.style.length > 1 ? "sm:grid-cols-2" : ""}`}>
           {images.style.map((image) => (
             <ReportImage key={image.id} image={image} className="aspect-[4/3]" />
           ))}
         </div>
       </Section>
-
-      <Section index="04" title="Zakaj bo ta dom deloval za vas" body={report.why} />
-
+      <Section index="04" title={t.sections[3]} body={report.why} />
       {report.rooms.length > 0 && (
-        <Section index="05" title="Priporočila za izbrane prostore">
+        <Section index="05" title={t.sections[4]}>
           <div className="mt-8 grid gap-10 sm:grid-cols-2">
             {report.rooms.map((room) => {
               const image = images.rooms[room.key];
@@ -251,25 +338,21 @@ export function HomeDnaReport({
           </div>
         </Section>
       )}
-
-      <Section index="06" title="Okvirna investicija">
+      <Section index="06" title={t.sections[5]}>
         <ReportImage image={images.investment} className="mt-8 aspect-[16/7]" />
-
         <dl className="mt-8 grid gap-8 sm:grid-cols-2">
           <div>
-            <dt className="eyebrow">Ocenjena investicija</dt>
+            <dt className="eyebrow">{t.estimated}</dt>
             <dd className="mt-3 font-display text-2xl">{investmentRange}</dd>
           </div>
           <div>
-            <dt className="eyebrow">Raven izvedbe</dt>
+            <dt className="eyebrow">{t.level}</dt>
             <dd className="mt-3 font-display text-2xl">{executionLevel}</dd>
           </div>
         </dl>
-
         <p className="mt-6 whitespace-pre-line text-muted-foreground">{report.investment}</p>
       </Section>
-
-      <Section index="07" title="Naslednji koraki">
+      <Section index="07" title={t.sections[6]}>
         <ol className="mt-8">
           {report.nextSteps.map((step, index) => (
             <li key={`${step.title}-${index}`} className="flex gap-6 border-t py-6">
@@ -281,22 +364,24 @@ export function HomeDnaReport({
             </li>
           ))}
         </ol>
-
         <p className="mt-8 whitespace-pre-line">{report.closing}</p>
       </Section>
     </article>
   );
 }
 
-async function createPdfBlob(state: HomeDnaState, report: Report): Promise<Blob> {
+async function createPdfBlob(state: HomeDnaState, report: Report, locale: Locale): Promise<Blob> {
   const est = state.investment.estimatedInvestment;
-  const { executionLevel } = buildReportInput(state);
+  const { executionLevel } = buildReportInput(state, locale);
+  const fallback =
+    locale === "hr" ? "Nakon konzultacija" : locale === "en" ? "After consultation" : "Po posvetu";
   return generateHomeDnaPdf({
     report,
     images: resolveReportImages(state, report),
     customerName: state.contact.name,
-    investmentRange: est ? `${formatEuro(est.min)} – ${formatEuro(est.max)}` : "Po posvetu",
+    investmentRange: est ? `${formatEuro(est.min)} – ${formatEuro(est.max)}` : fallback,
     executionLevel,
+    locale,
   });
 }
 
@@ -311,10 +396,7 @@ function blobToBase64(blob: Blob): Promise<string> {
     reader.onload = () => {
       const result = String(reader.result);
       const separator = result.indexOf(",");
-      if (separator < 0) {
-        reject(new Error("PDF encoding failed"));
-        return;
-      }
+      if (separator < 0) return reject(new Error("PDF encoding failed"));
       resolve(result.slice(separator + 1));
     };
     reader.onerror = () => reject(reader.error ?? new Error("PDF encoding failed"));
@@ -322,12 +404,15 @@ function blobToBase64(blob: Blob): Promise<string> {
   });
 }
 
-async function withTimeout<T>(promise: Promise<T>, milliseconds: number, message: string): Promise<T> {
+async function withTimeout<T>(
+  promise: Promise<T>,
+  milliseconds: number,
+  message: string,
+): Promise<T> {
   let timeoutId: number | undefined;
   const timeout = new Promise<never>((_, reject) => {
     timeoutId = window.setTimeout(() => reject(new Error(message)), milliseconds);
   });
-
   try {
     return await Promise.race([promise, timeout]);
   } finally {
@@ -337,7 +422,12 @@ async function withTimeout<T>(promise: Promise<T>, milliseconds: number, message
 
 function ReportImage({ image, className = "" }: { image: ReportImageAsset; className?: string }) {
   return (
-    <img src={image.src} alt={image.alt} loading="lazy" className={`w-full rounded-2xl object-cover ${className}`} />
+    <img
+      src={image.src}
+      alt={image.alt}
+      loading="lazy"
+      className={`w-full rounded-2xl object-cover ${className}`}
+    />
   );
 }
 

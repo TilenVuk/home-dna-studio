@@ -14,6 +14,7 @@ const ReservationInput = z.object({
   slotStart: z.string().datetime({ offset: true }),
   consultationType: z.enum(["online", "home-visit"]),
   source: z.enum(["contact", "home-dna"]),
+  locale: z.enum(["sl", "hr", "en"]).default("sl"),
   contact: ContactInput,
 });
 

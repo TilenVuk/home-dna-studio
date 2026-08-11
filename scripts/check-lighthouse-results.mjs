@@ -2,9 +2,7 @@ import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 
 const resultsDir = process.argv[2] ?? "lighthouse-results";
-const files = (await readdir(resultsDir))
-  .filter((file) => file.endsWith(".json"))
-  .sort();
+const files = (await readdir(resultsDir)).filter((file) => file.endsWith(".json")).sort();
 
 if (files.length === 0) {
   console.error(`No Lighthouse JSON reports found in ${resultsDir}.`);
@@ -36,7 +34,11 @@ for (const file of files) {
 
 const byUrl = new Map();
 for (const entry of reports) {
-  const url = entry.report.finalDisplayedUrl ?? entry.report.finalUrl ?? entry.report.requestedUrl ?? entry.file;
+  const url =
+    entry.report.finalDisplayedUrl ??
+    entry.report.finalUrl ??
+    entry.report.requestedUrl ??
+    entry.file;
   const group = byUrl.get(url) ?? [];
   group.push(entry);
   byUrl.set(url, group);

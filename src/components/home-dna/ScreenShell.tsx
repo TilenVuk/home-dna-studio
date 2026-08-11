@@ -29,7 +29,11 @@ export function ScreenShell({
       >
         {headline}
       </h1>
-      {support && <p className="mt-6 max-w-[58ch] text-base leading-relaxed text-muted-foreground">{support}</p>}
+      {support && (
+        <p className="mt-6 max-w-[58ch] text-base leading-relaxed text-muted-foreground">
+          {support}
+        </p>
+      )}
       {children}
     </div>
   );

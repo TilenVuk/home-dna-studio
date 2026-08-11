@@ -6,7 +6,6 @@ import { brand } from "@/content/site";
 const links = [
   { label: "Koncept", href: "#concept" },
   { label: "Proces", href: "#process" },
-
   { label: "Storitve", href: "#services" },
   { label: "Projekti", href: "#projects" },
   { label: "Kontakt", href: "#contact" },
@@ -37,7 +36,7 @@ export function SiteNav() {
           <span className="eyebrow">Studio</span>
         </a>
 
-        <div className="hidden items-center gap-9 lg:flex">
+        <div className="hidden items-center gap-7 lg:flex">
           {links.map((l) => (
             <a
               key={l.href}
@@ -47,6 +46,23 @@ export function SiteNav() {
               {l.label}
             </a>
           ))}
+          <div className="flex items-center gap-1 text-[11px]" aria-label="Jezik">
+            <span className="rounded-full border border-foreground px-2.5 py-1.5">SL</span>
+            <a
+              href="/hr/"
+              hrefLang="hr"
+              className="rounded-full border border-border px-2.5 py-1.5 text-muted-foreground hover:text-foreground"
+            >
+              HR
+            </a>
+            <a
+              href="/en/"
+              hrefLang="en"
+              className="rounded-full border border-border px-2.5 py-1.5 text-muted-foreground hover:text-foreground"
+            >
+              EN
+            </a>
+          </div>
           <Link
             to="/home-dna"
             className="rounded-full bg-primary px-5 py-2.5 text-[13px] text-primary-foreground transition-opacity hover:opacity-85"
@@ -72,6 +88,15 @@ export function SiteNav() {
               {l.label}
             </a>
           ))}
+          <div className="my-4 flex gap-2 text-xs" aria-label="Jezik">
+            <span className="rounded-full border border-foreground px-3 py-2">SL</span>
+            <a href="/hr/" hrefLang="hr" className="rounded-full border border-border px-3 py-2">
+              HR
+            </a>
+            <a href="/en/" hrefLang="en" className="rounded-full border border-border px-3 py-2">
+              EN
+            </a>
+          </div>
           <Link
             to="/home-dna"
             onClick={() => setOpen(false)}

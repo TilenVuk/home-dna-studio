@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { ArrowRight } from "lucide-react";
+import type { Locale } from "@/lib/i18n";
 
 export function EditorialScreen({
   screenKey,
@@ -8,6 +9,7 @@ export function EditorialScreen({
   body,
   cta,
   image,
+  locale = "sl",
   prominentEyebrow = false,
   onContinue,
   onBack,
@@ -19,12 +21,16 @@ export function EditorialScreen({
   body: string;
   cta: string;
   image: string;
+  locale?: Locale;
   prominentEyebrow?: boolean | undefined;
   onContinue?: () => void;
   onBack?: () => void;
   ctaDisabled?: boolean;
 }) {
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const nextRoom =
+    locale === "hr" ? "Sljedeći prostor" : locale === "en" ? "Next room" : "Naslednji prostor";
+  const back = locale === "hr" ? "Natrag" : locale === "en" ? "Back" : "Nazaj";
 
   useEffect(() => {
     headingRef.current?.focus({ preventScroll: true });
@@ -34,7 +40,7 @@ export function EditorialScreen({
     <div className="animate-[hd-enter_260ms_ease-out] motion-reduce:animate-none">
       {prominentEyebrow && (
         <div className="mb-10 max-w-[70ch] md:mb-12">
-          <p className="eyebrow">Naslednji prostor</p>
+          <p className="eyebrow">{nextRoom}</p>
           <h1
             ref={headingRef}
             tabIndex={-1}
@@ -47,7 +53,6 @@ export function EditorialScreen({
           </h2>
         </div>
       )}
-
       <div className="overflow-hidden">
         <img
           src={image}
@@ -58,18 +63,20 @@ export function EditorialScreen({
           className="h-[38vh] w-full object-cover md:h-[46vh]"
         />
       </div>
-
       <div className="mt-12 max-w-[52ch]">
         {!prominentEyebrow && (
           <>
             <p className="eyebrow">{eyebrow}</p>
-            <h1 ref={headingRef} tabIndex={-1} className="display-lg mt-6 max-w-[20ch] focus:outline-none">
+            <h1
+              ref={headingRef}
+              tabIndex={-1}
+              className="display-lg mt-6 max-w-[20ch] focus:outline-none"
+            >
               {headline}
             </h1>
           </>
         )}
         <p className="mt-6 text-base leading-relaxed text-muted-foreground">{body}</p>
-
         {onContinue ? (
           <button
             type="button"
@@ -84,7 +91,6 @@ export function EditorialScreen({
             {cta}
           </p>
         )}
-
         {onBack && (
           <div>
             <button
@@ -92,7 +98,7 @@ export function EditorialScreen({
               onClick={onBack}
               className="mt-10 inline-flex min-h-12 items-center text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2"
             >
-              Nazaj
+              {back}
             </button>
           </div>
         )}

@@ -12,6 +12,7 @@ import { SingleVisualChoiceScreen } from "./SingleVisualChoiceScreen";
 import { StyleSelection } from "./StyleSelection";
 import { pruneRooms, type ScreenDef } from "./screenDef";
 import type { HomeDnaState, RoomKey } from "./homeDnaTypes";
+import type { Locale } from "@/lib/i18n";
 
 const SuccessScreen = lazy(() =>
   import("./SuccessScreen").then((module) => ({ default: module.SuccessScreen })),
@@ -20,23 +21,25 @@ const SuccessScreen = lazy(() =>
 export function ScreenDefRenderer({
   def,
   state,
+  locale,
   onUpdate,
   onAdvance,
   onBack,
 }: {
   def: ScreenDef;
   state: HomeDnaState;
+  locale: Locale;
   onUpdate: (mutate: (state: HomeDnaState) => HomeDnaState) => void;
   onAdvance: (mutate?: (state: HomeDnaState) => HomeDnaState) => void;
   onBack: () => void;
 }) {
   switch (def.kind) {
     case "welcome":
-      return <HomeDnaWelcome onStart={() => onAdvance()} />;
-
+      return <HomeDnaWelcome locale={locale} onStart={() => onAdvance()} />;
     case "editorial":
       return (
         <EditorialScreen
+          locale={locale}
           screenKey={def.key}
           eyebrow={def.eyebrow}
           headline={def.headline}
@@ -48,10 +51,10 @@ export function ScreenDefRenderer({
           onBack={onBack}
         />
       );
-
     case "choice":
       return (
         <ChoiceScreen
+          locale={locale}
           screenKey={def.key}
           headline={def.headline}
           support={def.support}
@@ -61,10 +64,10 @@ export function ScreenDefRenderer({
           onBack={onBack}
         />
       );
-
     case "visual":
       return (
         <SingleVisualChoiceScreen
+          locale={locale}
           screenKey={def.key}
           headline={def.headline}
           {...(def.support ? { support: def.support } : {})}
@@ -75,10 +78,10 @@ export function ScreenDefRenderer({
           onBack={onBack}
         />
       );
-
     case "number":
       return (
         <NumberScreen
+          locale={locale}
           screenKey={def.key}
           headline={def.headline}
           {...(def.support ? { support: def.support } : {})}
@@ -92,10 +95,10 @@ export function ScreenDefRenderer({
           onBack={onBack}
         />
       );
-
     case "multi":
       return (
         <MultiSelectScreen
+          locale={locale}
           screenKey={def.key}
           headline={def.headline}
           {...(def.support ? { support: def.support } : {})}
@@ -109,10 +112,10 @@ export function ScreenDefRenderer({
           onBack={onBack}
         />
       );
-
     case "note":
       return (
         <NoteScreen
+          locale={locale}
           screenKey={def.key}
           headline={def.headline}
           {...(def.support ? { support: def.support } : {})}
@@ -121,10 +124,10 @@ export function ScreenDefRenderer({
           onBack={onBack}
         />
       );
-
     case "rooms":
       return (
         <RoomSelection
+          locale={locale}
           selectedRooms={def.selected}
           {...(state.home.childrenCount ? { childrenCount: state.home.childrenCount } : {})}
           {...(state.home.childrenCountPlus ? { childrenCountPlus: true } : {})}
@@ -133,46 +136,45 @@ export function ScreenDefRenderer({
           onBack={onBack}
         />
       );
-
     case "styles":
       return (
         <StyleSelection
+          locale={locale}
           selected={def.selected}
           onChange={(styles) => onUpdate((s) => def.apply(s, styles))}
           onNext={() => onAdvance()}
           onBack={onBack}
         />
       );
-
     case "link":
       return (
         <InspirationLink
+          locale={locale}
           {...(def.value ? { value: def.value } : {})}
           onSubmit={(url) => onAdvance((s) => def.apply(s, url))}
           onBack={onBack}
         />
       );
-
     case "contact":
       return (
         <ContactScreen
           value={def.value}
+          locale={locale}
           onSubmit={(contact) => onAdvance((s) => def.apply(s, contact))}
           onBack={onBack}
         />
       );
-
     case "success":
       return (
         <Suspense fallback={null}>
           <SuccessScreen
             state={state}
+            locale={locale}
             onBack={onBack}
             {...(state.contact.name ? { name: state.contact.name } : {})}
           />
         </Suspense>
       );
-
     default:
       return null;
   }
