@@ -141,6 +141,7 @@ export function ContactScreen({
           name="email"
           type="email"
           inputMode="email"
+          autoComplete="email"
           placeholder="name@example.com"
           value={form.email}
           onChange={(e) => set({ email: e.target.value })}
@@ -154,6 +155,7 @@ export function ContactScreen({
           name="phone"
           type="tel"
           inputMode="tel"
+          autoComplete="tel"
           placeholder="+386"
           value={form.phone}
           onChange={(e) => set({ phone: e.target.value })}
