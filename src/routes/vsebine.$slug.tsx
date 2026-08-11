@@ -1,22 +1,26 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AiSearchArticlePage } from "@/components/content/AiSearchArticlePage";
 import { articlePath, getArticleBySlug } from "@/content/aiSearchArticles";
+import { buildArticleSeo } from "@/content/articleSeo";
 
 export const Route = createFileRoute("/vsebine/$slug")({
   head: ({ params }) => {
     const article = getArticleBySlug("sl", params.slug);
     if (!article) return {};
     const content = article.localized.sl;
+    const seo = buildArticleSeo(article, "sl");
     return {
       meta: [
-        { title: `${content.title} — Nuveli Studio` },
+        { title: seo.title },
         { name: "description", content: content.description },
         { property: "og:title", content: content.title },
         { property: "og:description", content: content.description },
         { property: "og:type", content: "article" },
+        { property: "og:url", content: seo.canonicalUrl },
+        { name: "twitter:card", content: "summary_large_image" },
       ],
       links: [
-        { rel: "canonical", href: `https://nuvelistudio.com${articlePath(article, "sl")}` },
+        { rel: "canonical", href: seo.canonicalUrl },
         {
           rel: "alternate",
           hrefLang: "sl",
@@ -38,6 +42,7 @@ export const Route = createFileRoute("/vsebine/$slug")({
           href: `https://nuvelistudio.com${articlePath(article, "sl")}`,
         },
       ],
+      scripts: seo.scripts,
     };
   },
   component: ArticleRoute,

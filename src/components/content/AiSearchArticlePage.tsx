@@ -38,27 +38,6 @@ export function AiSearchArticlePage({
   const content = article.localized[locale];
   const prefix = locale === "sl" ? "" : `/${locale}`;
   const homeDnaPath = `${prefix}/home-dna`;
-  const schema = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: content.title,
-    description: content.description,
-    inLanguage: locale,
-    author: { "@type": "Organization", name: "Nuveli Studio" },
-    publisher: { "@type": "Organization", name: "Nuveli Studio" },
-    mainEntityOfPage: `https://nuvelistudio.com${articlePath(article, locale)}`,
-  };
-  const faqSchema = content.faqs?.length
-    ? {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        mainEntity: content.faqs.map((faq) => ({
-          "@type": "Question",
-          name: faq.question,
-          acceptedAnswer: { "@type": "Answer", text: faq.answer },
-        })),
-      }
-    : null;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -123,17 +102,6 @@ export function AiSearchArticlePage({
           </a>
         </aside>
       </main>
-
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-      />
-      {faqSchema ? (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-        />
-      ) : null}
     </div>
   );
 }
