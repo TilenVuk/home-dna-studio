@@ -63,9 +63,13 @@ export function ContactScreen({
       screenKey="contact"
       eyebrow="Zadnji korak"
       headline="Kam naj pošljemo vaš Home DNA™ Report?"
-      support="Poročilo bomo pripravili na podlagi vaših odgovorov in ga poslali na navedeni e-naslov."
+      support="Po oddaji prejmete osebni Home DNA™ Report in okvirno oceno investicije za izbrani obseg projekta. Ocena je informativna; končna ponudba sledi po posvetu, izmerah in potrditvi materialov."
     >
       <div className="mt-12 max-w-xl">
+        <div className="mb-10 border-y border-border py-5 text-sm leading-relaxed text-muted-foreground">
+          <strong className="font-medium text-foreground">Kaj prejmete:</strong> osebni PDF z vašimi priporočili, okvirno investicijsko območje in jasno osnovo za nadaljnji posvet z Nuveli Studio.
+        </div>
+
         <label htmlFor="contact-name" className="eyebrow block">
           Ime in priimek
         </label>
@@ -142,7 +146,7 @@ export function ContactScreen({
         )}
       </div>
 
-      <DiscoveryNavigation onBack={onBack} onNext={handleNext} nextLabel="Pripravi in pošlji" />
+      <DiscoveryNavigation onBack={onBack} onNext={handleNext} nextLabel="Pripravi report in oceno" />
     </ScreenShell>
   );
 }
