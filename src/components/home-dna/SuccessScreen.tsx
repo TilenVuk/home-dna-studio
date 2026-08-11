@@ -163,6 +163,7 @@ export function SuccessScreen({
       {deliveryState === "sent" && (
         <BookingCalendar
           className="mt-20"
+          locale={locale}
           contact={{
             name: state.contact.name,
             email: state.contact.email,
