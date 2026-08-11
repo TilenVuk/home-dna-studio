@@ -3,65 +3,166 @@ import { executionLevelOptions, kitchenFrontMaterialLabels } from "./discoveryDa
 import { buildReportImageCandidates } from "./reportImages";
 import { kitchenWallLengthCm } from "./pricing";
 import type { HomeDnaState, ReportImageCandidates, RoomKey } from "./homeDnaTypes";
+import type { Locale } from "@/lib/i18n";
 
-const projectStageLabels: Record<string, string> = {
-  "new-build": "Novogradnja",
-  "complete-renovation": "Celovita prenova",
-  "partial-renovation": "Delna prenova",
+const labels = {
+  sl: {
+    projectStage: {
+      "new-build": "Novogradnja",
+      "complete-renovation": "Celovita prenova",
+      "partial-renovation": "Delna prenova",
+    },
+    propertyType: { house: "Hiša", apartment: "Stanovanje", "holiday-home": "Počitniški dom" },
+    children: { none: "Brez otrok", planning: "Otroke načrtujejo", yes: "Otroci" },
+    cooking: { rarely: "Občasno", weekly: "Večkrat na teden", daily: "Vsak dan" },
+    work: { never: "Nikoli", sometimes: "Občasno", frequently: "Pogosto" },
+    hosting: { rarely: "Redko", occasionally: "Občasno", often: "Pogosto" },
+    fields: {
+      stage: "Faza projekta",
+      property: "Tip nepremičnine",
+      area: "Kvadratura",
+      adults: "Število odraslih",
+      children: "Otroci",
+      childrenCount: "Število otrok",
+      pets: "Hišni ljubljenčki",
+      rooms: "Izbrani prostori",
+      styles: "Slogi",
+      atmosphere: "Vzdušje",
+      colour: "Barvna smer",
+      priorities: "Prioritete",
+      cooking: "Pogostost kuhanja",
+      work: "Delo od doma",
+      hosting: "Pogostost gostov",
+      hobbies: "Hobiji in oprema",
+      challenges: "Trenutni izzivi",
+      challengeNote: "Opomba o izzivih",
+      future: "Prihodnje potrebe",
+      fronts: "Material kuhinjskih front",
+      frontPriorities: "Prioritete kuhinjskih front",
+      roomDetails: "Podrobnosti prostorov:",
+      estimateAfterConsultation: "Ocena bo pripravljena po posvetu",
+    },
+  },
+  hr: {
+    projectStage: {
+      "new-build": "Novogradnja",
+      "complete-renovation": "Cjelovita renovacija",
+      "partial-renovation": "Djelomična renovacija",
+    },
+    propertyType: { house: "Kuća", apartment: "Stan", "holiday-home": "Kuća za odmor" },
+    children: { none: "Bez djece", planning: "Planiraju djecu", yes: "Djeca" },
+    cooking: { rarely: "Povremeno", weekly: "Nekoliko puta tjedno", daily: "Svaki dan" },
+    work: { never: "Nikada", sometimes: "Povremeno", frequently: "Često" },
+    hosting: { rarely: "Rijetko", occasionally: "Povremeno", often: "Često" },
+    fields: {
+      stage: "Faza projekta",
+      property: "Vrsta nekretnine",
+      area: "Površina",
+      adults: "Broj odraslih",
+      children: "Djeca",
+      childrenCount: "Broj djece",
+      pets: "Kućni ljubimci",
+      rooms: "Odabrani prostori",
+      styles: "Stilovi",
+      atmosphere: "Ugođaj",
+      colour: "Smjer boja",
+      priorities: "Prioriteti",
+      cooking: "Učestalost kuhanja",
+      work: "Rad od kuće",
+      hosting: "Učestalost gostiju",
+      hobbies: "Hobiji i oprema",
+      challenges: "Trenutni izazovi",
+      challengeNote: "Napomena o izazovima",
+      future: "Buduće potrebe",
+      fronts: "Materijal kuhinjskih fronti",
+      frontPriorities: "Prioriteti kuhinjskih fronti",
+      roomDetails: "Detalji prostora:",
+      estimateAfterConsultation: "Procjena će biti pripremljena nakon konzultacija",
+    },
+  },
+  en: {
+    projectStage: {
+      "new-build": "New build",
+      "complete-renovation": "Complete renovation",
+      "partial-renovation": "Partial renovation",
+    },
+    propertyType: { house: "House", apartment: "Apartment", "holiday-home": "Holiday home" },
+    children: { none: "No children", planning: "Planning children", yes: "Children" },
+    cooking: { rarely: "Occasionally", weekly: "Several times a week", daily: "Every day" },
+    work: { never: "Never", sometimes: "Sometimes", frequently: "Frequently" },
+    hosting: { rarely: "Rarely", occasionally: "Occasionally", often: "Often" },
+    fields: {
+      stage: "Project stage",
+      property: "Property type",
+      area: "Floor area",
+      adults: "Number of adults",
+      children: "Children",
+      childrenCount: "Number of children",
+      pets: "Pets",
+      rooms: "Selected rooms",
+      styles: "Styles",
+      atmosphere: "Atmosphere",
+      colour: "Colour direction",
+      priorities: "Priorities",
+      cooking: "Cooking frequency",
+      work: "Working from home",
+      hosting: "Hosting frequency",
+      hobbies: "Hobbies and equipment",
+      challenges: "Current challenges",
+      challengeNote: "Challenge note",
+      future: "Future needs",
+      fronts: "Kitchen front material",
+      frontPriorities: "Kitchen front priorities",
+      roomDetails: "Room details:",
+      estimateAfterConsultation: "Estimate will be prepared after the consultation",
+    },
+  },
+} as const;
+
+const roomTranslations: Record<Locale, Partial<Record<RoomKey, string>>> = {
+  sl: {},
+  hr: {
+    kitchen: "Kuhinja",
+    wardrobe: "Garderoba",
+    "living-room": "Dnevni boravak",
+    "entry-hall": "Predsoblje",
+    "utility-room": "Gospodarska prostorija",
+    bathroom: "Kupaonica",
+    bedroom: "Spavaća soba",
+    "children-room": "Dječje sobe",
+  },
+  en: {
+    kitchen: "Kitchen",
+    wardrobe: "Wardrobe",
+    "living-room": "Living room",
+    "entry-hall": "Entry hall",
+    "utility-room": "Utility room",
+    bathroom: "Bathroom",
+    bedroom: "Bedroom",
+    "children-room": "Children's rooms",
+  },
 };
 
-const propertyTypeLabels: Record<string, string> = {
-  house: "Hiša",
-  apartment: "Stanovanje",
-  "holiday-home": "Počitniški dom",
-};
+export const roomLabel = (key: RoomKey, locale: Locale = "sl") =>
+  roomTranslations[locale][key] ?? roomOptions.find((r) => r.key === key)?.title ?? key;
 
-const childrenLabels: Record<string, string> = {
-  none: "Brez otrok",
-  planning: "Otroke načrtujejo",
-  yes: "Otroci",
-};
-
-const cookingFrequencyLabels: Record<string, string> = {
-  rarely: "Občasno",
-  weekly: "Večkrat na teden",
-  daily: "Vsak dan",
-};
-
-const workFromHomeFrequencyLabels: Record<string, string> = {
-  never: "Nikoli",
-  sometimes: "Občasno",
-  frequently: "Pogosto",
-};
-
-const hostingFrequencyLabels: Record<string, string> = {
-  rarely: "Redko",
-  occasionally: "Občasno",
-  often: "Pogosto",
-};
-
-export const roomLabel = (key: RoomKey) => roomOptions.find((r) => r.key === key)?.title ?? key;
-
-export function roomLabelForState(key: RoomKey, state: HomeDnaState): string {
-  if (key !== "children-room") return roomLabel(key);
+export function roomLabelForState(key: RoomKey, state: HomeDnaState, locale: Locale = "sl"): string {
+  if (key !== "children-room") return roomLabel(key, locale);
   const count = state.home.childrenCount ?? 1;
-  return `${roomLabel(key)} (${count}${state.home.childrenCountPlus ? "+" : ""})`;
+  return `${roomLabel(key, locale)} (${count}${state.home.childrenCountPlus ? "+" : ""})`;
 }
 
 const styleLabel = (value: string) => styleOptions.find((s) => s.value === value)?.title ?? value;
-
-const colourLabel = (value: string) =>
-  colourDirectionOptions.find((c) => c.value === value)?.title ?? value;
-
+const colourLabel = (value: string) => colourDirectionOptions.find((c) => c.value === value)?.title ?? value;
 export const executionLevelLabel = (value: string) =>
   executionLevelOptions.find((o) => o.value === value)?.title ?? value;
 
-/** Rooms that get their own recommendation section (never the "complete-home" meta option). */
 export function reportRooms(state: HomeDnaState): RoomKey[] {
   return state.selectedRooms.filter((r) => r !== "complete-home");
 }
 
 export interface ReportInput {
+  locale: Locale;
   projectSummary: string;
   turnstileToken: string;
   rooms: { key: string; label: string }[];
@@ -70,9 +171,10 @@ export interface ReportInput {
   imageCandidates: ReportImageCandidates;
 }
 
-export function buildReportInput(state: HomeDnaState): ReportInput {
+export function buildReportInput(state: HomeDnaState, locale: Locale = "sl"): ReportInput {
   const { home, style, lifestyle, rooms } = state;
   const selected = reportRooms(state);
+  const t = labels[locale];
 
   const lines: string[] = [];
   const push = (label: string, value?: string | number | boolean | null) => {
@@ -80,49 +182,36 @@ export function buildReportInput(state: HomeDnaState): ReportInput {
     lines.push(`${label}: ${value}`);
   };
 
-  push("Faza projekta", home.projectStage ? projectStageLabels[home.projectStage] : undefined);
-  push("Tip nepremičnine", home.propertyType ? propertyTypeLabels[home.propertyType] : undefined);
-  push("Kvadratura", home.floorArea ? `${home.floorArea} m2` : undefined);
+  push(t.fields.stage, home.projectStage ? t.projectStage[home.projectStage] : undefined);
+  push(t.fields.property, home.propertyType ? t.propertyType[home.propertyType] : undefined);
+  push(t.fields.area, home.floorArea ? `${home.floorArea} m2` : undefined);
   push(
-    "Število članov gospodinjstva",
+    t.fields.adults,
     home.householdSize ? `${home.householdSize}${home.householdSizePlus ? "+" : ""}` : undefined,
   );
-  push("Otroci", home.children ? childrenLabels[home.children] : undefined);
+  push(t.fields.children, home.children ? t.children[home.children] : undefined);
   push(
-    "Število otrok",
+    t.fields.childrenCount,
     home.childrenCount ? `${home.childrenCount}${home.childrenCountPlus ? "+" : ""}` : undefined,
   );
-  push("Hišni ljubljenčki", home.pets.join(", "));
-  push("Izbrani prostori", selected.map((key) => roomLabelForState(key, state)).join(", "));
-  push("Slogi", style.selectedStyles.map(styleLabel).join(", "));
-  push("Vzdušje", style.atmosphere.join(", "));
-  push("Barvna smer", style.colourDirection ? colourLabel(style.colourDirection) : undefined);
-  push("Prioritete", lifestyle.priorities.join(", "));
+  push(t.fields.pets, home.pets.join(", "));
+  push(t.fields.rooms, selected.map((key) => roomLabelForState(key, state, locale)).join(", "));
+  push(t.fields.styles, style.selectedStyles.map(styleLabel).join(", "));
+  push(t.fields.atmosphere, style.atmosphere.join(", "));
+  push(t.fields.colour, style.colourDirection ? colourLabel(style.colourDirection) : undefined);
+  push(t.fields.priorities, lifestyle.priorities.join(", "));
+  push(t.fields.cooking, lifestyle.cookingFrequency ? t.cooking[lifestyle.cookingFrequency] : undefined);
+  push(t.fields.work, lifestyle.workFromHomeFrequency ? t.work[lifestyle.workFromHomeFrequency] : undefined);
+  push(t.fields.hosting, lifestyle.hostingFrequency ? t.hosting[lifestyle.hostingFrequency] : undefined);
+  push(t.fields.hobbies, lifestyle.hobbies.join(", "));
+  push(t.fields.challenges, lifestyle.currentChallenges.join(", "));
+  push(t.fields.challengeNote, lifestyle.challengeNote);
+  push(t.fields.future, lifestyle.futureNeeds.join(", "));
   push(
-    "Pogostost kuhanja",
-    lifestyle.cookingFrequency ? cookingFrequencyLabels[lifestyle.cookingFrequency] : undefined,
+    t.fields.fronts,
+    rooms.kitchen?.frontMaterial ? kitchenFrontMaterialLabels[rooms.kitchen.frontMaterial] : undefined,
   );
-  push(
-    "Delo od doma",
-    lifestyle.workFromHomeFrequency
-      ? workFromHomeFrequencyLabels[lifestyle.workFromHomeFrequency]
-      : undefined,
-  );
-  push(
-    "Pogostost gostov",
-    lifestyle.hostingFrequency ? hostingFrequencyLabels[lifestyle.hostingFrequency] : undefined,
-  );
-  push("Hobiji in oprema", lifestyle.hobbies.join(", "));
-  push("Trenutni izzivi", lifestyle.currentChallenges.join(", "));
-  push("Opomba o izzivih", lifestyle.challengeNote);
-  push("Prihodnje potrebe", lifestyle.futureNeeds.join(", "));
-  push(
-    "Material kuhinjskih front",
-    rooms.kitchen?.frontMaterial
-      ? kitchenFrontMaterialLabels[rooms.kitchen.frontMaterial]
-      : undefined,
-  );
-  push("Prioritete kuhinjskih front", rooms.kitchen?.frontPriorities?.join(", "));
+  push(t.fields.frontPriorities, rooms.kitchen?.frontPriorities?.join(", "));
 
   const roomDetails = selected
     .map((key) => {
@@ -151,20 +240,18 @@ export function buildReportInput(state: HomeDnaState): ReportInput {
               ? { frontMaterial: kitchenFrontMaterialLabels[kitchenData.frontMaterial] }
               : {}),
             ...(kitchenData.hasLed ? { ledLength: kitchenWallLengthCm(kitchenData) } : {}),
-            ...(kitchenData.hasGlassFronts
-              ? { glassFrontLength: kitchenWallLengthCm(kitchenData) }
-              : {}),
+            ...(kitchenData.hasGlassFronts ? { glassFrontLength: kitchenWallLengthCm(kitchenData) } : {}),
           }
         : data;
       const entries = Object.entries(reportData)
         .filter(([, v]) => v !== undefined && v !== null && v !== "" && v !== false)
         .map(([k, v]) => `${k}=${Array.isArray(v) ? v.join("/") : String(v)}`);
-      return entries.length ? `${roomLabelForState(key, state)}: ${entries.join(", ")}` : null;
+      return entries.length ? `${roomLabelForState(key, state, locale)}: ${entries.join(", ")}` : null;
     })
     .filter(Boolean) as string[];
 
   if (roomDetails.length) {
-    lines.push("Podrobnosti prostorov:");
+    lines.push(t.fields.roomDetails);
     lines.push(...roomDetails);
   }
 
@@ -172,10 +259,11 @@ export function buildReportInput(state: HomeDnaState): ReportInput {
   const level = executionLevelLabel(state.investment.level);
 
   return {
+    locale,
     projectSummary: lines.join("\n"),
     turnstileToken: state.contact.turnstileToken,
-    rooms: selected.map((key) => ({ key, label: roomLabelForState(key, state) })),
-    investmentLine: est ? `${est.min} – ${est.max} EUR` : "Ocena bo pripravljena po posvetu",
+    rooms: selected.map((key) => ({ key, label: roomLabelForState(key, state, locale) })),
+    investmentLine: est ? `${est.min} – ${est.max} EUR` : t.fields.estimateAfterConsultation,
     executionLevel: level,
     imageCandidates: buildReportImageCandidates(state),
   };
