@@ -11,6 +11,16 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as HomeDnaRouteImport } from './routes/home-dna'
+import { Route as EnIndexRouteImport } from './routes/en.index'
+import { Route as EnHomeDnaRouteImport } from './routes/en.home-dna'
+import { Route as HrIndexRouteImport } from './routes/hr.index'
+import { Route as HrHomeDnaRouteImport } from './routes/hr.home-dna'
+import { Route as VsebineIndexRouteImport } from './routes/vsebine.index'
+import { Route as VsebineSlugRouteImport } from './routes/vsebine.$slug'
+import { Route as EnVsebineIndexRouteImport } from './routes/en.vsebine.index'
+import { Route as EnVsebineSlugRouteImport } from './routes/en.vsebine.$slug'
+import { Route as HrVsebineIndexRouteImport } from './routes/hr.vsebine.index'
+import { Route as HrVsebineSlugRouteImport } from './routes/hr.vsebine.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +32,158 @@ const HomeDnaRoute = HomeDnaRouteImport.update({
   path: '/home-dna',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EnIndexRoute = EnIndexRouteImport.update({
+  id: '/en/',
+  path: '/en/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnHomeDnaRoute = EnHomeDnaRouteImport.update({
+  id: '/en/home-dna',
+  path: '/en/home-dna',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HrIndexRoute = HrIndexRouteImport.update({
+  id: '/hr/',
+  path: '/hr/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HrHomeDnaRoute = HrHomeDnaRouteImport.update({
+  id: '/hr/home-dna',
+  path: '/hr/home-dna',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VsebineIndexRoute = VsebineIndexRouteImport.update({
+  id: '/vsebine/',
+  path: '/vsebine/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VsebineSlugRoute = VsebineSlugRouteImport.update({
+  id: '/vsebine/$slug',
+  path: '/vsebine/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnVsebineIndexRoute = EnVsebineIndexRouteImport.update({
+  id: '/en/vsebine/',
+  path: '/en/vsebine/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnVsebineSlugRoute = EnVsebineSlugRouteImport.update({
+  id: '/en/vsebine/$slug',
+  path: '/en/vsebine/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HrVsebineIndexRoute = HrVsebineIndexRouteImport.update({
+  id: '/hr/vsebine/',
+  path: '/hr/vsebine/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HrVsebineSlugRoute = HrVsebineSlugRouteImport.update({
+  id: '/hr/vsebine/$slug',
+  path: '/hr/vsebine/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/home-dna': typeof HomeDnaRoute
+  '/en/home-dna': typeof EnHomeDnaRoute
+  '/hr/home-dna': typeof HrHomeDnaRoute
+  '/vsebine/$slug': typeof VsebineSlugRoute
+  '/en/': typeof EnIndexRoute
+  '/hr/': typeof HrIndexRoute
+  '/vsebine/': typeof VsebineIndexRoute
+  '/en/vsebine/$slug': typeof EnVsebineSlugRoute
+  '/hr/vsebine/$slug': typeof HrVsebineSlugRoute
+  '/en/vsebine/': typeof EnVsebineIndexRoute
+  '/hr/vsebine/': typeof HrVsebineIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/home-dna': typeof HomeDnaRoute
+  '/en/home-dna': typeof EnHomeDnaRoute
+  '/hr/home-dna': typeof HrHomeDnaRoute
+  '/vsebine/$slug': typeof VsebineSlugRoute
+  '/en': typeof EnIndexRoute
+  '/hr': typeof HrIndexRoute
+  '/vsebine': typeof VsebineIndexRoute
+  '/en/vsebine/$slug': typeof EnVsebineSlugRoute
+  '/hr/vsebine/$slug': typeof HrVsebineSlugRoute
+  '/en/vsebine': typeof EnVsebineIndexRoute
+  '/hr/vsebine': typeof HrVsebineIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/home-dna': typeof HomeDnaRoute
+  '/en/home-dna': typeof EnHomeDnaRoute
+  '/hr/home-dna': typeof HrHomeDnaRoute
+  '/vsebine/$slug': typeof VsebineSlugRoute
+  '/en/': typeof EnIndexRoute
+  '/hr/': typeof HrIndexRoute
+  '/vsebine/': typeof VsebineIndexRoute
+  '/en/vsebine/$slug': typeof EnVsebineSlugRoute
+  '/hr/vsebine/$slug': typeof HrVsebineSlugRoute
+  '/en/vsebine/': typeof EnVsebineIndexRoute
+  '/hr/vsebine/': typeof HrVsebineIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/home-dna'
+  fullPaths:
+    | '/'
+    | '/home-dna'
+    | '/en/home-dna'
+    | '/hr/home-dna'
+    | '/vsebine/$slug'
+    | '/en/'
+    | '/hr/'
+    | '/vsebine/'
+    | '/en/vsebine/$slug'
+    | '/hr/vsebine/$slug'
+    | '/en/vsebine/'
+    | '/hr/vsebine/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/home-dna'
-  id: '__root__' | '/' | '/home-dna'
+  to:
+    | '/'
+    | '/home-dna'
+    | '/en/home-dna'
+    | '/hr/home-dna'
+    | '/vsebine/$slug'
+    | '/en'
+    | '/hr'
+    | '/vsebine'
+    | '/en/vsebine/$slug'
+    | '/hr/vsebine/$slug'
+    | '/en/vsebine'
+    | '/hr/vsebine'
+  id:
+    | '__root__'
+    | '/'
+    | '/home-dna'
+    | '/en/home-dna'
+    | '/hr/home-dna'
+    | '/vsebine/$slug'
+    | '/en/'
+    | '/hr/'
+    | '/vsebine/'
+    | '/en/vsebine/$slug'
+    | '/hr/vsebine/$slug'
+    | '/en/vsebine/'
+    | '/hr/vsebine/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   HomeDnaRoute: typeof HomeDnaRoute
+  EnHomeDnaRoute: typeof EnHomeDnaRoute
+  HrHomeDnaRoute: typeof HrHomeDnaRoute
+  VsebineSlugRoute: typeof VsebineSlugRoute
+  EnIndexRoute: typeof EnIndexRoute
+  HrIndexRoute: typeof HrIndexRoute
+  VsebineIndexRoute: typeof VsebineIndexRoute
+  EnVsebineSlugRoute: typeof EnVsebineSlugRoute
+  HrVsebineSlugRoute: typeof HrVsebineSlugRoute
+  EnVsebineIndexRoute: typeof EnVsebineIndexRoute
+  HrVsebineIndexRoute: typeof HrVsebineIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +202,92 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HomeDnaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/en/': {
+      id: '/en/'
+      path: '/en'
+      fullPath: '/en/'
+      preLoaderRoute: typeof EnIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en/home-dna': {
+      id: '/en/home-dna'
+      path: '/en/home-dna'
+      fullPath: '/en/home-dna'
+      preLoaderRoute: typeof EnHomeDnaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hr/': {
+      id: '/hr/'
+      path: '/hr'
+      fullPath: '/hr/'
+      preLoaderRoute: typeof HrIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hr/home-dna': {
+      id: '/hr/home-dna'
+      path: '/hr/home-dna'
+      fullPath: '/hr/home-dna'
+      preLoaderRoute: typeof HrHomeDnaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vsebine/': {
+      id: '/vsebine/'
+      path: '/vsebine'
+      fullPath: '/vsebine/'
+      preLoaderRoute: typeof VsebineIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vsebine/$slug': {
+      id: '/vsebine/$slug'
+      path: '/vsebine/$slug'
+      fullPath: '/vsebine/$slug'
+      preLoaderRoute: typeof VsebineSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en/vsebine/': {
+      id: '/en/vsebine/'
+      path: '/en/vsebine'
+      fullPath: '/en/vsebine/'
+      preLoaderRoute: typeof EnVsebineIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en/vsebine/$slug': {
+      id: '/en/vsebine/$slug'
+      path: '/en/vsebine/$slug'
+      fullPath: '/en/vsebine/$slug'
+      preLoaderRoute: typeof EnVsebineSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hr/vsebine/': {
+      id: '/hr/vsebine/'
+      path: '/hr/vsebine'
+      fullPath: '/hr/vsebine/'
+      preLoaderRoute: typeof HrVsebineIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hr/vsebine/$slug': {
+      id: '/hr/vsebine/$slug'
+      path: '/hr/vsebine/$slug'
+      fullPath: '/hr/vsebine/$slug'
+      preLoaderRoute: typeof HrVsebineSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HomeDnaRoute: HomeDnaRoute,
+  EnHomeDnaRoute: EnHomeDnaRoute,
+  HrHomeDnaRoute: HrHomeDnaRoute,
+  VsebineSlugRoute: VsebineSlugRoute,
+  EnIndexRoute: EnIndexRoute,
+  HrIndexRoute: HrIndexRoute,
+  VsebineIndexRoute: VsebineIndexRoute,
+  EnVsebineSlugRoute: EnVsebineSlugRoute,
+  HrVsebineSlugRoute: HrVsebineSlugRoute,
+  EnVsebineIndexRoute: EnVsebineIndexRoute,
+  HrVsebineIndexRoute: HrVsebineIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
