@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { HomeDnaLayout } from "./HomeDnaLayout";
 import { ScreenDefRenderer } from "./ScreenDefRenderer";
-import { buildDiscoveryFlow } from "./discoveryFlow";
+import { buildLocalizedDiscoveryFlow } from "./localizedDiscoveryFlow";
 import { initialHomeDnaState, type HomeDnaState } from "./homeDnaTypes";
+import type { Locale } from "@/lib/i18n";
 
-export function HomeDnaDiscovery() {
+export function HomeDnaDiscovery({ locale = "sl" }: { locale?: Locale }) {
   const [state, setState] = useState<HomeDnaState>(initialHomeDnaState);
 
-  const flow = useMemo(() => buildDiscoveryFlow(state), [state]);
+  const flow = useMemo(() => buildLocalizedDiscoveryFlow(state, locale), [locale, state]);
   const index = Math.max(
     flow.findIndex((s) => s.key === state.currentScreen),
     0,
@@ -26,16 +27,19 @@ export function HomeDnaDiscovery() {
     }
   }, [def?.kind]);
 
-  const step = useCallback((direction: 1 | -1, mutate?: (state: HomeDnaState) => HomeDnaState) => {
-    setState((prev) => {
-      const next = mutate ? mutate(prev) : prev;
-      const screens = buildDiscoveryFlow(next);
-      const current = screens.findIndex((s) => s.key === prev.currentScreen);
-      const from = current >= 0 ? current : 0;
-      const target = Math.min(Math.max(from + direction, 0), screens.length - 1);
-      return { ...next, currentScreen: screens[target]?.key ?? prev.currentScreen };
-    });
-  }, []);
+  const step = useCallback(
+    (direction: 1 | -1, mutate?: (state: HomeDnaState) => HomeDnaState) => {
+      setState((prev) => {
+        const next = mutate ? mutate(prev) : prev;
+        const screens = buildLocalizedDiscoveryFlow(next, locale);
+        const current = screens.findIndex((s) => s.key === prev.currentScreen);
+        const from = current >= 0 ? current : 0;
+        const target = Math.min(Math.max(from + direction, 0), screens.length - 1);
+        return { ...next, currentScreen: screens[target]?.key ?? prev.currentScreen };
+      });
+    },
+    [locale],
+  );
 
   const advance = useCallback((mutate?: (state: HomeDnaState) => HomeDnaState) => step(1, mutate), [step]);
   const back = useCallback(() => step(-1), [step]);
@@ -45,7 +49,15 @@ export function HomeDnaDiscovery() {
 
   return (
     <HomeDnaLayout progress={progress}>
-      <ScreenDefRenderer key={def.key} def={def} state={state} onUpdate={update} onAdvance={advance} onBack={back} />
+      <ScreenDefRenderer
+        key={def.key}
+        def={def}
+        state={state}
+        locale={locale}
+        onUpdate={update}
+        onAdvance={advance}
+        onBack={back}
+      />
     </HomeDnaLayout>
   );
 }
