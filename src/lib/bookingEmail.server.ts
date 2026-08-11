@@ -262,11 +262,7 @@ function emailLayout(locale: BookingLocale, content: string): string {
   return `<!doctype html><html lang="${locale}"><head><meta charset="utf-8"></head><body style="margin:0;background:#f6f4ef;color:#2d2b28;font-family:Arial,sans-serif"><div style="max-width:640px;margin:0 auto;padding:34px 20px"><div style="background:#fff;padding:34px;border-radius:12px;line-height:1.6">${content}</div></div></body></html>`;
 }
 
-function bookingTags(
-  id: string,
-  recipient: "customer" | "internal",
-  locale: BookingLocale,
-) {
+function bookingTags(id: string, recipient: "customer" | "internal", locale: BookingLocale) {
   return [
     { name: "type", value: "consultation-booking" },
     { name: "recipient", value: recipient },
