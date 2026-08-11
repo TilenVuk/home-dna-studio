@@ -8,17 +8,18 @@ import { generateHomeDnaPdf, downloadBlob } from "./reportPdf";
 import { resolveReportImages, type ReportImageAsset } from "./reportImages";
 import { formatEuro } from "./pricing";
 import type { HomeDnaState } from "./homeDnaTypes";
-
-const PDF_FILENAME = "Nuveli-Studio-Home-DNA-Report.pdf";
+import type { Locale } from "@/lib/i18n";
 
 export type HomeDnaDeliveryState = "processing" | "sent" | "generation-error" | "delivery-error";
 
 export function HomeDnaReport({
   state,
+  locale = "sl",
   onDeliveryStateChange,
   onRequireNewVerification,
 }: {
   state: HomeDnaState;
+  locale?: Locale;
   onDeliveryStateChange?: (status: HomeDnaDeliveryState) => void;
   onRequireNewVerification: () => void;
 }) {
@@ -33,6 +34,7 @@ export function HomeDnaReport({
   const [pdfError, setPdfError] = useState<string | null>(null);
   const started = useRef(false);
   const submissionId = useRef<string | null>(null);
+  const pdfFilename = `Nuveli-Studio-Home-DNA-Report-${locale}.pdf`;
 
   const prepareAndSubmit = useCallback(async () => {
     if (preparing) return;
@@ -46,12 +48,13 @@ export function HomeDnaReport({
     onDeliveryStateChange?.("processing");
 
     try {
-      const reportInput = buildReportInput(state);
+      const reportInput = buildReportInput(state, locale);
       const currentReport = report ?? (await generate({ data: reportInput }));
       reportReady = true;
       if (!report) setReport(currentReport);
 
-      const currentPdf = pdfBlob ?? (await withTimeout(createPdfBlob(state, currentReport), 120_000, "PDF timeout"));
+      const currentPdf =
+        pdfBlob ?? (await withTimeout(createPdfBlob(state, currentReport, locale), 120_000, "PDF timeout"));
       pdfReady = true;
       if (!pdfBlob) setPdfBlob(currentPdf);
 
@@ -60,6 +63,7 @@ export function HomeDnaReport({
       const result = await submit({
         data: {
           submissionId: submissionId.current,
+          locale,
           contact: {
             name: state.contact.name,
             email: state.contact.email,
@@ -70,7 +74,7 @@ export function HomeDnaReport({
           summary: reportInput.projectSummary,
           report: currentReport,
           pdfBase64: await blobToBase64(currentPdf),
-          pdfFilename: PDF_FILENAME,
+          pdfFilename,
         },
       });
 
@@ -99,7 +103,7 @@ export function HomeDnaReport({
     } finally {
       setPreparing(false);
     }
-  }, [generate, onDeliveryStateChange, pdfBlob, preparing, report, state, submit]);
+  }, [generate, locale, onDeliveryStateChange, pdfBlob, pdfFilename, preparing, report, state, submit]);
 
   useEffect(() => {
     if (started.current) return;
@@ -114,9 +118,10 @@ export function HomeDnaReport({
     setPdfError(null);
 
     try {
-      const blob = pdfBlob ?? (await withTimeout(createPdfBlob(state, report), 120_000, "PDF timeout"));
+      const blob =
+        pdfBlob ?? (await withTimeout(createPdfBlob(state, report, locale), 120_000, "PDF timeout"));
       if (!pdfBlob) setPdfBlob(blob);
-      downloadBlob(blob, PDF_FILENAME);
+      downloadBlob(blob, pdfFilename);
     } catch (error) {
       console.error(error);
       setPdfError("PDF-ja trenutno ni bilo mogoče ustvariti.");
@@ -128,9 +133,7 @@ export function HomeDnaReport({
   if (generationError) {
     return (
       <div className="mt-16">
-        <p role="alert" className="text-sm text-destructive">
-          {generationError}
-        </p>
+        <p role="alert" className="text-sm text-destructive">{generationError}</p>
         <button
           type="button"
           onClick={onRequireNewVerification}
@@ -153,18 +156,14 @@ export function HomeDnaReport({
   }
 
   const est = state.investment.estimatedInvestment;
-  const { executionLevel } = buildReportInput(state);
+  const { executionLevel } = buildReportInput(state, locale);
   const investmentRange = est ? `${formatEuro(est.min)} – ${formatEuro(est.max)}` : "Po posvetu";
   const images = resolveReportImages(state, report);
 
   return (
     <article className="mt-20 border-t border-border pt-16">
       <div className="mb-12 overflow-hidden rounded-2xl bg-muted">
-        <img
-          src={images.cover.src}
-          alt={images.cover.alt}
-          className="aspect-[16/9] w-full object-cover sm:aspect-[2/1]"
-        />
+        <img src={images.cover.src} alt={images.cover.alt} className="aspect-[16/9] w-full object-cover sm:aspect-[2/1]" />
       </div>
 
       <div className="mb-16">
@@ -200,15 +199,9 @@ export function HomeDnaReport({
           className="inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-7 py-4 text-sm text-primary-foreground disabled:opacity-60"
         >
           {downloadBusy ? (
-            <>
-              <Loader2 size={16} className="animate-spin" />
-              Pripravljamo PDF ...
-            </>
+            <><Loader2 size={16} className="animate-spin" />Pripravljamo PDF ...</>
           ) : (
-            <>
-              <Download size={16} />
-              Prenesi Home DNA™ Report (PDF)
-            </>
+            <><Download size={16} />Prenesi Home DNA™ Report (PDF)</>
           )}
         </button>
 
@@ -216,19 +209,14 @@ export function HomeDnaReport({
       </div>
 
       <Section index="01" title="Dobrodošli v vašem Home DNA™" body={report.intro} />
-
       <Section index="02" title="Vaš življenjski slog" body={report.lifestyle}>
         <ReportImage image={images.lifestyle} className="mt-8 aspect-[16/7]" />
       </Section>
-
       <Section index="03" title="Vaš slog" body={report.style}>
         <div className={`mt-8 grid gap-4 ${images.style.length > 1 ? "sm:grid-cols-2" : ""}`}>
-          {images.style.map((image) => (
-            <ReportImage key={image.id} image={image} className="aspect-[4/3]" />
-          ))}
+          {images.style.map((image) => <ReportImage key={image.id} image={image} className="aspect-[4/3]" />)}
         </div>
       </Section>
-
       <Section index="04" title="Zakaj bo ta dom deloval za vas" body={report.why} />
 
       {report.rooms.length > 0 && (
@@ -241,9 +229,7 @@ export function HomeDnaReport({
                   {image && <ReportImage image={image} className="aspect-[4/3] rounded-none" />}
                   <div className="p-6">
                     <h4 className="font-display text-lg">{room.label}</h4>
-                    <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
-                      {room.text}
-                    </p>
+                    <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{room.text}</p>
                   </div>
                 </div>
               );
@@ -254,18 +240,10 @@ export function HomeDnaReport({
 
       <Section index="06" title="Okvirna investicija">
         <ReportImage image={images.investment} className="mt-8 aspect-[16/7]" />
-
         <dl className="mt-8 grid gap-8 sm:grid-cols-2">
-          <div>
-            <dt className="eyebrow">Ocenjena investicija</dt>
-            <dd className="mt-3 font-display text-2xl">{investmentRange}</dd>
-          </div>
-          <div>
-            <dt className="eyebrow">Raven izvedbe</dt>
-            <dd className="mt-3 font-display text-2xl">{executionLevel}</dd>
-          </div>
+          <div><dt className="eyebrow">Ocenjena investicija</dt><dd className="mt-3 font-display text-2xl">{investmentRange}</dd></div>
+          <div><dt className="eyebrow">Raven izvedbe</dt><dd className="mt-3 font-display text-2xl">{executionLevel}</dd></div>
         </dl>
-
         <p className="mt-6 whitespace-pre-line text-muted-foreground">{report.investment}</p>
       </Section>
 
@@ -274,29 +252,26 @@ export function HomeDnaReport({
           {report.nextSteps.map((step, index) => (
             <li key={`${step.title}-${index}`} className="flex gap-6 border-t py-6">
               <span className="eyebrow">{String(index + 1).padStart(2, "0")}</span>
-              <div>
-                <h4 className="font-display text-lg">{step.title}</h4>
-                <p className="mt-2 whitespace-pre-line text-muted-foreground">{step.text}</p>
-              </div>
+              <div><h4 className="font-display text-lg">{step.title}</h4><p className="mt-2 whitespace-pre-line text-muted-foreground">{step.text}</p></div>
             </li>
           ))}
         </ol>
-
         <p className="mt-8 whitespace-pre-line">{report.closing}</p>
       </Section>
     </article>
   );
 }
 
-async function createPdfBlob(state: HomeDnaState, report: Report): Promise<Blob> {
+async function createPdfBlob(state: HomeDnaState, report: Report, locale: Locale): Promise<Blob> {
   const est = state.investment.estimatedInvestment;
-  const { executionLevel } = buildReportInput(state);
+  const { executionLevel } = buildReportInput(state, locale);
   return generateHomeDnaPdf({
     report,
     images: resolveReportImages(state, report),
     customerName: state.contact.name,
     investmentRange: est ? `${formatEuro(est.min)} – ${formatEuro(est.max)}` : "Po posvetu",
     executionLevel,
+    locale,
   });
 }
 
@@ -327,7 +302,6 @@ async function withTimeout<T>(promise: Promise<T>, milliseconds: number, message
   const timeout = new Promise<never>((_, reject) => {
     timeoutId = window.setTimeout(() => reject(new Error(message)), milliseconds);
   });
-
   try {
     return await Promise.race([promise, timeout]);
   } finally {
@@ -336,22 +310,10 @@ async function withTimeout<T>(promise: Promise<T>, milliseconds: number, message
 }
 
 function ReportImage({ image, className = "" }: { image: ReportImageAsset; className?: string }) {
-  return (
-    <img src={image.src} alt={image.alt} loading="lazy" className={`w-full rounded-2xl object-cover ${className}`} />
-  );
+  return <img src={image.src} alt={image.alt} loading="lazy" className={`w-full rounded-2xl object-cover ${className}`} />;
 }
 
-function Section({
-  index,
-  title,
-  body,
-  children,
-}: {
-  index: string;
-  title: string;
-  body?: string;
-  children?: React.ReactNode;
-}) {
+function Section({ index, title, body, children }: { index: string; title: string; body?: string; children?: React.ReactNode }) {
   return (
     <section className="mb-16">
       <p className="eyebrow">{index}</p>
