@@ -1,13 +1,16 @@
-import { Link } from "@tanstack/react-router";
 import { ArrowDownRight } from "lucide-react";
 
 import heroImage from "@/assets/hero-interior.jpg";
 import heroWebp768 from "@/assets/hero-interior-768.webp";
 import heroWebp1280 from "@/assets/hero-interior-1280.webp";
 import heroWebp1920 from "@/assets/hero-interior-1920.webp";
-import { hero } from "@/content/site";
+import { getSiteCopy } from "@/content/siteLocalized";
+import type { Locale } from "@/lib/i18n";
 
-export function Hero() {
+export function Hero({ locale = "sl" }: { locale?: Locale }) {
+  const t = getSiteCopy(locale).hero;
+  const prefix = locale === "sl" ? "" : `/${locale}`;
+
   return (
     <section id="top" className="relative min-h-[100svh] w-full overflow-hidden">
       <picture className="absolute inset-0 block h-full w-full">
@@ -18,7 +21,7 @@ export function Hero() {
         />
         <img
           src={heroImage}
-          alt="Sodoben skandinavski interjer s hrastovim pohištvom po meri"
+          alt={t.imageAlt}
           width={1920}
           height={1200}
           fetchPriority="high"
@@ -30,30 +33,28 @@ export function Hero() {
 
       <div className="relative mx-auto flex min-h-[100svh] max-w-[1400px] flex-col justify-end px-6 pb-16 pt-32 md:px-10 md:pb-20">
         <p className="eyebrow text-background/80">Nuveli Studio — Home DNA™</p>
-        <h1 className="display-xl mt-6 max-w-[16ch] text-background">{hero.headline}</h1>
+        <h1 className="display-xl mt-6 max-w-[16ch] text-background">{t.headline}</h1>
         <p className="mt-8 max-w-[46ch] text-base leading-relaxed text-background/85 md:text-lg">
-          {hero.sub}
+          {t.sub}
         </p>
 
         <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <Link
-            to="/home-dna"
+          <a
+            href={`${prefix}/home-dna`}
             className="inline-flex items-center justify-center gap-2 rounded-full bg-background px-7 py-4 text-sm text-foreground transition-transform duration-300 hover:-translate-y-0.5"
           >
-            {hero.primaryCta}
+            {t.primaryCta}
             <ArrowDownRight size={16} />
-          </Link>
+          </a>
 
           <a
             href="#projects"
             className="inline-flex items-center justify-center rounded-full border border-background/50 px-7 py-4 text-sm text-background transition-colors hover:bg-background/10"
           >
-            {hero.secondaryCta}
+            {t.secondaryCta}
           </a>
         </div>
-        <p className="mt-4 max-w-[54ch] text-sm leading-relaxed text-background/80">
-          Brezplačen osebni Home DNA™ Report + okvirna ponudba za izbrani obseg projekta.
-        </p>
+        <p className="mt-4 max-w-[54ch] text-sm leading-relaxed text-background/80">{t.note}</p>
       </div>
     </section>
   );
