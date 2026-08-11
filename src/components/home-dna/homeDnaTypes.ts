@@ -278,7 +278,7 @@ export type ReportImageId =
 export interface ReportImageChoice {
   id: ReportImageId;
   label: string;
-  matchReasons?: string[];
+  matchReasons?: string[] | undefined;
 }
 
 export interface ReportImageCandidates {

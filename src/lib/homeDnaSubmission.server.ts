@@ -216,7 +216,7 @@ async function createSubmission(
       internal_email_status: "pending",
     })
     .select(
-      "id, locale, customer_name, customer_email, customer_phone, answers, summary, report, customer_email_status, internal_email_status, customer_resend_id, internal_resend_id, attempt_count",
+      "id, locale, customer_name, customer_email, customer_phone, answers, summary, report, customer_email_status, internal_email_status, customer_resend_id, internal_resend_id, attempt_count, last_error",
     )
     .single();
 

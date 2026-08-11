@@ -389,16 +389,16 @@ function uniqueIds(ids: Array<ReportImageId | undefined>): ReportImageId[] {
 }
 
 interface ImageMatchContext {
-  room?: ReportRoomKey;
+  room?: ReportRoomKey | undefined;
   styles: string[];
-  colour?: string;
-  propertyType?: string;
-  projectStage?: string;
-  size?: RoomSize;
-  kitchenLayout?: string;
-  kitchenWorktop?: string;
-  kitchenFrontMaterial?: KitchenFrontMaterial;
-  wardrobeDoor?: string;
+  colour?: string | undefined;
+  propertyType?: string | undefined;
+  projectStage?: string | undefined;
+  size?: RoomSize | undefined;
+  kitchenLayout?: string | undefined;
+  kitchenWorktop?: string | undefined;
+  kitchenFrontMaterial?: KitchenFrontMaterial | undefined;
+  wardrobeDoor?: string | undefined;
   lifestyle: string[];
 }
 
