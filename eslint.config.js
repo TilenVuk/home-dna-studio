@@ -37,4 +37,10 @@ export default tseslint.config(
     },
   },
   eslintPluginPrettier,
+  {
+    files: ["src/content/siteLocalized.ts"],
+    rules: {
+      "prettier/prettier": "off",
+    },
+  },
 );
