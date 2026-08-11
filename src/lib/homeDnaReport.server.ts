@@ -31,7 +31,7 @@ const ReportSchema = z.object({
 interface ImageChoice {
   id: string;
   label: string;
-  matchReasons?: string[];
+  matchReasons?: string[] | undefined;
 }
 
 interface ReportRequest {

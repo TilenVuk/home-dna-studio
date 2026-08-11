@@ -197,7 +197,7 @@ async function createSubmission(
   email: string,
   ipHash: string,
 ): Promise<SubmissionRow> {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = (await supabaseAdmin
     .from("home_dna_submissions")
     .insert({
       id: input.submissionId,
@@ -214,11 +214,11 @@ async function createSubmission(
       send_status: "processing",
       customer_email_status: "pending",
       internal_email_status: "pending",
-    })
+    } as any)
     .select(
       "id, locale, customer_name, customer_email, customer_phone, answers, summary, report, customer_email_status, internal_email_status, customer_resend_id, internal_resend_id, attempt_count",
     )
-    .single();
+    .single()) as { data: unknown; error: { code?: string; message: string } | null };
 
   if (error) {
     if (error.code === "23505") {

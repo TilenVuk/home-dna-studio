@@ -13,9 +13,9 @@ const fieldClass =
 type ContactData = {
   name: string;
   email: string;
-  phone?: string;
+  phone?: string | undefined;
   projectType: string;
-  message?: string;
+  message?: string | undefined;
 };
 
 export function Contact({ locale = "sl" }: { locale?: Locale }) {
