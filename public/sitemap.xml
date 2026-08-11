@@ -6,6 +6,9 @@
   <url><loc>https://nuvelistudio.com/home-dna</loc><changefreq>monthly</changefreq><priority>0.90</priority></url>
   <url><loc>https://nuvelistudio.com/hr/home-dna</loc><changefreq>monthly</changefreq><priority>0.80</priority></url>
   <url><loc>https://nuvelistudio.com/en/home-dna</loc><changefreq>monthly</changefreq><priority>0.80</priority></url>
+  <url><loc>https://nuvelistudio.com/vsebine</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://nuvelistudio.com/hr/vsebine</loc><changefreq>monthly</changefreq><priority>0.80</priority></url>
+  <url><loc>https://nuvelistudio.com/en/vsebine</loc><changefreq>monthly</changefreq><priority>0.80</priority></url>
   <url><loc>https://nuvelistudio.com/vsebine/kaj-je-home-dna</loc><changefreq>monthly</changefreq><priority>0.80</priority></url>
   <url><loc>https://nuvelistudio.com/hr/vsebine/sto-je-home-dna</loc><changefreq>monthly</changefreq><priority>0.75</priority></url>
   <url><loc>https://nuvelistudio.com/en/vsebine/what-is-home-dna</loc><changefreq>monthly</changefreq><priority>0.75</priority></url>
