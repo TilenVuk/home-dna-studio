@@ -2,33 +2,34 @@ import { useState, type FormEvent } from "react";
 import { Upload, ArrowRight } from "lucide-react";
 import { z } from "zod";
 import { brand } from "@/content/site";
+import { getSiteCopy } from "@/content/siteLocalized";
+import type { Locale } from "@/lib/i18n";
 import { BookingCalendar } from "@/components/booking/BookingCalendar";
 import { Reveal } from "./Reveal";
-
-const schema = z.object({
-  name: z.string().trim().min(2, "Vnesite svoje ime").max(100),
-  email: z.string().trim().email("Vnesite veljaven e-naslov").max(255),
-  phone: z.string().trim().max(40).optional().or(z.literal("")),
-  projectType: z.string().trim().min(1, "Izberite vrsto projekta"),
-  message: z.string().trim().max(1500).optional().or(z.literal("")),
-});
-
-const projectTypes = [
-  "Opremljanje celotnega doma",
-  "Kuhinja",
-  "Garderobna omara",
-  "Pohodna garderoba",
-  "Kopalniško pohištvo",
-  "Dnevni prostor",
-];
 
 const fieldClass =
   "w-full border-0 border-b border-border bg-transparent py-3 text-base outline-none transition-colors placeholder:text-muted-foreground/60 focus:border-forest";
 
-export function Contact() {
+type ContactData = {
+  name: string;
+  email: string;
+  phone?: string;
+  projectType: string;
+  message?: string;
+};
+
+export function Contact({ locale = "sl" }: { locale?: Locale }) {
+  const t = getSiteCopy(locale).contact;
+  const schema = z.object({
+    name: z.string().trim().min(2, t.validationName).max(100),
+    email: z.string().trim().email(t.validationEmail).max(255),
+    phone: z.string().trim().max(40).optional().or(z.literal("")),
+    projectType: z.string().trim().min(1, t.validationProject),
+    message: z.string().trim().max(1500).optional().or(z.literal("")),
+  });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [files, setFiles] = useState<string[]>([]);
-  const [submittedContact, setSubmittedContact] = useState<z.infer<typeof schema> | null>(null);
+  const [submittedContact, setSubmittedContact] = useState<ContactData | null>(null);
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -36,8 +37,8 @@ export function Contact() {
     const parsed = schema.safeParse(data);
     if (!parsed.success) {
       const next: Record<string, string> = {};
-      parsed.error.issues.forEach((i) => {
-        next[String(i.path[0])] = i.message;
+      parsed.error.issues.forEach((issue) => {
+        next[String(issue.path[0])] = issue.message;
       });
       setErrors(next);
       return;
@@ -51,16 +52,15 @@ export function Contact() {
       <div className="grid gap-16 lg:grid-cols-12 lg:gap-20">
         <div className="lg:col-span-4">
           <Reveal>
-            <p className="eyebrow">Kontakt</p>
-            <h2 className="display-lg mt-6 max-w-[14ch]">Začnimo pri vašem življenju</h2>
+            <p className="eyebrow">{t.eyebrow}</p>
+            <h2 className="display-lg mt-6 max-w-[14ch]">{t.title}</h2>
             <p className="mt-8 max-w-[38ch] text-sm leading-relaxed text-muted-foreground">
-              Povejte nam, kako živite. Odgovorimo v dveh delovnih dneh in se dogovorimo za osebni
-              pogovor.
+              {t.intro}
             </p>
             <div className="mt-10 space-y-1 text-sm">
               <p>{brand.email}</p>
               <p>{brand.phone}</p>
-              <p className="text-muted-foreground">{brand.address}</p>
+              <p className="text-muted-foreground">{getSiteCopy(locale).footer.address}</p>
             </div>
           </Reveal>
         </div>
@@ -76,32 +76,33 @@ export function Contact() {
                 message: submittedContact.message ?? "",
               }}
               source="contact"
+              locale={locale}
               initialConsultationType="home-visit"
-              heading="Izberite termin za osebni pogovor"
-              description="Vaši kontaktni podatki so pripravljeni. Za dokončanje rezervacije izberite način srečanja, datum in uro."
+              heading={t.bookingHeading}
+              description={t.bookingDescription}
             />
           ) : (
             <form onSubmit={onSubmit} noValidate className="grid gap-8 sm:grid-cols-2">
-              <Field label="Ime" htmlFor="contact-name" error={errors["name"]}>
+              <Field label={t.name} htmlFor="contact-name" error={errors["name"]}>
                 <input
                   id="contact-name"
                   name="name"
                   autoComplete="name"
                   className={fieldClass}
-                  placeholder="Vaše ime in priimek"
+                  placeholder={t.namePlaceholder}
                 />
               </Field>
-              <Field label="E-pošta" htmlFor="contact-email" error={errors["email"]}>
+              <Field label={t.email} htmlFor="contact-email" error={errors["email"]}>
                 <input
                   id="contact-email"
                   name="email"
                   type="email"
                   autoComplete="email"
                   className={fieldClass}
-                  placeholder="vi@epošta.si"
+                  placeholder={t.emailPlaceholder}
                 />
               </Field>
-              <Field label="Telefon" htmlFor="contact-phone" error={errors["phone"]}>
+              <Field label={t.phone} htmlFor="contact-phone" error={errors["phone"]}>
                 <input
                   id="contact-phone"
                   name="phone"
@@ -111,11 +112,7 @@ export function Contact() {
                   placeholder="+386"
                 />
               </Field>
-              <Field
-                label="Vrsta projekta"
-                htmlFor="contact-project-type"
-                error={errors["projectType"]}
-              >
+              <Field label={t.projectType} htmlFor="contact-project-type" error={errors["projectType"]}>
                 <select
                   id="contact-project-type"
                   name="projectType"
@@ -123,19 +120,19 @@ export function Contact() {
                   className={fieldClass}
                 >
                   <option value="" disabled>
-                    Izberite
+                    {t.choose}
                   </option>
-                  {projectTypes.map((p) => (
-                    <option key={p} value={p}>
-                      {p}
+                  {t.projectTypes.map((projectType) => (
+                    <option key={projectType} value={projectType}>
+                      {projectType}
                     </option>
                   ))}
                 </select>
               </Field>
-              <Field label="Slike za navdih" htmlFor="contact-inspiration" error={undefined}>
+              <Field label={t.inspiration} htmlFor="contact-inspiration" error={undefined}>
                 <label className="flex cursor-pointer items-center gap-3 border-b border-border py-3 text-sm text-muted-foreground transition-colors hover:text-foreground">
                   <Upload size={16} />
-                  {files.length ? `Izbranih datotek: ${files.length}` : "Naložite slike"}
+                  {files.length ? t.selectedFiles(files.length) : t.upload}
                   <input
                     id="contact-inspiration"
                     type="file"
@@ -145,7 +142,7 @@ export function Contact() {
                     onChange={(e) =>
                       setFiles(
                         Array.from(e.target.files ?? [])
-                          .map((f) => f.name)
+                          .map((file) => file.name)
                           .slice(0, 10),
                       )
                     }
@@ -153,14 +150,14 @@ export function Contact() {
                 </label>
               </Field>
               <div className="sm:col-span-2">
-                <Field label="Sporočilo" htmlFor="contact-message" error={errors["message"]}>
+                <Field label={t.message} htmlFor="contact-message" error={errors["message"]}>
                   <textarea
                     id="contact-message"
                     name="message"
                     rows={4}
                     maxLength={1500}
                     className={`${fieldClass} resize-none`}
-                    placeholder="Povejte nam o svojem domu, časovnici in kaj želite rešiti."
+                    placeholder={t.messagePlaceholder}
                   />
                 </Field>
               </div>
@@ -169,7 +166,7 @@ export function Contact() {
                   type="submit"
                   className="inline-flex items-center gap-2 rounded-full bg-primary px-8 py-4 text-sm text-primary-foreground transition-transform hover:-translate-y-0.5"
                 >
-                  Nadaljujte na izbiro termina <ArrowRight size={16} />
+                  {t.submit} <ArrowRight size={16} />
                 </button>
               </div>
             </form>
