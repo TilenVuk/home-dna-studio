@@ -149,6 +149,27 @@ supabase/migrations/20260806101500_home_dna_report_protection.sql
 
 It provides the database-side rate limiting used before report generation. The implementation stores a one-way SHA-256 hash derived from the requester IP rather than the original IP address.
 
+## First-party funnel analytics
+
+Anonymous Home DNA™ and consultation funnel events are stored in:
+
+```text
+public.home_dna_analytics_events
+```
+
+The events cover questionnaire views, starts, per-screen views and completions, report and PDF generation, errors, PDF downloads, booking views, slot selection and confirmed consultations. Each event also includes locale, temporary page-session ID, device category, viewport width, landing path, external referrer and UTM campaign fields.
+
+The analytics records intentionally exclude names, email addresses, phone numbers, IP addresses, questionnaire answers and persistent browser identifiers. A temporary session ID exists only for the current page load.
+
+Aggregated reporting is available through:
+
+```text
+public.home_dna_funnel_daily
+public.home_dna_step_funnel_daily
+```
+
+Meta and Google event forwarding is consent-gated in `src/lib/useAnalytics.ts`. It remains disabled unless a consent-management implementation explicitly sets `window.__NUVELI_MARKETING_CONSENT__` to `true` and loads the relevant provider scripts.
+
 ## Home DNA™ report generation
 
 The production report flow calls Gemini directly from the server-side Cloudflare Worker.

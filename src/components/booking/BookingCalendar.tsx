@@ -19,6 +19,7 @@ import {
 } from "@/lib/booking.functions";
 import { addCalendarDays, BOOKING_TIME_ZONE } from "@/lib/bookingSlots";
 import type { Locale } from "@/lib/i18n";
+import { useAnalytics } from "@/lib/useAnalytics";
 
 export interface BookingContact {
   name: string;
@@ -177,6 +178,7 @@ export function BookingCalendar({
   className = "",
 }: BookingCalendarProps) {
   const t = copy[locale];
+  const track = useAnalytics(locale, source);
   const dateFormatter = useMemo(
     () =>
       new Intl.DateTimeFormat(localeCodes[locale], {
@@ -237,17 +239,25 @@ export function BookingCalendar({
     } catch (loadError) {
       console.error(loadError);
       setError(t.loadError);
+      track("booking_error", {
+        details: {
+          stage: "schedule",
+          result: "failed",
+          errorCode: analyticsErrorCode(loadError),
+        },
+      });
       return false;
     } finally {
       setLoading(false);
     }
-  }, [getSchedule, t.loadError]);
+  }, [getSchedule, t.loadError, track]);
 
   useEffect(() => {
     if (started.current) return;
     started.current = true;
+    track("booking_view");
     void loadSchedule();
-  }, [loadSchedule]);
+  }, [loadSchedule, track]);
 
   const activeWeek = schedule?.weekStarts[weekIndex];
   const activeDays = useMemo(
@@ -272,6 +282,7 @@ export function BookingCalendar({
     if (!selectedStart || submitting) return;
     setSubmitting(true);
     setError(null);
+    track("booking_submit", { details: { stage: "booking", consultationType } });
 
     try {
       const result = await reserveSlot({
@@ -295,8 +306,20 @@ export function BookingCalendar({
         customerEmailStatus: result.customerEmailStatus,
         internalEmailStatus: result.internalEmailStatus,
       });
+      track("consultation_booked", {
+        bookingId: result.bookingId,
+        details: { stage: "booking", result: "success", consultationType },
+      });
     } catch (reservationError) {
       console.error(reservationError);
+      track("booking_error", {
+        details: {
+          stage: "booking",
+          result: "failed",
+          consultationType,
+          errorCode: analyticsErrorCode(reservationError),
+        },
+      });
       setSelectedStart(null);
       const refreshed = await loadSchedule();
       if (refreshed) setError(t.reserveError);
@@ -422,7 +445,12 @@ export function BookingCalendar({
                             key={slot.start}
                             type="button"
                             aria-pressed={selected}
-                            onClick={() => setSelectedStart(slot.start)}
+                            onClick={() => {
+                              setSelectedStart(slot.start);
+                              track("booking_slot_selected", {
+                                details: { stage: "booking", consultationType },
+                              });
+                            }}
                             className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-full border px-3 py-2 text-sm transition-colors ${
                               selected
                                 ? "border-primary bg-primary text-primary-foreground"
@@ -485,6 +513,11 @@ export function BookingCalendar({
       )}
     </section>
   );
+}
+
+function analyticsErrorCode(error: unknown): string {
+  const message = error instanceof Error ? error.message.toUpperCase() : "UNKNOWN_ERROR";
+  return message.match(/[A-Z][A-Z0-9_]{2,79}/)?.[0] ?? "UNKNOWN_ERROR";
 }
 
 function TypeButton({
