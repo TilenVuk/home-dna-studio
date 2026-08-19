@@ -1,7 +1,7 @@
 import { roomOptions, styleOptions, colourDirectionOptions } from "./homeDnaData";
 import { executionLevelOptions, kitchenFrontMaterialLabels } from "./discoveryData";
 import { buildReportImageCandidates } from "./reportImages";
-import { kitchenWallLengthCm } from "./pricing";
+import { getRoomQuantity, kitchenWallLengthCm } from "./pricing";
 import type { HomeDnaState, ReportImageCandidates, RoomKey } from "./homeDnaTypes";
 import type { Locale } from "@/lib/i18n";
 
@@ -151,9 +151,9 @@ export function roomLabelForState(
   state: HomeDnaState,
   locale: Locale = "sl",
 ): string {
-  if (key !== "children-room") return roomLabel(key, locale);
-  const count = state.home.childrenCount ?? 1;
-  return `${roomLabel(key, locale)} (${count}${state.home.childrenCountPlus ? "+" : ""})`;
+  if (!["wardrobe", "bathroom", "children-room"].includes(key)) return roomLabel(key, locale);
+  const quantity = getRoomQuantity(state, key);
+  return `${roomLabel(key, locale)} (${quantity.value}${quantity.plus ? "+" : ""})`;
 }
 
 const styleLabel = (value: string) => styleOptions.find((s) => s.value === value)?.title ?? value;

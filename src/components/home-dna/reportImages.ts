@@ -60,7 +60,7 @@ import type {
   ReportImageId,
   RoomKey,
 } from "./homeDnaTypes";
-import { kitchenWallLengthCm } from "./pricing";
+import { getRoomQuantity, kitchenWallLengthCm } from "./pricing";
 
 type ReportRoomKey = Exclude<RoomKey, "complete-home">;
 type RoomSize = "compact" | "medium" | "generous";
@@ -649,14 +649,17 @@ export function buildReportImageCandidates(state: HomeDnaState): ReportImageCand
       [...selectedStyles, colourImage, "detail-material", "style-intro"],
       imageContext(state),
     ),
-    rooms: selectedRooms.map((key) => ({
-      key,
-      label:
-        key === "children-room"
-          ? `${roomLabels[key]} (${state.home.childrenCount ?? 1}${state.home.childrenCountPlus ? "+" : ""})`
+    rooms: selectedRooms.map((key) => {
+      const quantity = getRoomQuantity(state, key);
+      const showQuantity = ["wardrobe", "bathroom", "children-room"].includes(key);
+      return {
+        key,
+        label: showQuantity
+          ? `${roomLabels[key]} (${quantity.value}${quantity.plus ? "+" : ""})`
           : roomLabels[key],
-      images: rankChoices(roomImageIds(key, state), imageContext(state, key)),
-    })),
+        images: rankChoices(roomImageIds(key, state), imageContext(state, key)),
+      };
+    }),
   };
 }
 

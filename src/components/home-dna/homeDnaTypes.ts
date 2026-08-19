@@ -89,6 +89,8 @@ export interface KitchenState {
 }
 
 export interface WardrobeState {
+  quantity?: number;
+  quantityPlus?: boolean;
   users?: string;
   storageTypes: string[];
   hangingPriority?: Priority;
@@ -136,6 +138,8 @@ export interface UtilityRoomState {
 }
 
 export interface BathroomState {
+  quantity?: number;
+  quantityPlus?: boolean;
   users?: string;
   width?: number;
   singleOrDoubleSink?: "single" | "double";

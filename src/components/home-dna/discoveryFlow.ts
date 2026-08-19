@@ -106,7 +106,12 @@ function applyRoomScope(state: HomeDnaState, selectedRooms: RoomKey[]): HomeDnaS
   if (!shouldAskHobbies(selectedRooms)) lifestyle.hobbies = [];
   if (!lifestyle.currentChallenges.includes(otherChallengeLabel)) delete lifestyle.challengeNote;
 
-  return { ...state, selectedRooms, lifestyle };
+  const rooms = { ...state.rooms };
+  if (scopeIncludes(selectedRooms, "wardrobe") && rooms.bedroom?.wardrobe) {
+    rooms.bedroom = { ...rooms.bedroom, wardrobe: false };
+  }
+
+  return { ...state, selectedRooms, lifestyle, rooms };
 }
 
 /* ---------------- about your home ---------------- */

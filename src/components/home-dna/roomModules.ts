@@ -17,7 +17,7 @@ import {
   wardrobeStorageOptions,
   worktopOptions,
 } from "./discoveryData";
-import { priorityLevels, setRoom, type ScreenDef } from "./screenDef";
+import { hasRoom, priorityLevels, setRoom, type ScreenDef } from "./screenDef";
 import type {
   HomeDnaState,
   KitchenFrontMaterial,
@@ -325,15 +325,34 @@ function wardrobeScreens(state: HomeDnaState): ScreenDef[] {
       key: "wardrobe-intro",
       eyebrow: "Garderoba",
       headline: "Najprej moramo razumeti, kaj bo omara dejansko shranjevala.",
-      body: "Notranja razporeditev se mora prilagoditi vašim oblačilom, obutvi in vsakodnevnim navadam.",
+      body: "Najprej določimo število garderob, nato opišete eno tipično garderobo, po kateri pripravimo skupno oceno.",
       cta: "Načrtujmo notranjost",
       image: projectCloset,
       prominentEyebrow: true,
     },
     {
       kind: "choice",
+      key: "wardrobe-quantity",
+      headline: "Koliko garderob vključuje projekt?",
+      support:
+        "Naslednji odgovori veljajo za eno tipično garderobo; okvirno investicijo pomnožimo s številom. Pri 4+ računamo najmanj štiri.",
+      options: ["1", "2", "3", "4+"].map((value) => ({ value, label: value })),
+      value:
+        w.quantity === undefined
+          ? undefined
+          : w.quantityPlus
+            ? `${w.quantity}+`
+            : String(w.quantity),
+      apply: (s, value) =>
+        setRoom(s, "wardrobe", {
+          quantity: value === "4+" ? 4 : Number(value),
+          quantityPlus: value === "4+",
+        }),
+    },
+    {
+      kind: "choice",
       key: "wardrobe-users",
-      headline: "Koliko oseb bo uporabljalo to garderobo?",
+      headline: "Koliko oseb bo uporabljalo posamezno garderobo?",
       support: "Podatek pomaga pravilno razdeliti notranjost omare in določiti ločene cone.",
       options: [
         { value: "1", label: "1 oseba" },
@@ -780,15 +799,34 @@ function bathroomScreens(state: HomeDnaState): ScreenDef[] {
       key: "bathroom-intro",
       eyebrow: "Kopalnica",
       headline: "Umirjen prostor potrebuje jasno organizacijo vsakodnevnih predmetov.",
-      body: "Zanima nas stena, namenjena pohištvu, in način vsakodnevne uporabe.",
+      body: "Najprej določimo število kopalnic, nato opišete pohištvo v eni tipični kopalnici, po kateri pripravimo skupno oceno.",
       cta: "Nadaljujmo",
       image: projectBathroom,
       prominentEyebrow: true,
     },
     {
       kind: "choice",
+      key: "bathroom-quantity",
+      headline: "Koliko kopalnic vključuje projekt?",
+      support:
+        "Naslednji odgovori opisujejo pohištvo v eni tipični kopalnici; okvirno investicijo pomnožimo s številom. Pri 4+ računamo najmanj štiri.",
+      options: ["1", "2", "3", "4+"].map((value) => ({ value, label: value })),
+      value:
+        b.quantity === undefined
+          ? undefined
+          : b.quantityPlus
+            ? `${b.quantity}+`
+            : String(b.quantity),
+      apply: (s, value) =>
+        setRoom(s, "bathroom", {
+          quantity: value === "4+" ? 4 : Number(value),
+          quantityPlus: value === "4+",
+        }),
+    },
+    {
+      kind: "choice",
       key: "bathroom-users",
-      headline: "Koliko oseb redno uporablja to kopalnico?",
+      headline: "Koliko oseb redno uporablja posamezno kopalnico?",
       support:
         "To vpliva na količino shranjevanja, širino umivalniškega sestava in organizacijo predalov.",
       options: [
@@ -863,6 +901,16 @@ function bathroomScreens(state: HomeDnaState): ScreenDef[] {
 
 function bedroomScreens(state: HomeDnaState): ScreenDef[] {
   const b = state.rooms.bedroom ?? {};
+  const wardrobeHandledSeparately = hasRoom(state, "wardrobe");
+  const furnitureEntries: Array<[string, boolean | undefined]> = [
+    ...(wardrobeHandledSeparately
+      ? []
+      : ([[bedroomWardrobe, b.wardrobe]] as Array<[string, boolean | undefined]>)),
+    [bedroomBedFrame, b.bedFrame],
+    [bedroomBedsideTables, b.bedsideTables],
+    [bedroomDressingTable, b.dressingTable],
+    [bedroomTvWall, b.tvWall],
+  ];
   const screens: ScreenDef[] = [
     {
       kind: "editorial",
@@ -879,23 +927,11 @@ function bedroomScreens(state: HomeDnaState): ScreenDef[] {
       key: "bedroom-furniture",
       headline: "Katere elemente želite vključiti v spalnico?",
       support: "Izberite vse elemente, ki naj bodo del celostne rešitve po meri.",
-      options: [
-        bedroomWardrobe,
-        bedroomBedFrame,
-        bedroomBedsideTables,
-        bedroomDressingTable,
-        bedroomTvWall,
-      ],
-      selected: selectedBooleanOptions([
-        [bedroomWardrobe, b.wardrobe],
-        [bedroomBedFrame, b.bedFrame],
-        [bedroomBedsideTables, b.bedsideTables],
-        [bedroomDressingTable, b.dressingTable],
-        [bedroomTvWall, b.tvWall],
-      ]),
+      options: furnitureEntries.map(([label]) => label),
+      selected: selectedBooleanOptions(furnitureEntries),
       apply: (s, features) =>
         setRoom(s, "bedroom", {
-          wardrobe: features.includes(bedroomWardrobe),
+          wardrobe: !wardrobeHandledSeparately && features.includes(bedroomWardrobe),
           bedFrame: features.includes(bedroomBedFrame),
           bedsideTables: features.includes(bedroomBedsideTables),
           dressingTable: features.includes(bedroomDressingTable),
@@ -906,8 +942,9 @@ function bedroomScreens(state: HomeDnaState): ScreenDef[] {
       kind: "number",
       key: "bedroom-furniture-width",
       headline: "Kolikšna je skupna dolžina pohištva po meri?",
-      support:
-        "Seštejte približno dolžino omare, posteljnega sestava in drugih izbranih elementov.",
+      support: wardrobeHandledSeparately
+        ? "Seštejte približno dolžino posteljnega sestava in drugih izbranih elementov brez garderob."
+        : "Seštejte približno dolžino omare, posteljnega sestava in drugih izbranih elementov.",
       unit: "cm",
       min: 100,
       max: 1200,
