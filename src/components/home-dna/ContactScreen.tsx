@@ -29,7 +29,8 @@ const copy = {
       name: "Vpišite svoje ime.",
       email: "Vpišite veljaven e-naslov.",
       consent: "Za pripravo poročila potrebujemo vaše soglasje.",
-      config: "Varnostna zaščita obrazca ni konfigurirana.",
+      config:
+        "Trenutno ni mogoče nadaljevati. Poskusite znova pozneje ali nam pišite na info@nuvelistudio.com.",
       verify: "Počakajte, da se varnostno preverjanje zaključi.",
       widget: "Varnostnega preverjanja ni bilo mogoče naložiti.",
     },
@@ -52,7 +53,8 @@ const copy = {
       name: "Unesite svoje ime.",
       email: "Unesite valjanu e-mail adresu.",
       consent: "Za pripremu izvještaja potrebna je vaša suglasnost.",
-      config: "Sigurnosna zaštita obrasca nije konfigurirana.",
+      config:
+        "Trenutačno nije moguće nastaviti. Pokušajte ponovno kasnije ili nam pišite na info@nuvelistudio.com.",
       verify: "Pričekajte da sigurnosna provjera završi.",
       widget: "Sigurnosnu provjeru nije bilo moguće učitati.",
     },
@@ -75,7 +77,8 @@ const copy = {
       name: "Enter your name.",
       email: "Enter a valid email address.",
       consent: "We need your consent to prepare the report.",
-      config: "Form security is not configured.",
+      config:
+        "You cannot continue right now. Please try again later or email us at info@nuvelistudio.com.",
       verify: "Wait for the security check to finish.",
       widget: "The security check could not be loaded.",
     },

@@ -33,21 +33,18 @@ export function RoomSelection({
     locale === "hr"
       ? {
           headline: "Koje prostore želite urediti?",
-          support:
-            "Odaberite jedan prostor, više prostora ili cijeli dom. Discovery ćemo automatski prilagoditi opsegu vašeg projekta.",
+          support: "Odaberite jedan prostor, više prostora ili cijeli dom.",
           aria: "Odabir prostora",
         }
       : locale === "en"
         ? {
             headline: "Which spaces would you like to design?",
-            support:
-              "Choose one room, several rooms or the whole home. Discovery will automatically adapt to your project scope.",
+            support: "Choose one room, several rooms or the whole home.",
             aria: "Room selection",
           }
         : {
             headline: "Katere prostore želite urediti?",
-            support:
-              "Izberite en prostor, več prostorov ali celoten dom. Discovery bomo samodejno prilagodili obsegu vašega projekta.",
+            support: "Izberite en prostor, več prostorov ali celoten dom.",
             aria: "Izbira prostorov",
           };
 
@@ -64,13 +61,6 @@ export function RoomSelection({
     const allSelected = individualRoomKeys.every((r) => individualsOnly.includes(r));
     onChange(allSelected ? [completeHomeKey, ...individualRoomKeys] : individualsOnly);
   };
-
-  const childrenDescription = (quantity: string) =>
-    locale === "hr"
-      ? `Odabir znači ${quantity} ${childrenCount === 1 ? "dječju sobu" : "dječje sobe"}; procjena investicije automatski se množi brojem djece.`
-      : locale === "en"
-        ? `This selection represents ${quantity} ${childrenCount === 1 ? "children's room" : "children's rooms"}; the investment estimate is automatically multiplied by the number of children.`
-        : `Izbor pomeni ${quantity} ${childrenCount === 1 ? "otroško sobo" : "otroške sobe"}; ocena investicije se samodejno pomnoži s številom otrok.`;
 
   return (
     <div>
@@ -92,11 +82,7 @@ export function RoomSelection({
               key={room.key}
               image={room.image}
               title={isChildrenRoom && quantity ? `${title} (${quantity})` : title}
-              description={
-                isChildrenRoom && quantity
-                  ? childrenDescription(quantity)
-                  : (uiText(locale, room.description) ?? room.description)
-              }
+              description={uiText(locale, room.description) ?? room.description}
               multiSelect
               selected={selectedRooms.includes(room.key)}
               onSelect={() => toggle(room.key)}

@@ -147,8 +147,6 @@ function homeScreens(state: HomeDnaState): ScreenDef[] {
       kind: "choice",
       key: "household-size",
       headline: "Koliko ljudi bo uporabljalo ta dom?",
-      support:
-        "V naslednjem koraku vprašamo, koliko je med njimi otrok; otroci so že vključeni v skupno število.",
       options: householdSizeOptions.map((o) => ({ value: o, label: o })),
       value:
         home.householdSize === undefined
@@ -205,7 +203,6 @@ function homeScreens(state: HomeDnaState): ScreenDef[] {
       kind: "choice",
       key: "children-count",
       headline: "Koliko otrok bo uporabljalo dom?",
-      support: "Število otrok je že vključeno v skupno število oseb.",
       options: childrenCountOptionsForHousehold(home.householdSize, home.householdSizePlus).map(
         (o) => ({ value: o, label: o }),
       ),
@@ -369,7 +366,6 @@ function lifestyleScreens(state: HomeDnaState): ScreenDef[] {
       kind: "choice",
       key: "work-from-home-frequency",
       headline: "Kako pogosto delate od doma?",
-      support: "Vprašanje prikažemo le tam, kjer lahko izbrani prostor vključuje delovno mesto.",
       options: workFromHomeOptions.map((option) => ({
         value: option.value,
         label: option.label,
@@ -398,7 +394,7 @@ function lifestyleScreens(state: HomeDnaState): ScreenDef[] {
     kind: "multi",
     key: "challenges",
     headline: "Kaj vas pri teh prostorih trenutno najbolj ovira?",
-    support: "Prikazane so samo težave, povezane z izbranimi prostori. Izberite največ tri.",
+    support: "Izberite največ tri.",
     options: challenges,
     max: 3,
     limitNotice: "Izberete lahko največ tri izzive.",
@@ -421,7 +417,6 @@ function lifestyleScreens(state: HomeDnaState): ScreenDef[] {
     kind: "multi",
     key: "future-needs",
     headline: "Kako naj se izbrani prostori prilagajajo prihodnosti?",
-    support: "Prikazane so samo spremembe, ki lahko vplivajo na izbrani obseg projekta.",
     options: futureNeeds,
     exclusive: noFutureChangesLabel,
     selected: life.futureNeeds.filter((value) => futureNeeds.includes(value)),
