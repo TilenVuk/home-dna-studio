@@ -94,6 +94,11 @@ export function NumberScreen({
               setInput(e.target.value);
               setError(null);
             }}
+            onKeyDown={(event) => {
+              if (event.key !== "Enter") return;
+              event.preventDefault();
+              handleNext();
+            }}
             aria-describedby={error ? `${screenKey}-error` : `${screenKey}-hint`}
             aria-invalid={Boolean(error)}
             className="w-full min-w-0 bg-transparent font-display text-5xl tracking-[-0.04em] outline-none placeholder:text-muted-foreground/40 focus-visible:outline-none"

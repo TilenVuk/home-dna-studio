@@ -21,11 +21,15 @@ const hr: CopyMap = {
   },
   "property-type": { headline: "Kakav dom opremate?" },
   "household-size": {
-    headline: "Koliko će odraslih živjeti u domu?",
-    support: "Broj djece pitamo odvojeno kako bi struktura kućanstva bila potpuno jasna.",
+    headline: "Koliko će ljudi koristiti ovaj dom?",
+    support:
+      "U sljedećem koraku pitamo koliko je među njima djece; djeca su već uključena u ukupan broj.",
   },
   children: { headline: "Hoće li u domu živjeti djeca?" },
-  "children-count": { headline: "Koliko će djece živjeti u domu?" },
+  "children-count": {
+    headline: "Koliko će djece živjeti u domu?",
+    support: "Broj djece već je uključen u ukupan broj osoba.",
+  },
   pets: {
     headline: "Žive li s vama kućni ljubimci?",
     support: "Utječu na izbor materijala, održavanje i organizaciju odabranih prostora.",
@@ -131,11 +135,16 @@ const hr: CopyMap = {
   "wardrobe-intro": {
     eyebrow: "Garderoba",
     headline: "Najprije moramo razumjeti što će ormar stvarno spremati.",
-    body: "Unutarnji raspored treba se prilagoditi vašoj odjeći, obući i svakodnevnim navikama.",
+    body: "Najprije određujemo broj garderoba, a zatim opisujete jednu tipičnu garderobu prema kojoj pripremamo ukupnu procjenu.",
     cta: "Planirajmo unutrašnjost",
   },
+  "wardrobe-quantity": {
+    headline: "Koliko garderoba uključuje projekt?",
+    support:
+      "Sljedeći odgovori vrijede za jednu tipičnu garderobu; okvirnu investiciju množimo s brojem. Za 4+ računamo najmanje četiri.",
+  },
   "wardrobe-users": {
-    headline: "Koliko će osoba koristiti ovu garderobu?",
+    headline: "Koliko će osoba koristiti pojedinu garderobu?",
     support: "Podatak pomaže pravilno podijeliti unutrašnjost i definirati odvojene zone.",
   },
   "wardrobe-storage-types": {
@@ -222,11 +231,16 @@ const hr: CopyMap = {
   "bathroom-intro": {
     eyebrow: "Kupaonica",
     headline: "Miran prostor treba jasnu organizaciju svakodnevnih predmeta.",
-    body: "Zanima nas zid namijenjen namještaju i način svakodnevne uporabe.",
+    body: "Najprije određujemo broj kupaonica, a zatim opisujete namještaj u jednoj tipičnoj kupaonici prema kojoj pripremamo ukupnu procjenu.",
     cta: "Nastavimo",
   },
+  "bathroom-quantity": {
+    headline: "Koliko kupaonica uključuje projekt?",
+    support:
+      "Sljedeći odgovori opisuju namještaj u jednoj tipičnoj kupaonici; okvirnu investiciju množimo s brojem. Za 4+ računamo najmanje četiri.",
+  },
   "bathroom-users": {
-    headline: "Koliko osoba redovito koristi ovu kupaonicu?",
+    headline: "Koliko osoba redovito koristi pojedinu kupaonicu?",
     support: "To utječe na količinu spremanja, širinu umivaoničkog elementa i organizaciju ladica.",
   },
   "bathroom-width": {
@@ -286,11 +300,15 @@ const en: CopyMap = {
   },
   "property-type": { headline: "What type of home are you furnishing?" },
   "household-size": {
-    headline: "How many adults will live in the home?",
-    support: "We ask about children separately so the household structure is completely clear.",
+    headline: "How many people will use this home?",
+    support:
+      "In the next step we ask how many of them are children; children are already included in the total.",
   },
   children: { headline: "Will children live in the home?" },
-  "children-count": { headline: "How many children will live in the home?" },
+  "children-count": {
+    headline: "How many children will live in the home?",
+    support: "The number of children is already included in the total household size.",
+  },
   pets: {
     headline: "Do you live with pets?",
     support: "Pets affect material choices, maintenance and the organisation of selected spaces.",
@@ -396,11 +414,16 @@ const en: CopyMap = {
   "wardrobe-intro": {
     eyebrow: "Wardrobe",
     headline: "First we need to understand what the wardrobe will actually store.",
-    body: "The internal layout should adapt to your clothes, shoes and everyday habits.",
+    body: "First we set the number of wardrobes, then you describe one typical wardrobe that we use for the overall estimate.",
     cta: "Plan the interior",
   },
+  "wardrobe-quantity": {
+    headline: "How many wardrobes are included in the project?",
+    support:
+      "The following answers apply to one typical wardrobe; we multiply the indicative estimate by the quantity. For 4+, we calculate at least four.",
+  },
   "wardrobe-users": {
-    headline: "How many people will use this wardrobe?",
+    headline: "How many people will use each wardrobe?",
     support: "This helps divide the interior correctly and define separate zones.",
   },
   "wardrobe-storage-types": {
@@ -485,11 +508,16 @@ const en: CopyMap = {
   "bathroom-intro": {
     eyebrow: "Bathroom",
     headline: "A calm space needs clear organisation for everyday items.",
-    body: "We need the wall intended for furniture and how the bathroom is used each day.",
+    body: "First we set the number of bathrooms, then you describe the furniture in one typical bathroom that we use for the overall estimate.",
     cta: "Continue",
   },
+  "bathroom-quantity": {
+    headline: "How many bathrooms are included in the project?",
+    support:
+      "The following answers describe the furniture in one typical bathroom; we multiply the indicative estimate by the quantity. For 4+, we calculate at least four.",
+  },
   "bathroom-users": {
-    headline: "How many people regularly use this bathroom?",
+    headline: "How many people regularly use each bathroom?",
     support: "This affects storage volume, vanity width and drawer organisation.",
   },
   "bathroom-width": {
@@ -547,17 +575,6 @@ const dictionaries: Record<Exclude<Locale, "sl">, CopyMap> = { hr, en };
 
 export function buildLocalizedDiscoveryFlow(state: HomeDnaState, locale: Locale): ScreenDef[] {
   return buildDiscoveryFlow(state).map((screen) => {
-    if (screen.key === "household-size") {
-      const localized = locale === "sl" ? undefined : dictionaries[locale][screen.key];
-      return {
-        ...screen,
-        headline: localized?.headline ?? "Koliko odraslih bo živelo v domu?",
-        support:
-          localized?.support ??
-          "Število otrok vprašamo ločeno, da je sestava gospodinjstva popolnoma jasna.",
-      } as ScreenDef;
-    }
-
     if (screen.key === "children-room-intro" && screen.kind === "editorial" && locale !== "sl") {
       const quantity = state.home.childrenCount ?? 1;
       const quantityLabel = `${quantity}${state.home.childrenCountPlus ? "+" : ""}`;
@@ -576,6 +593,20 @@ export function buildLocalizedDiscoveryFlow(state: HomeDnaState, locale: Locale)
         headline: `We will adapt one shared concept for ${quantityLabel} ${quantity === 1 ? "children's room" : "children's rooms"}.`,
         body: "Answers apply to one room; the indicative investment estimate is automatically multiplied by the number of children.",
         cta: "Plan the children's rooms",
+      };
+    }
+
+    if (
+      screen.key === "bedroom-furniture-width" &&
+      locale !== "sl" &&
+      (state.selectedRooms.includes("complete-home") || state.selectedRooms.includes("wardrobe"))
+    ) {
+      return {
+        ...screen,
+        support:
+          locale === "hr"
+            ? "Zbrojite približnu duljinu kreveta i drugih odabranih elemenata bez garderoba."
+            : "Add the approximate lengths of the bed composition and other selected elements, excluding wardrobes.",
       };
     }
 

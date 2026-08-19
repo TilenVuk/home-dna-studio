@@ -16,7 +16,7 @@ const localizedWelcome: Record<Locale, typeof welcomeCopy> = {
       "Osebne funkcionalne in oblikovne smernice",
       "Okvirna ponudba glede na izbrane prostore, materiale in nivo izvedbe",
     ],
-    time: "Približno 3–10 minut, odvisno od obsega projekta.",
+    time: "Približno 5–15 minut, odvisno od obsega projekta.",
     cta: "Začni Home DNA™ Discovery",
   },
   hr: {
@@ -28,7 +28,7 @@ const localizedWelcome: Record<Locale, typeof welcomeCopy> = {
       "Osobne funkcionalne i oblikovne smjernice",
       "Okvirna ponuda prema odabranim prostorima, materijalima i razini izvedbe",
     ],
-    time: "Približno 3–10 minuta, ovisno o opsegu projekta.",
+    time: "Približno 5–15 minuta, ovisno o opsegu projekta.",
     cta: "Pokreni Home DNA™ Discovery",
   },
   en: {
@@ -40,7 +40,7 @@ const localizedWelcome: Record<Locale, typeof welcomeCopy> = {
       "Personal functional and design priorities",
       "Indicative proposal based on selected rooms, materials and execution level",
     ],
-    time: "About 3–10 minutes, depending on the project scope.",
+    time: "About 5–15 minutes, depending on the project scope.",
     cta: "Start Home DNA™ Discovery",
   },
 };

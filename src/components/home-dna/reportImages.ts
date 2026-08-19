@@ -10,7 +10,7 @@ import stageNewBuild from "@/assets/stage-new-build.jpg";
 import stageFullRenovation from "@/assets/stage-full-renovation.jpg";
 import stagePartialRenovation from "@/assets/stage-partial-renovation.jpg";
 import styleWarmModern from "@/assets/style-warm-modern.jpg";
-import styleMinimal from "@/assets/style-minimal.jpg.asset.json";
+import styleMinimal from "@/assets/style-minimal.jpg";
 import styleScandinavian from "@/assets/style-scandinavian.jpg";
 import styleJapandi from "@/assets/style-japandi.jpg";
 import styleNatural from "@/assets/style-natural.jpg";
@@ -60,7 +60,7 @@ import type {
   ReportImageId,
   RoomKey,
 } from "./homeDnaTypes";
-import { kitchenWallLengthCm } from "./pricing";
+import { getRoomQuantity, kitchenWallLengthCm } from "./pricing";
 
 type ReportRoomKey = Exclude<RoomKey, "complete-home">;
 type RoomSize = "compact" | "medium" | "generous";
@@ -145,7 +145,7 @@ export const REPORT_IMAGES: Record<ReportImageId, ReportImageAsset> = {
   "style-warm-modern": asset("style-warm-modern", styleWarmModern, "Toplo modern slog", {
     styles: ["warm-modern"],
   }),
-  "style-minimal": asset("style-minimal", styleMinimal.url, "Sodobno minimalističen slog", {
+  "style-minimal": asset("style-minimal", styleMinimal, "Sodobno minimalističen slog", {
     styles: ["contemporary-minimal"],
   }),
   "style-scandinavian": asset("style-scandinavian", styleScandinavian, "Skandinavski slog", {
@@ -649,14 +649,17 @@ export function buildReportImageCandidates(state: HomeDnaState): ReportImageCand
       [...selectedStyles, colourImage, "detail-material", "style-intro"],
       imageContext(state),
     ),
-    rooms: selectedRooms.map((key) => ({
-      key,
-      label:
-        key === "children-room"
-          ? `${roomLabels[key]} (${state.home.childrenCount ?? 1}${state.home.childrenCountPlus ? "+" : ""})`
+    rooms: selectedRooms.map((key) => {
+      const quantity = getRoomQuantity(state, key);
+      const showQuantity = ["wardrobe", "bathroom", "children-room"].includes(key);
+      return {
+        key,
+        label: showQuantity
+          ? `${roomLabels[key]} (${quantity.value}${quantity.plus ? "+" : ""})`
           : roomLabels[key],
-      images: rankChoices(roomImageIds(key, state), imageContext(state, key)),
-    })),
+        images: rankChoices(roomImageIds(key, state), imageContext(state, key)),
+      };
+    }),
   };
 }
 

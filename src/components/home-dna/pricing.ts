@@ -211,6 +211,31 @@ const calculators: { room: RoomKey; calc: (rooms: RoomsState, level: ExecutionLe
 
 const round500 = (n: number) => Math.round(n / 500) * 500;
 
+export function getRoomQuantity(
+  state: HomeDnaState,
+  room: RoomKey,
+): { value: number; plus: boolean } {
+  if (room === "wardrobe") {
+    return {
+      value: Math.max(1, state.rooms.wardrobe?.quantity ?? 1),
+      plus: Boolean(state.rooms.wardrobe?.quantityPlus),
+    };
+  }
+  if (room === "bathroom") {
+    return {
+      value: Math.max(1, state.rooms.bathroom?.quantity ?? 1),
+      plus: Boolean(state.rooms.bathroom?.quantityPlus),
+    };
+  }
+  if (room === "children-room") {
+    return {
+      value: Math.max(1, state.home.childrenCount ?? 1),
+      plus: Boolean(state.home.childrenCountPlus),
+    };
+  }
+  return { value: 1, plus: false };
+}
+
 export interface PricingResult {
   roomBreakdown: RoomEstimate[];
   estimatedInvestment: EstimatedInvestment;
@@ -222,13 +247,13 @@ export function calculateInvestment(state: HomeDnaState): PricingResult {
   const roomBreakdown: RoomEstimate[] = calculators
     .filter(({ room }) => hasRoom(state, room))
     .map(({ room, calc }) => {
-      const quantity = room === "children-room" ? Math.max(1, state.home.childrenCount ?? 1) : 1;
-      const quantityLabel = `${quantity}${room === "children-room" && state.home.childrenCountPlus ? "+" : ""}`;
+      const quantity = getRoomQuantity(state, room);
+      const showQuantity = ["wardrobe", "bathroom", "children-room"].includes(room);
+      const quantityLabel = `${quantity.value}${quantity.plus ? "+" : ""}`;
       return {
         room,
-        label:
-          room === "children-room" ? `${roomLabels[room]} (${quantityLabel})` : roomLabels[room],
-        amount: Math.round(calc(state.rooms, level) * quantity),
+        label: showQuantity ? `${roomLabels[room]} (${quantityLabel})` : roomLabels[room],
+        amount: Math.round(calc(state.rooms, level) * quantity.value),
       };
     });
 
