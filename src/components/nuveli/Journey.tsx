@@ -39,15 +39,6 @@ export function Journey({ locale = "sl" }: { locale?: Locale }) {
           ))}
         </ol>
       </div>
-
-      <div className="mt-28 grid gap-px bg-border md:grid-cols-2 xl:grid-cols-4">
-        {t.benefits.map((b, i) => (
-          <Reveal key={b.title} delay={i * 80} className="bg-background px-8 py-10">
-            <h3 className="text-lg">{b.title}</h3>
-            <p className="mt-2 text-sm text-muted-foreground">{b.text}</p>
-          </Reveal>
-        ))}
-      </div>
     </section>
   );
 }
