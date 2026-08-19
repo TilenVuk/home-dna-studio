@@ -12,8 +12,7 @@ export const brand = {
 export const hero = {
   headline: "Ne začnemo pri pohištvu. Začnemo pri ljudeh.",
   sub: "Nuveli Studio oblikuje pohištvo domov okoli načina, kako živite — z metodologijo Home DNA™, s katero razumemo vsakdan, preden karkoli narišemo.",
-  primaryCta: "Odkrijte svoj Home DNA™",
-  secondaryCta: "Poglejte, kako ljudje živijo",
+  primaryCta: "Odkrijte svoj Home DNA™ in dobite okvirno ponudbo",
 };
 
 export const concept = {

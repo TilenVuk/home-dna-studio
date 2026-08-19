@@ -38,20 +38,13 @@ export function Hero({ locale = "sl" }: { locale?: Locale }) {
           {t.sub}
         </p>
 
-        <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="mt-10">
           <a
             href={`${prefix}/home-dna`}
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-background px-7 py-4 text-sm text-foreground transition-transform duration-300 hover:-translate-y-0.5"
+            className="inline-flex min-h-16 max-w-full items-center justify-center gap-3 rounded-full bg-background px-9 py-5 text-center text-base font-medium leading-snug text-foreground transition-transform duration-300 hover:-translate-y-1 md:px-11 md:py-6 md:text-lg"
           >
             {t.primaryCta}
-            <ArrowDownRight size={16} />
-          </a>
-
-          <a
-            href="#projects"
-            className="inline-flex items-center justify-center rounded-full border border-background/50 px-7 py-4 text-sm text-background transition-colors hover:bg-background/10"
-          >
-            {t.secondaryCta}
+            <ArrowDownRight className="shrink-0" size={19} />
           </a>
         </div>
         <p className="mt-4 max-w-[54ch] text-sm leading-relaxed text-background/80">{t.note}</p>
