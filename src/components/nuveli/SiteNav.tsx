@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Menu, X } from "lucide-react";
+import { ArrowUpRight, Menu, X } from "lucide-react";
 import { brand } from "@/content/site";
 import { getSiteCopy } from "@/content/siteLocalized";
 import type { Locale } from "@/lib/i18n";
@@ -70,7 +70,9 @@ export function SiteNav({ locale = "sl" }: { locale?: Locale }) {
           </div>
           <a
             href={`${prefix}/home-dna`}
-            className="rounded-full bg-primary px-5 py-2.5 text-[13px] text-primary-foreground transition-opacity hover:opacity-85"
+            className={`rounded-full bg-primary px-5 py-2.5 text-[13px] text-primary-foreground transition-all duration-300 hover:opacity-85 ${
+              scrolled ? "invisible opacity-0" : "opacity-100"
+            }`}
           >
             {t.nav.cta}
           </a>
@@ -122,6 +124,18 @@ export function SiteNav({ locale = "sl" }: { locale?: Locale }) {
           <p className="eyebrow mt-6">{brand.email}</p>
         </div>
       )}
+
+      <a
+        href={`${prefix}/home-dna`}
+        className={`fixed bottom-5 left-4 right-4 z-[60] inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-center text-sm font-medium text-primary-foreground shadow-[0_12px_35px_rgba(20,25,21,0.24)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(20,25,21,0.3)] sm:bottom-8 sm:left-auto sm:right-8 sm:min-h-14 sm:px-7 sm:text-base ${
+          scrolled && !open
+            ? "translate-y-0 opacity-100"
+            : "pointer-events-none translate-y-4 opacity-0"
+        }`}
+      >
+        {t.nav.cta}
+        <ArrowUpRight className="shrink-0" size={18} />
+      </a>
     </header>
   );
 }

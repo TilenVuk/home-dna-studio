@@ -16,8 +16,7 @@ export const siteCopy = {
     hero: {
       headline: "Ne začnemo pri pohištvu. Začnemo pri ljudeh.",
       sub: "Nuveli Studio oblikuje pohištvo domov okoli načina, kako živite — z metodologijo Home DNA™, s katero razumemo vsakdan, preden karkoli narišemo.",
-      primaryCta: "Odkrijte svoj Home DNA™",
-      secondaryCta: "Poglejte, kako ljudje živijo",
+      primaryCta: "Odkrijte svoj Home DNA™ in dobite okvirno ponudbo",
       note: "Brezplačen osebni Home DNA™ Report + okvirna ponudba za izbrani obseg projekta.",
       imageAlt: "Sodoben skandinavski interjer s hrastovim pohištvom po meri",
     },
@@ -134,8 +133,7 @@ export const siteCopy = {
     hero: {
       headline: "Ne počinjemo namještajem. Počinjemo ljudima.",
       sub: "Nuveli Studio oblikuje interijere i namještaj oko načina na koji živite — metodologijom Home DNA™ razumijemo svakodnevicu prije nego što išta nacrtamo.",
-      primaryCta: "Otkrijte svoj Home DNA™",
-      secondaryCta: "Pogledajte kako ljudi žive",
+      primaryCta: "Otkrijte svoj Home DNA™ i dobijte okvirnu ponudu",
       note: "Besplatan osobni Home DNA™ Report + okvirna ponuda za odabrani opseg projekta.",
       imageAlt: "Suvremen skandinavski interijer s namještajem po mjeri od hrasta",
     },
@@ -252,8 +250,7 @@ export const siteCopy = {
     hero: {
       headline: "We don't start with furniture. We start with people.",
       sub: "Nuveli Studio designs interiors and custom furniture around the way you live — with Home DNA™, we understand everyday life before we draw anything.",
-      primaryCta: "Discover your Home DNA™",
-      secondaryCta: "See how people live",
+      primaryCta: "Discover your Home DNA™ and get an indicative quote",
       note: "Free personal Home DNA™ Report + indicative quotation for your selected project scope.",
       imageAlt: "Contemporary Scandinavian interior with bespoke oak cabinetry",
     },
