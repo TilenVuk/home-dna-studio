@@ -21,8 +21,8 @@ export function LocalizedLanding({ locale }: { locale: Exclude<Locale, "sl"> }) 
         <Services locale={locale} />
         <Gallery locale={locale} />
         <Journey locale={locale} />
-        <AiSearchQuestions locale={locale} />
         <Contact locale={locale} />
+        <AiSearchQuestions locale={locale} />
       </main>
       <Footer locale={locale} />
     </div>
