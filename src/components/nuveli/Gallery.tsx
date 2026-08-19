@@ -24,7 +24,9 @@ export function Gallery({ locale = "sl" }: { locale?: Locale }) {
             <p className="eyebrow">{t.eyebrow}</p>
             <h2 className="display-lg mt-6 max-w-[18ch]">{t.title}</h2>
           </div>
-          <p className="max-w-[34ch] text-sm leading-relaxed text-muted-foreground">{t.intro}</p>
+          {t.intro ? (
+            <p className="max-w-[34ch] text-sm leading-relaxed text-muted-foreground">{t.intro}</p>
+          ) : null}
         </Reveal>
 
         <div className="mt-16 grid gap-6 lg:grid-cols-12">

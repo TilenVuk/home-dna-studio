@@ -3,6 +3,13 @@ import { aiSearchArticles, articlePath } from "@/content/aiSearchArticles";
 import { getSiteCopy } from "@/content/siteLocalized";
 import type { Locale } from "@/lib/i18n";
 
+const featuredArticleIds = new Set([
+  "home-dna-method",
+  "whole-home-cost",
+  "custom-kitchen",
+  "nuveli-process",
+]);
+
 export function AiSearchQuestions({ locale = "sl" }: { locale?: Locale }) {
   const t = getSiteCopy(locale).content;
   const prefix = locale === "sl" ? "" : `/${locale}`;
@@ -19,25 +26,27 @@ export function AiSearchQuestions({ locale = "sl" }: { locale?: Locale }) {
         </div>
 
         <div className="mt-16 grid gap-x-12 md:grid-cols-2">
-          {aiSearchArticles.map((article, index) => {
-            const content = article.localized[locale];
-            return (
-              <article key={article.id} className="border-t border-border py-8">
-                <p className="eyebrow">{String(index + 1).padStart(2, "0")}</p>
-                <h3 className="mt-3 font-display text-2xl tracking-tight">{content.title}</h3>
-                <p className="mt-4 text-sm leading-7 text-muted-foreground">
-                  {content.description}
-                </p>
-                <a
-                  href={articlePath(article, locale)}
-                  className="mt-6 inline-flex items-center gap-2 text-sm underline-offset-4 hover:underline"
-                >
-                  {t.read}
-                  <ArrowUpRight size={15} />
-                </a>
-              </article>
-            );
-          })}
+          {aiSearchArticles
+            .filter((article) => featuredArticleIds.has(article.id))
+            .map((article, index) => {
+              const content = article.localized[locale];
+              return (
+                <article key={article.id} className="border-t border-border py-8">
+                  <p className="eyebrow">{String(index + 1).padStart(2, "0")}</p>
+                  <h3 className="mt-3 font-display text-2xl tracking-tight">{content.title}</h3>
+                  <p className="mt-4 text-sm leading-7 text-muted-foreground">
+                    {content.description}
+                  </p>
+                  <a
+                    href={articlePath(article, locale)}
+                    className="mt-6 inline-flex items-center gap-2 text-sm underline-offset-4 hover:underline"
+                  >
+                    {t.read}
+                    <ArrowUpRight size={15} />
+                  </a>
+                </article>
+              );
+            })}
         </div>
 
         <div className="mt-12 border-t border-border pt-8">

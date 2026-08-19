@@ -13,7 +13,7 @@ export function Process({ locale = "sl" }: { locale?: Locale }) {
           <h2 className="display-lg mt-6 max-w-[18ch]">{t.title}</h2>
         </Reveal>
 
-        <div className="mt-16 grid gap-px bg-border md:grid-cols-2 xl:grid-cols-4">
+        <div className="mt-16 grid gap-px bg-border md:grid-cols-3">
           {t.steps.map((s, i) => (
             <Reveal key={s.step} delay={i * 90} className="group bg-secondary p-8 md:p-10">
               <span className="font-display text-sm text-oak">{s.step}</span>
