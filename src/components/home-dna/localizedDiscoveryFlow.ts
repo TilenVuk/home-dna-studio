@@ -21,11 +21,15 @@ const hr: CopyMap = {
   },
   "property-type": { headline: "Kakav dom opremate?" },
   "household-size": {
-    headline: "Koliko će odraslih živjeti u domu?",
-    support: "Broj djece pitamo odvojeno kako bi struktura kućanstva bila potpuno jasna.",
+    headline: "Koliko će ljudi koristiti ovaj dom?",
+    support:
+      "U sljedećem koraku pitamo koliko je među njima djece; djeca su već uključena u ukupan broj.",
   },
   children: { headline: "Hoće li u domu živjeti djeca?" },
-  "children-count": { headline: "Koliko će djece živjeti u domu?" },
+  "children-count": {
+    headline: "Koliko će djece živjeti u domu?",
+    support: "Broj djece već je uključen u ukupan broj osoba.",
+  },
   pets: {
     headline: "Žive li s vama kućni ljubimci?",
     support: "Utječu na izbor materijala, održavanje i organizaciju odabranih prostora.",
@@ -286,11 +290,15 @@ const en: CopyMap = {
   },
   "property-type": { headline: "What type of home are you furnishing?" },
   "household-size": {
-    headline: "How many adults will live in the home?",
-    support: "We ask about children separately so the household structure is completely clear.",
+    headline: "How many people will use this home?",
+    support:
+      "In the next step we ask how many of them are children; children are already included in the total.",
   },
   children: { headline: "Will children live in the home?" },
-  "children-count": { headline: "How many children will live in the home?" },
+  "children-count": {
+    headline: "How many children will live in the home?",
+    support: "The number of children is already included in the total household size.",
+  },
   pets: {
     headline: "Do you live with pets?",
     support: "Pets affect material choices, maintenance and the organisation of selected spaces.",
@@ -547,17 +555,6 @@ const dictionaries: Record<Exclude<Locale, "sl">, CopyMap> = { hr, en };
 
 export function buildLocalizedDiscoveryFlow(state: HomeDnaState, locale: Locale): ScreenDef[] {
   return buildDiscoveryFlow(state).map((screen) => {
-    if (screen.key === "household-size") {
-      const localized = locale === "sl" ? undefined : dictionaries[locale][screen.key];
-      return {
-        ...screen,
-        headline: localized?.headline ?? "Koliko odraslih bo živelo v domu?",
-        support:
-          localized?.support ??
-          "Število otrok vprašamo ločeno, da je sestava gospodinjstva popolnoma jasna.",
-      } as ScreenDef;
-    }
-
     if (screen.key === "children-room-intro" && screen.kind === "editorial" && locale !== "sl") {
       const quantity = state.home.childrenCount ?? 1;
       const quantityLabel = `${quantity}${state.home.childrenCountPlus ? "+" : ""}`;

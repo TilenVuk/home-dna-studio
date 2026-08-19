@@ -40,6 +40,15 @@ import type {
 
 const noPetsLabel = petOptions[3]?.label ?? "Brez hišnih ljubljenčkov";
 
+function childrenCountOptionsForHousehold(
+  householdSize: number | undefined,
+  householdSizePlus: boolean | undefined,
+): string[] {
+  if (!householdSize || householdSizePlus) return childrenCountOptions;
+
+  return Array.from({ length: Math.min(householdSize, 4) }, (_, index) => String(index + 1));
+}
+
 function setLife(state: HomeDnaState, patch: Partial<LifestyleState>): HomeDnaState {
   return { ...state, lifestyle: { ...state.lifestyle, ...patch } };
 }
@@ -133,7 +142,8 @@ function homeScreens(state: HomeDnaState): ScreenDef[] {
       kind: "choice",
       key: "household-size",
       headline: "Koliko ljudi bo uporabljalo ta dom?",
-      support: "Dom mora delovati za vsakogar, ki v njem živi.",
+      support:
+        "V naslednjem koraku vprašamo, koliko je med njimi otrok; otroci so že vključeni v skupno število.",
       options: householdSizeOptions.map((o) => ({ value: o, label: o })),
       value:
         home.householdSize === undefined
@@ -141,14 +151,21 @@ function homeScreens(state: HomeDnaState): ScreenDef[] {
           : home.householdSizePlus
             ? "5+"
             : String(home.householdSize),
-      apply: (s, value) => ({
-        ...s,
-        home: {
-          ...s.home,
-          householdSize: value === "5+" ? 5 : Number(value),
-          householdSizePlus: value === "5+",
-        },
-      }),
+      apply: (s, value) => {
+        const householdSize = value === "5+" ? 5 : Number(value);
+        const householdSizePlus = value === "5+";
+        const nextHome = { ...s.home, householdSize, householdSizePlus };
+
+        if (
+          !householdSizePlus &&
+          (nextHome.childrenCountPlus || (nextHome.childrenCount ?? 0) > householdSize)
+        ) {
+          delete nextHome.childrenCount;
+          delete nextHome.childrenCountPlus;
+        }
+
+        return { ...s, home: nextHome };
+      },
     },
     {
       kind: "choice",
@@ -183,7 +200,10 @@ function homeScreens(state: HomeDnaState): ScreenDef[] {
       kind: "choice",
       key: "children-count",
       headline: "Koliko otrok bo uporabljalo dom?",
-      options: childrenCountOptions.map((o) => ({ value: o, label: o })),
+      support: "Število otrok je že vključeno v skupno število oseb.",
+      options: childrenCountOptionsForHousehold(home.householdSize, home.householdSizePlus).map(
+        (o) => ({ value: o, label: o }),
+      ),
       value:
         home.childrenCount === undefined
           ? undefined
