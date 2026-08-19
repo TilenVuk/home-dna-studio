@@ -22,13 +22,10 @@ const hr: CopyMap = {
   "property-type": { headline: "Kakav dom opremate?" },
   "household-size": {
     headline: "Koliko će ljudi koristiti ovaj dom?",
-    support:
-      "U sljedećem koraku pitamo koliko je među njima djece; djeca su već uključena u ukupan broj.",
   },
   children: { headline: "Hoće li u domu živjeti djeca?" },
   "children-count": {
     headline: "Koliko će djece živjeti u domu?",
-    support: "Broj djece već je uključen u ukupan broj osoba.",
   },
   pets: {
     headline: "Žive li s vama kućni ljubimci?",
@@ -57,7 +54,6 @@ const hr: CopyMap = {
   },
   "work-from-home-frequency": {
     headline: "Koliko često radite od kuće?",
-    support: "Pitanje prikazujemo samo kada odabrani prostor može uključivati radno mjesto.",
   },
   hobbies: {
     headline: "Koje hobije ili opremu trebaju podržati odabrani prostori?",
@@ -65,7 +61,7 @@ const hr: CopyMap = {
   },
   challenges: {
     headline: "Što vas trenutačno najviše ometa u tim prostorima?",
-    support: "Prikazujemo samo probleme povezane s odabranim prostorima. Odaberite najviše tri.",
+    support: "Odaberite najviše tri.",
   },
   "challenges-other": {
     headline: "Što biste još željeli poboljšati?",
@@ -73,7 +69,6 @@ const hr: CopyMap = {
   },
   "future-needs": {
     headline: "Kako se odabrani prostori trebaju prilagođavati budućnosti?",
-    support: "Prikazujemo samo promjene koje mogu utjecati na odabrani opseg projekta.",
   },
   investment: {
     headline: "Koja razina izvedbe najbolje odgovara vašem projektu?",
@@ -135,13 +130,11 @@ const hr: CopyMap = {
   "wardrobe-intro": {
     eyebrow: "Garderoba",
     headline: "Najprije moramo razumjeti što će ormar stvarno spremati.",
-    body: "Najprije određujemo broj garderoba, a zatim opisujete jednu tipičnu garderobu prema kojoj pripremamo ukupnu procjenu.",
+    body: "Odredit ćemo potrebe za spremanjem, osnovne mjere i način korištenja.",
     cta: "Planirajmo unutrašnjost",
   },
   "wardrobe-quantity": {
     headline: "Koliko garderoba uključuje projekt?",
-    support:
-      "Sljedeći odgovori vrijede za jednu tipičnu garderobu; okvirnu investiciju množimo s brojem. Za 4+ računamo najmanje četiri.",
   },
   "wardrobe-users": {
     headline: "Koliko će osoba koristiti pojedinu garderobu?",
@@ -231,13 +224,11 @@ const hr: CopyMap = {
   "bathroom-intro": {
     eyebrow: "Kupaonica",
     headline: "Miran prostor treba jasnu organizaciju svakodnevnih predmeta.",
-    body: "Najprije određujemo broj kupaonica, a zatim opisujete namještaj u jednoj tipičnoj kupaonici prema kojoj pripremamo ukupnu procjenu.",
+    body: "Odredit ćemo korisnike, raspoloživu širinu i potrebna rješenja za spremanje.",
     cta: "Nastavimo",
   },
   "bathroom-quantity": {
     headline: "Koliko kupaonica uključuje projekt?",
-    support:
-      "Sljedeći odgovori opisuju namještaj u jednoj tipičnoj kupaonici; okvirnu investiciju množimo s brojem. Za 4+ računamo najmanje četiri.",
   },
   "bathroom-users": {
     headline: "Koliko osoba redovito koristi pojedinu kupaonicu?",
@@ -301,13 +292,10 @@ const en: CopyMap = {
   "property-type": { headline: "What type of home are you furnishing?" },
   "household-size": {
     headline: "How many people will use this home?",
-    support:
-      "In the next step we ask how many of them are children; children are already included in the total.",
   },
   children: { headline: "Will children live in the home?" },
   "children-count": {
     headline: "How many children will live in the home?",
-    support: "The number of children is already included in the total household size.",
   },
   pets: {
     headline: "Do you live with pets?",
@@ -336,7 +324,6 @@ const en: CopyMap = {
   },
   "work-from-home-frequency": {
     headline: "How often do you work from home?",
-    support: "We only ask this where the selected space can reasonably include a workstation.",
   },
   hobbies: {
     headline: "Which hobbies or equipment should the selected spaces accommodate?",
@@ -344,7 +331,7 @@ const en: CopyMap = {
   },
   challenges: {
     headline: "What currently gets in the way most in these spaces?",
-    support: "Only challenges relevant to the selected spaces are shown. Choose up to three.",
+    support: "Choose up to three.",
   },
   "challenges-other": {
     headline: "What else would you like to improve?",
@@ -352,7 +339,6 @@ const en: CopyMap = {
   },
   "future-needs": {
     headline: "How should the selected spaces adapt to the future?",
-    support: "Only changes that can affect the selected project scope are shown.",
   },
   investment: {
     headline: "Which level of execution best fits your project?",
@@ -414,13 +400,11 @@ const en: CopyMap = {
   "wardrobe-intro": {
     eyebrow: "Wardrobe",
     headline: "First we need to understand what the wardrobe will actually store.",
-    body: "First we set the number of wardrobes, then you describe one typical wardrobe that we use for the overall estimate.",
+    body: "We will define your storage needs, key measurements and how each wardrobe will be used.",
     cta: "Plan the interior",
   },
   "wardrobe-quantity": {
     headline: "How many wardrobes are included in the project?",
-    support:
-      "The following answers apply to one typical wardrobe; we multiply the indicative estimate by the quantity. For 4+, we calculate at least four.",
   },
   "wardrobe-users": {
     headline: "How many people will use each wardrobe?",
@@ -508,13 +492,11 @@ const en: CopyMap = {
   "bathroom-intro": {
     eyebrow: "Bathroom",
     headline: "A calm space needs clear organisation for everyday items.",
-    body: "First we set the number of bathrooms, then you describe the furniture in one typical bathroom that we use for the overall estimate.",
+    body: "We will define the users, available width and the storage solutions you need.",
     cta: "Continue",
   },
   "bathroom-quantity": {
     headline: "How many bathrooms are included in the project?",
-    support:
-      "The following answers describe the furniture in one typical bathroom; we multiply the indicative estimate by the quantity. For 4+, we calculate at least four.",
   },
   "bathroom-users": {
     headline: "How many people regularly use each bathroom?",
@@ -583,7 +565,7 @@ export function buildLocalizedDiscoveryFlow(state: HomeDnaState, locale: Locale)
           ...screen,
           eyebrow: `Dječje sobe · ${quantityLabel}`,
           headline: `Jedan zajednički koncept prilagodit ćemo za ${quantityLabel} ${quantity === 1 ? "dječju sobu" : "dječje sobe"}.`,
-          body: "Odgovori vrijede za pojedinačnu sobu, a okvirna investicija automatski se množi brojem djece.",
+          body: "Dizajn prilagođavamo dobi, navikama i potrebama svakog djeteta.",
           cta: "Planirajmo dječje sobe",
         };
       }
@@ -591,7 +573,7 @@ export function buildLocalizedDiscoveryFlow(state: HomeDnaState, locale: Locale)
         ...screen,
         eyebrow: `Children's rooms · ${quantityLabel}`,
         headline: `We will adapt one shared concept for ${quantityLabel} ${quantity === 1 ? "children's room" : "children's rooms"}.`,
-        body: "Answers apply to one room; the indicative investment estimate is automatically multiplied by the number of children.",
+        body: "We adapt the design to each child's age, routines and needs.",
         cta: "Plan the children's rooms",
       };
     }

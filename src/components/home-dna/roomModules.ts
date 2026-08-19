@@ -325,7 +325,7 @@ function wardrobeScreens(state: HomeDnaState): ScreenDef[] {
       key: "wardrobe-intro",
       eyebrow: "Garderoba",
       headline: "Najprej moramo razumeti, kaj bo omara dejansko shranjevala.",
-      body: "Najprej določimo število garderob, nato opišete eno tipično garderobo, po kateri pripravimo skupno oceno.",
+      body: "Določili bomo potrebe po shranjevanju, osnovne mere in način uporabe.",
       cta: "Načrtujmo notranjost",
       image: projectCloset,
       prominentEyebrow: true,
@@ -334,8 +334,6 @@ function wardrobeScreens(state: HomeDnaState): ScreenDef[] {
       kind: "choice",
       key: "wardrobe-quantity",
       headline: "Koliko garderob vključuje projekt?",
-      support:
-        "Naslednji odgovori veljajo za eno tipično garderobo; okvirno investicijo pomnožimo s številom. Pri 4+ računamo najmanj štiri.",
       options: ["1", "2", "3", "4+"].map((value) => ({ value, label: value })),
       value:
         w.quantity === undefined
@@ -799,7 +797,7 @@ function bathroomScreens(state: HomeDnaState): ScreenDef[] {
       key: "bathroom-intro",
       eyebrow: "Kopalnica",
       headline: "Umirjen prostor potrebuje jasno organizacijo vsakodnevnih predmetov.",
-      body: "Najprej določimo število kopalnic, nato opišete pohištvo v eni tipični kopalnici, po kateri pripravimo skupno oceno.",
+      body: "Določili bomo uporabnike, razpoložljivo širino in potrebne rešitve za shranjevanje.",
       cta: "Nadaljujmo",
       image: projectBathroom,
       prominentEyebrow: true,
@@ -808,8 +806,6 @@ function bathroomScreens(state: HomeDnaState): ScreenDef[] {
       kind: "choice",
       key: "bathroom-quantity",
       headline: "Koliko kopalnic vključuje projekt?",
-      support:
-        "Naslednji odgovori opisujejo pohištvo v eni tipični kopalnici; okvirno investicijo pomnožimo s številom. Pri 4+ računamo najmanj štiri.",
       options: ["1", "2", "3", "4+"].map((value) => ({ value, label: value })),
       value:
         b.quantity === undefined
@@ -1015,7 +1011,7 @@ function childrenRoomScreens(state: HomeDnaState): ScreenDef[] {
       key: "children-room-intro",
       eyebrow: `Otroške sobe · ${quantityLabel}`,
       headline: `En skupen koncept bomo prilagodili za ${quantityLabel} ${quantity === 1 ? "otroško sobo" : "otroške sobe"}.`,
-      body: "Odgovori veljajo za posamezno sobo, okvirna investicija pa se samodejno pomnoži s številom otrok.",
+      body: "Zasnovo prilagodimo starosti, navadam in potrebam posameznega otroka.",
       cta: "Načrtujmo otroške sobe",
       image: projectChildRoom,
       prominentEyebrow: true,

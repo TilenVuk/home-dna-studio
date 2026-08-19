@@ -24,8 +24,7 @@ const copy = {
     verify: "Nazaj na varnostno preverjanje",
     preparing: "Pripravljamo vaš Home DNA™ Report in e-pošto …",
     sending: (email: string) => `Poročilo pošiljamo na ${email} …`,
-    retryInfo:
-      "PDF lahko prenesete takoj. Ponovni poskus ne bo ustvaril podvojene oddaje ali podvojenih sporočil.",
+    retryInfo: "PDF lahko prenesete takoj, pošiljanje pa lahko varno poskusite ponovno.",
     retry: "Ponovno pošlji",
     preparingPdf: "Pripravljamo PDF ...",
     download: "Prenesi Home DNA™ Report (PDF)",
@@ -52,8 +51,7 @@ const copy = {
     verify: "Natrag na sigurnosnu provjeru",
     preparing: "Pripremamo vaš Home DNA™ Report i e-mail …",
     sending: (email: string) => `Izvještaj šaljemo na ${email} …`,
-    retryInfo:
-      "PDF možete odmah preuzeti. Ponovni pokušaj neće stvoriti dvostruku prijavu ili dvostruke poruke.",
+    retryInfo: "PDF možete odmah preuzeti, a slanje možete sigurno pokušati ponovno.",
     retry: "Pošalji ponovno",
     preparingPdf: "Pripremamo PDF ...",
     download: "Preuzmi Home DNA™ Report (PDF)",
@@ -80,8 +78,7 @@ const copy = {
     verify: "Back to security verification",
     preparing: "Preparing your Home DNA™ Report and email …",
     sending: (email: string) => `Sending the report to ${email} …`,
-    retryInfo:
-      "You can download the PDF immediately. Retrying will not create a duplicate submission or duplicate emails.",
+    retryInfo: "You can download the PDF immediately and safely retry sending it.",
     retry: "Send again",
     preparingPdf: "Preparing PDF ...",
     download: "Download Home DNA™ Report (PDF)",
