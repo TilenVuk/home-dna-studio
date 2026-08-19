@@ -14,8 +14,8 @@ export function SiteNav({ locale = "sl" }: { locale?: Locale }) {
     { label: t.nav.process, href: "#process" },
     { label: t.nav.services, href: "#services" },
     { label: t.nav.projects, href: "#projects" },
-    { label: t.nav.content, href: `${prefix}/vsebine` },
     { label: t.nav.contact, href: "#contact" },
+    { label: t.nav.content, href: `${prefix}/vsebine` },
   ];
 
   useEffect(() => {

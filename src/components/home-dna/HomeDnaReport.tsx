@@ -9,6 +9,7 @@ import { resolveReportImages, type ReportImageAsset } from "./reportImages";
 import { formatEuro } from "./pricing";
 import type { HomeDnaState } from "./homeDnaTypes";
 import type { Locale } from "@/lib/i18n";
+import { useAnalytics } from "@/lib/useAnalytics";
 
 export type HomeDnaDeliveryState = "processing" | "sent" | "generation-error" | "delivery-error";
 
@@ -111,6 +112,7 @@ export function HomeDnaReport({
   onRequireNewVerification: () => void;
 }) {
   const t = copy[locale];
+  const track = useAnalytics(locale, "home-dna");
   const generate = useServerFn(generateHomeDnaReport);
   const submit = useServerFn(submitHomeDna);
   const [report, setReport] = useState<Report | null>(null);
@@ -132,18 +134,25 @@ export function HomeDnaReport({
     setGenerationError(null);
     setDeliveryError(null);
     onDeliveryStateChange?.("processing");
+    track("home_dna_report_generation_started", { details: { stage: "report" } });
 
     try {
       const reportInput = buildReportInput(state, locale);
       const currentReport = report ?? (await generate({ data: reportInput }));
       reportReady = true;
-      if (!report) setReport(currentReport);
+      if (!report) {
+        setReport(currentReport);
+        track("home_dna_report_generated", { details: { stage: "report", result: "success" } });
+      }
 
       const currentPdf =
         pdfBlob ??
         (await withTimeout(createPdfBlob(state, currentReport, locale), 120_000, "PDF timeout"));
       pdfReady = true;
-      if (!pdfBlob) setPdfBlob(currentPdf);
+      if (!pdfBlob) {
+        setPdfBlob(currentPdf);
+        track("home_dna_pdf_generated", { details: { stage: "pdf", result: "success" } });
+      }
       if (!submissionId.current) submissionId.current = crypto.randomUUID();
 
       const result = await submit({
@@ -164,6 +173,16 @@ export function HomeDnaReport({
         },
       });
 
+      const deliveryResult = result.delivered
+        ? "sent"
+        : result.customerEmailStatus === "sent" || result.internalEmailStatus === "sent"
+          ? "partial"
+          : "failed";
+      track("home_dna_complete", {
+        submissionId: result.submissionId,
+        details: { stage: "submission", result: deliveryResult },
+      });
+
       if (!result.delivered) {
         setDeliveryError(result.customerEmailStatus === "sent" ? t.studioDelivery : t.delivery);
         onDeliveryStateChange?.("delivery-error");
@@ -172,6 +191,10 @@ export function HomeDnaReport({
       onDeliveryStateChange?.("sent");
     } catch (error) {
       console.error("Home DNA preparation or delivery failed", error);
+      const stage = !reportReady ? "report" : !pdfReady ? "pdf" : "submission";
+      track("home_dna_error", {
+        details: { stage, result: "failed", errorCode: analyticsErrorCode(error) },
+      });
       if (!reportReady) {
         setGenerationError(t.generation);
         onDeliveryStateChange?.("generation-error");
@@ -196,6 +219,7 @@ export function HomeDnaReport({
     state,
     submit,
     t,
+    track,
   ]);
 
   useEffect(() => {
@@ -214,9 +238,13 @@ export function HomeDnaReport({
         (await withTimeout(createPdfBlob(state, report, locale), 120_000, "PDF timeout"));
       if (!pdfBlob) setPdfBlob(blob);
       downloadBlob(blob, pdfFilename);
+      track("home_dna_pdf_download", { details: { stage: "download", result: "success" } });
     } catch (error) {
       console.error(error);
       setPdfError(t.pdfCreate);
+      track("home_dna_error", {
+        details: { stage: "download", result: "failed", errorCode: analyticsErrorCode(error) },
+      });
     } finally {
       setDownloadBusy(false);
     }
@@ -368,6 +396,11 @@ export function HomeDnaReport({
       </Section>
     </article>
   );
+}
+
+function analyticsErrorCode(error: unknown): string {
+  const message = error instanceof Error ? error.message.toUpperCase() : "UNKNOWN_ERROR";
+  return message.match(/[A-Z][A-Z0-9_]{2,79}/)?.[0] ?? "UNKNOWN_ERROR";
 }
 
 async function createPdfBlob(state: HomeDnaState, report: Report, locale: Locale): Promise<Blob> {

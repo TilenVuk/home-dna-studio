@@ -64,8 +64,8 @@ function Index() {
         <Services />
         <Gallery />
         <Journey />
-        <AiSearchQuestions />
         <Contact />
+        <AiSearchQuestions />
       </main>
       <Footer />
     </div>

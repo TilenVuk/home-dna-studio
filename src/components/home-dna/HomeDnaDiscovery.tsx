@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { HomeDnaLayout } from "./HomeDnaLayout";
 import { ScreenDefRenderer } from "./ScreenDefRenderer";
 import { buildLocalizedDiscoveryFlow } from "./localizedDiscoveryFlow";
 import { initialHomeDnaState, type HomeDnaState } from "./homeDnaTypes";
 import type { Locale } from "@/lib/i18n";
+import { useAnalytics } from "@/lib/useAnalytics";
 
 const householdQuestion = {
   sl: {
@@ -22,6 +23,8 @@ const householdQuestion = {
 
 export function HomeDnaDiscovery({ locale = "sl" }: { locale?: Locale }) {
   const [state, setState] = useState<HomeDnaState>(initialHomeDnaState);
+  const track = useAnalytics(locale, "home-dna");
+  const lastTrackedScreen = useRef<string | null>(null);
 
   const flow = useMemo(() => {
     const localized = buildLocalizedDiscoveryFlow(state, locale);
@@ -50,8 +53,29 @@ export function HomeDnaDiscovery({ locale = "sl" }: { locale?: Locale }) {
     }
   }, [def?.kind]);
 
+  useEffect(() => {
+    if (!def || lastTrackedScreen.current === def.key) return;
+    lastTrackedScreen.current = def.key;
+
+    if (def.kind === "welcome") {
+      track("home_dna_view");
+      return;
+    }
+    if (def.kind === "success") return;
+
+    const stepData = { screenKey: def.key, stepIndex: index, stepTotal: flow.length };
+    track("home_dna_step_view", stepData);
+    if (def.kind === "contact") track("home_dna_contact_view", stepData);
+  }, [def, flow.length, index, track]);
+
   const step = useCallback(
     (direction: 1 | -1, mutate?: (state: HomeDnaState) => HomeDnaState) => {
+      if (direction === 1 && def) {
+        const stepData = { screenKey: def.key, stepIndex: index, stepTotal: flow.length };
+        if (def.kind === "welcome") track("home_dna_start", stepData);
+        else if (def.kind !== "success") track("home_dna_step_complete", stepData);
+      }
+
       setState((prev) => {
         const next = mutate ? mutate(prev) : prev;
         const screens = buildLocalizedDiscoveryFlow(next, locale);
@@ -61,7 +85,7 @@ export function HomeDnaDiscovery({ locale = "sl" }: { locale?: Locale }) {
         return { ...next, currentScreen: screens[target]?.key ?? prev.currentScreen };
       });
     },
-    [locale],
+    [def, flow.length, index, locale, track],
   );
 
   const advance = useCallback(
