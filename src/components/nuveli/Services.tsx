@@ -35,7 +35,12 @@ export function Services({ locale = "sl" }: { locale?: Locale }) {
                   className="inline-flex items-center gap-2 text-sm font-medium text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   <span>{t.cta}</span>
-                  <ArrowRight size={16} strokeWidth={1.5} className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true" />
+                  <ArrowRight
+                    size={16}
+                    strokeWidth={1.5}
+                    className="transition-transform duration-300 group-hover:translate-x-1"
+                    aria-hidden="true"
+                  />
                 </Link>
               </div>
             </Reveal>

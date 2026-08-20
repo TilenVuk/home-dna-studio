@@ -1,4 +1,5 @@
 import detailImage from "@/assets/detail-material.jpg";
+import detailImage640 from "@/assets/detail-material-640.webp";
 import { getSiteCopy } from "@/content/siteLocalized";
 import type { Locale } from "@/lib/i18n";
 import { Reveal } from "./Reveal";
@@ -32,14 +33,18 @@ export function Concept({ locale = "sl" }: { locale?: Locale }) {
         </div>
 
         <Reveal delay={120} className="lg:col-span-5">
-          <img
-            src={detailImage}
-            alt={t.imageAlt}
-            loading="lazy"
-            width={1200}
-            height={900}
-            className="h-full min-h-[380px] w-full object-cover"
-          />
+          <picture className="block h-full">
+            <source media="(max-width: 767px)" type="image/webp" srcSet={detailImage640} />
+            <img
+              src={detailImage}
+              alt={t.imageAlt}
+              loading="lazy"
+              decoding="async"
+              width={1200}
+              height={900}
+              className="h-full min-h-[380px] w-full object-cover"
+            />
+          </picture>
         </Reveal>
       </div>
     </section>

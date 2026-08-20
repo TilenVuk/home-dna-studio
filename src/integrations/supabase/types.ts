@@ -80,6 +80,78 @@ export type Database = {
         }
         Relationships: []
       }
+      home_dna_analytics_events: {
+        Row: {
+          booking_id: string | null
+          created_at: string
+          details: Json
+          device_type: string
+          event_name: string
+          id: string
+          landing_path: string
+          locale: string
+          referrer_host: string | null
+          screen_key: string | null
+          session_id: string
+          source: string
+          step_index: number | null
+          step_total: number | null
+          submission_id: string | null
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
+          viewport_width: number
+        }
+        Insert: {
+          booking_id?: string | null
+          created_at?: string
+          details?: Json
+          device_type: string
+          event_name: string
+          id: string
+          landing_path: string
+          locale: string
+          referrer_host?: string | null
+          screen_key?: string | null
+          session_id: string
+          source: string
+          step_index?: number | null
+          step_total?: number | null
+          submission_id?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          viewport_width: number
+        }
+        Update: {
+          booking_id?: string | null
+          created_at?: string
+          details?: Json
+          device_type?: string
+          event_name?: string
+          id?: string
+          landing_path?: string
+          locale?: string
+          referrer_host?: string | null
+          screen_key?: string | null
+          session_id?: string
+          source?: string
+          step_index?: number | null
+          step_total?: number | null
+          submission_id?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          viewport_width?: number
+        }
+        Relationships: []
+      }
       home_dna_report_attempts: {
         Row: {
           created_at: string
@@ -114,6 +186,7 @@ export type Database = {
           internal_email_status: string
           internal_resend_id: string | null
           last_error: string | null
+          locale: string
           report: Json
           request_ip_hash: string
           send_status: string
@@ -135,6 +208,7 @@ export type Database = {
           internal_email_status?: string
           internal_resend_id?: string | null
           last_error?: string | null
+          locale?: string
           report: Json
           request_ip_hash: string
           send_status?: string
@@ -156,6 +230,7 @@ export type Database = {
           internal_email_status?: string
           internal_resend_id?: string | null
           last_error?: string | null
+          locale?: string
           report?: Json
           request_ip_hash?: string
           send_status?: string
@@ -166,7 +241,33 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      home_dna_funnel_daily: {
+        Row: {
+          acquisition_campaign: string | null
+          acquisition_medium: string | null
+          acquisition_source: string | null
+          booking_views: number | null
+          completions: number | null
+          consultations: number | null
+          contact_views: number | null
+          day: string | null
+          locale: string | null
+          starts: number | null
+          views: number | null
+        }
+        Relationships: []
+      }
+      home_dna_step_funnel_daily: {
+        Row: {
+          completions: number | null
+          day: string | null
+          locale: string | null
+          screen_key: string | null
+          step_index: number | null
+          views: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       consume_home_dna_report_quota: {
