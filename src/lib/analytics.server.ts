@@ -5,7 +5,7 @@ const MAX_EVENTS_PER_SESSION = 250;
 
 export async function storeAnalyticsEvent(input: AnalyticsEventInput) {
   const since = new Date(Date.now() - 24 * 60 * 60 * 1_000).toISOString();
-  const { count, error: countError } = await (supabaseAdmin as any)
+  const { count, error: countError } = await supabaseAdmin
     .from("home_dna_analytics_events")
     .select("id", { count: "exact", head: true })
     .eq("session_id", input.sessionId)
@@ -18,7 +18,7 @@ export async function storeAnalyticsEvent(input: AnalyticsEventInput) {
 
   if ((count ?? 0) >= MAX_EVENTS_PER_SESSION) return { accepted: false };
 
-  const { error } = await (supabaseAdmin as any).from("home_dna_analytics_events").insert({
+  const { error } = await supabaseAdmin.from("home_dna_analytics_events").insert({
     id: input.id,
     session_id: input.sessionId,
     event_name: input.eventName,
