@@ -29,13 +29,15 @@ export function Services({ locale = "sl" }: { locale?: Locale }) {
               <Icon size={22} strokeWidth={1.4} className="text-forest" />
               <h3 className="mt-14 text-2xl">{s.title}</h3>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{s.text}</p>
-              <Link
-                to={ctaHref}
-                className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-foreground transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest focus-visible:ring-offset-2 focus-visible:ring-offset-background md:pointer-events-none md:translate-y-2 md:opacity-0 md:group-hover:pointer-events-auto md:group-hover:translate-y-0 md:group-hover:opacity-100 md:group-focus-within:pointer-events-auto md:group-focus-within:translate-y-0 md:group-focus-within:opacity-100"
-              >
-                <span>{t.cta}</span>
-                <ArrowRight size={16} strokeWidth={1.5} className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true" />
-              </Link>
+              <div className="mt-8 transition-all duration-300 md:mt-0 md:max-h-0 md:translate-y-2 md:overflow-hidden md:opacity-0 md:pointer-events-none md:group-hover:pointer-events-auto md:group-hover:mt-8 md:group-hover:max-h-20 md:group-hover:translate-y-0 md:group-hover:overflow-visible md:group-hover:opacity-100 md:group-focus-within:pointer-events-auto md:group-focus-within:mt-8 md:group-focus-within:max-h-20 md:group-focus-within:translate-y-0 md:group-focus-within:overflow-visible md:group-focus-within:opacity-100">
+                <Link
+                  to={ctaHref}
+                  className="inline-flex items-center gap-2 text-sm font-medium text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                >
+                  <span>{t.cta}</span>
+                  <ArrowRight size={16} strokeWidth={1.5} className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true" />
+                </Link>
+              </div>
             </Reveal>
           );
         })}
