@@ -29,14 +29,16 @@ export function SiteNav({ locale = "sl" }: { locale?: Locale }) {
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
         scrolled
-          ? "bg-background/85 backdrop-blur-xl border-b border-border"
-          : "border-b border-transparent"
+          ? "border-b border-border bg-background/85 text-foreground backdrop-blur-xl"
+          : "border-b border-transparent text-background"
       }`}
     >
       <nav className="mx-auto flex max-w-[1400px] items-center justify-between px-6 py-5 md:px-10">
         <a href="#top" className="flex items-baseline gap-2">
           <span className="font-display text-lg font-medium tracking-[-0.04em]">NUVELI</span>
-          <span className="eyebrow">Studio</span>
+          <span className={`eyebrow ${scrolled ? "text-muted-foreground" : "text-background/80"}`}>
+            Studio
+          </span>
         </a>
 
         <div className="hidden items-center gap-7 lg:flex">
@@ -44,7 +46,11 @@ export function SiteNav({ locale = "sl" }: { locale?: Locale }) {
             <a
               key={`${l.href}-${l.label}`}
               href={l.href}
-              className="text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+              className={`text-[13px] transition-colors ${
+                scrolled
+                  ? "text-muted-foreground hover:text-foreground"
+                  : "text-background/80 hover:text-background"
+              }`}
             >
               {l.label}
             </a>
@@ -53,7 +59,15 @@ export function SiteNav({ locale = "sl" }: { locale?: Locale }) {
             {(["sl", "hr", "en"] as const).map((target) => {
               const href = target === "sl" ? "/" : `/${target}/`;
               return target === locale ? (
-                <span key={target} className="rounded-full border border-foreground px-2.5 py-1.5">
+                <span
+                  key={target}
+                  aria-current="page"
+                  className={`rounded-full border px-2.5 py-1.5 font-medium shadow-sm transition-colors ${
+                    scrolled
+                      ? "border-foreground bg-foreground text-background"
+                      : "border-background/90 bg-background/95 text-foreground"
+                  }`}
+                >
                   {target.toUpperCase()}
                 </span>
               ) : (
@@ -61,7 +75,11 @@ export function SiteNav({ locale = "sl" }: { locale?: Locale }) {
                   key={target}
                   href={href}
                   hrefLang={target}
-                  className="rounded-full border border-border px-2.5 py-1.5 text-muted-foreground hover:text-foreground"
+                  className={`rounded-full border px-2.5 py-1.5 font-medium shadow-sm backdrop-blur-md transition-colors ${
+                    scrolled
+                      ? "border-border text-foreground hover:border-foreground"
+                      : "border-background/80 bg-foreground/70 text-background hover:bg-background hover:text-foreground"
+                  }`}
                 >
                   {target.toUpperCase()}
                 </a>
