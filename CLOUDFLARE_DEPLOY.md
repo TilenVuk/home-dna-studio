@@ -6,7 +6,7 @@ Pred Gemini se pošljejo samo odgovori o prostorih, načinu življenja, slogu, i
 
 ## 1. Namestitev
 
-Potrebujete Node.js 20 ali novejši in pnpm.
+Potrebujete Node.js 24 in pnpm.
 
 ```bash
 pnpm install --frozen-lockfile
