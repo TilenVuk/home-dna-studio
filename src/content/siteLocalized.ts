@@ -50,6 +50,7 @@ export const siteCopy = {
         { title: "Bivalni prostori", text: "TV-elementi, knjižne omare, sedežne niše in shranjevanje z urejenimi prehodi." },
         { title: "Celoten dom", text: "Enoten načrt kuhinje, garderob, kopalniškega in bivalnega pohištva." },
       ],
+      cta: "Pridobite okvirno ponudbo",
     },
     gallery: {
       eyebrow: "Projekti",
@@ -160,6 +161,7 @@ export const siteCopy = {
         { title: "Dnevni prostori", text: "TV-elementi, police za knjige, sjedeće niše i spremanje s uređenim prolazima." },
         { title: "Cijeli dom", text: "Jedinstven plan kuhinje, garderoba, kupaonskog i dnevnog namještaja." },
       ],
+      cta: "Zatražite okvirnu ponudu",
     },
     gallery: {
       eyebrow: "Projekti",
@@ -270,6 +272,7 @@ export const siteCopy = {
         { title: "Living spaces", text: "Media units, bookcases, seating niches and storage with clear circulation." },
         { title: "Whole home", text: "One coordinated plan for kitchens, wardrobes, bathrooms and living spaces." },
       ],
+      cta: "Get an indicative quote",
     },
     gallery: {
       eyebrow: "Projects",
