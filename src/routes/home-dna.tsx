@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { HomeDnaDiscovery } from "@/components/home-dna/HomeDnaDiscovery";
+import { HomeDnaEntry } from "@/components/home-dna/HomeDnaEntry";
 
 const title = "Home DNA™ – osebni report in okvirna ponudba | Nuveli";
 const socialTitle = "Home DNA™: osebni report + okvirna ponudba";
@@ -30,5 +30,5 @@ export const Route = createFileRoute("/home-dna")({
 });
 
 function HomeDnaPage() {
-  return <HomeDnaDiscovery locale="sl" />;
+  return <HomeDnaEntry locale="sl" />;
 }

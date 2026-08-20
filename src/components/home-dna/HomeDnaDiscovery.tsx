@@ -8,8 +8,23 @@ import { useAnalytics } from "@/lib/useAnalytics";
 
 const EARLY_FLOW_PROGRESS = 20;
 
-export function HomeDnaDiscovery({ locale = "sl" }: { locale?: Locale }) {
-  const [state, setState] = useState<HomeDnaState>(initialHomeDnaState);
+export function HomeDnaDiscovery({
+  locale = "sl",
+  startAfterWelcome = false,
+}: {
+  locale?: Locale;
+  startAfterWelcome?: boolean;
+}) {
+  const [state, setState] = useState<HomeDnaState>(() => {
+    if (!startAfterWelcome) return initialHomeDnaState;
+
+    const firstScreen = buildLocalizedDiscoveryFlow(initialHomeDnaState, locale).find(
+      (screen) => screen.kind !== "welcome",
+    );
+    return firstScreen
+      ? { ...initialHomeDnaState, currentScreen: firstScreen.key }
+      : initialHomeDnaState;
+  });
   const [highestProgress, setHighestProgress] = useState(0);
   const track = useAnalytics(locale, "home-dna");
   const lastTrackedScreen = useRef<string | null>(null);
