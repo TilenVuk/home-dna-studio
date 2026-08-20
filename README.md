@@ -72,7 +72,7 @@ The Lovable editor and Lovable hosting are no longer part of the production depl
 
 ## Requirements
 
-- Node.js 20 or newer
+- Node.js 24
 - pnpm
 - access to the required development or production environment values
 
