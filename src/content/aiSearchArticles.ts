@@ -157,6 +157,26 @@ export const aiSearchArticles: AiSearchArticle[] = [
             heading: "Okvirna ocena ni končna ponudba",
             body: "Digitalna ocena je namenjena orientaciji. Končna cena je možna šele po meritvah, razvoju rešitve, potrditvi materialov in natančnem popisu elementov. Dobra zgodnja ocena pa prepreči, da bi projekt razvijali v smeri, ki je bistveno nad realnim proračunom.",
           },
+          {
+            heading: "Kako pripraviti popis za primerljivo ponudbo",
+            body: "Za vsak prostor zapišite elemente, ki jih potrebujete, njihove okvirne mere in želeno funkcijo. Pri kuhinji ločite spodnje, zgornje in visoke omare, delovno ploščo ter aparate. Pri garderobi navedite dolžino, višino, predale in način odpiranja. Dodajte fotografije prostora in obstoječi tloris. Ponudba za »opremo stanovanja« brez tega popisa lahko zajema bistveno manj elementov kot druga ponudba z enakim naslovom.",
+          },
+          {
+            heading: "Kaj mora biti vključeno v ceno",
+            body: "Pri primerjavi preverite, ali cena vključuje izmero, načrtovanje, dostavo in montažo. Posebej preverite aparate, svetila, priklop vode in elektrike, odstranitev starega pohištva ter zaključna gradbena dela. Zapisana morata biti tudi obravnava DDV in način obračuna sprememb. Če ena ponudba vključuje samo pohištvo, druga pa celotno izvedbo, skupnih zneskov ni smiselno primerjati neposredno.",
+          },
+          {
+            heading: "Primer razdelitve proračuna, ne cenik",
+            body: "Če si za opremo določite proračun 30.000 €, lahko kot načrtovalsko vajo najprej rezervirate 3.000 € za nepredvidene postavke in preostalih 27.000 € razdelite po prostorih. Nato preverite, katere postavke morajo biti izvedene pred vselitvijo in katere lahko počakajo. Ta znesek je izključno ilustrativen primer upravljanja proračuna, ne ocena tržne cene ali ponudba Nuveli Studio. Dejanski obseg za isti proračun je odvisen od izmer, materialov, aparatov in izvedbe.",
+          },
+          {
+            heading: "Kje lahko zmanjšate strošek brez izgube funkcionalnosti",
+            body: "Najprej ločite nujne funkcije od vizualnih dodatkov. Smiselno je ohraniti uporabno notranjo razporeditev in ustrezno okovje pri elementih, ki jih odpirate vsak dan. Prihranek lahko poiščete v preprostejših frontah, manjšem številu posebnih detajlov ali postopni izvedbi manj pomembnih prostorov. Vsako spremembo preverite na popisu: cenejši material še ne pomeni cenejše celote, če zahteva zahtevnejšo obdelavo ali montažo.",
+          },
+          {
+            heading: "Kaj pripraviti pred prvim pogovorom",
+            body: "Pripravite tloris, seznam prostorov, okvirni skupni proračun, želeni rok ter nekaj referenc. Označite, kaj želite obdržati in katere stroške že krije drug izvajalec. Home DNA™ pomaga zbrati potrebe gospodinjstva in prioritete; za zavezujočo ponudbo pa ostajajo potrebni natančen obseg, izmere in potrjene rešitve.",
+          },
         ],
       },
       hr: {
@@ -227,6 +247,26 @@ export const aiSearchArticles: AiSearchArticle[] = [
           {
             heading: "Materiali in priključki morajo biti usklajeni zgodaj",
             body: "Vrsta front, delovna plošča in način odpiranja vplivajo na detajle in ceno. Pri novogradnji je idealno kuhinjo razviti pred zaključkom elektro in vodovodnih instalacij, da so vtičnice, odtoki, napa in osvetlitev na pravem mestu.",
+          },
+          {
+            heading: "Izmerite prostor in preverite ovire",
+            body: "Na tlorisu označite okna, vrata, smer odpiranja, radiatorje, stebre in obstoječe priključke. Preverite tudi višino parapeta in končno višino tal. Za začetni pogovor so uporabne okvirne mere, pred izdelavo pa je potrebna natančna izmera dejanskega prostora. Pri novogradnji naj bo jasno, katere mere vključujejo omete, talne obloge in druge zaključne sloje.",
+          },
+          {
+            heading: "Preverite celoten delovni tok",
+            body: "Na načrtu preigrajte pripravo običajnega obroka: vzamete živila iz hladilnika, jih odložite, operete, pripravite in kuhate. Preverite, ali med temi opravili prečkate glavni prehod ter ali imate uporabno površino tam, kjer jo potrebujete. Pomivalni stroj in posoda naj bosta razporejena tako, da lahko pospravljate brez nepotrebnega hoje. Pri dveh uporabnikih preizkusite tudi sočasno delo.",
+          },
+          {
+            heading: "Otok preverite z odprtimi vrati in predali",
+            body: "Na tlorisu ni dovolj preveriti samo zaprtih omar. Narišite odprta vrata pomivalnega stroja, pečice in hladilnika ter izvlečene predale. Nato preverite, ali druga oseba še lahko dostopa do delovne površine in ali prehod ostane uporaben. Če je prostor tesen, je lahko polotok ali razporeditev brez otoka boljša izbira. Odločitev naj temelji na merah in uporabi, ne samo na referenčni fotografiji.",
+          },
+          {
+            heading: "Aparate izberite pred potrditvijo izdelave",
+            body: "Zabeležite točne modele aparatov in njihove vgradne zahteve. Hladilnik potrebuje predvideno prezračevanje, napa ustrezen način odvoda ali recirkulacije, pomivalni stroj pa dostop do priključkov. Višina pečice in način odpiranja morata ustrezati uporabnikom. Razpored priključkov naj preverijo odgovorni izvajalci električnih in strojnih instalacij po navodilih proizvajalcev aparatov.",
+          },
+          {
+            heading: "Kontrolni seznam pred potrditvijo kuhinje",
+            body: "Preverite načrt z merami, seznam aparatov, položaj korita, košev in razsvetljave, material front in pulta, smeri odpiranja ter dostop za montažo. V ponudbi naj bo navedeno, kdo zagotovi aparate in priklope. Zahtevajte pojasnilo, kaj je vključeno in kaj se obračuna posebej. Tako se o videzu, funkciji in obsegu odločite pred izdelavo, ko so spremembe še lažje.",
           },
         ],
         faqs: [
@@ -447,6 +487,30 @@ export const aiSearchArticles: AiSearchArticle[] = [
           {
             heading: "Kaj če je gradnja že napredovala",
             body: "Projekt je še vedno smiseln, vendar je svoboda odločanja manjša. Takrat najprej določimo, katere instalacije se splača prestaviti in katere je bolje sprejeti ter jim prilagoditi pohištvo.",
+          },
+          {
+            heading: "Kaj pripraviti za prvi sestanek",
+            body: "Pripravite aktualni tloris, fazo gradnje, načrte instalacij, ki so že na voljo, okvir investicije in predvideni datum vselitve. Dodajte podatke o gospodinjstvu: delo od doma, kuhanje, gostje, otroci ter količina stvari za shranjevanje. Označite odločitve, ki so že dokončne. Oblikovalec tako razlikuje med željami, tehničnimi omejitvami in postavkami, ki jih je še mogoče uskladiti.",
+          },
+          {
+            heading: "Prva faza: preverjanje tlorisa in uporabe",
+            body: "Pred izbiro dekorja preverite velikosti in položaj ključnega pohištva. Ali je ob jedilni mizi dovolj prostora za uporabo stolov? Ali vrata ovirajo garderobo? Kje bodo sesalnik, perilo in sezonske stvari? Razporeditev kuhinje, omar ter delovnih površin naj bo usklajena z vsakodnevnimi potmi. Te odločitve so osnova za smiselne pozicije priključkov in svetil.",
+          },
+          {
+            heading: "Druga faza: uskladitev pred izvedbo instalacij",
+            body: "Na potrjenem razporedu pohištva preverite vtičnice, stikala, osvetlitev delovnih površin in priključke aparatov. Posebej obravnavajte kuhinjski otok, vgradne omare ter pohištvo, ki skriva tehnično opremo. Notranji oblikovalec usklajuje prostorske potrebe, odgovorni projektanti in izvajalci pa preverijo tehnično izvedljivost ter zahteve svojih področij. Vsak naj dela z isto aktualno različico načrta.",
+          },
+          {
+            heading: "Tretja faza: materiali, detajli in izmere",
+            body: "Pred izdelavo pohištva uskladite vzorce materialov, stike s tlemi in stenami, višine ter način odpiranja. Začetni tloris ni nadomestilo za končno izmero. Dejanske mere se lahko spremenijo zaradi zaključnih slojev in izvedbenih odstopanj. Dogovorite se, kdo opravi izmero, kdaj se ta izvede in katere odločitve morajo biti do takrat potrjene.",
+          },
+          {
+            heading: "Primer spremembe, ki jo je bolje preveriti zgodaj",
+            body: "Če se šele po izvedbi tlakov odločite za kuhinjski otok s koritom, je lahko potreben poseg zaradi vode in odtoka. Če otok prej določite samo kot delovno in jedilno površino, so zahteve drugačne. To je ilustrativen primer, ne opis izvedenega projekta Nuveli. Namen zgodnjega načrtovanja je preveriti takšne možnosti, preden postanejo drage spremembe.",
+          },
+          {
+            heading: "Če se približuje vselitev",
+            body: "Najprej določite nujne prostore in preverite dejanske dobavne ter izvedbene roke z izvajalci. Kuhinja, osnovno shranjevanje in kopalniško pohištvo imajo lahko prednost pred dodatnimi dekorativnimi elementi. Ne spreminjajte že izvedenih instalacij brez ocene stroška in vpliva na rok. Home DNA™ lahko pomaga razvrstiti prioritete, nato pa je treba načrt prilagoditi stanju gradnje in potrjenemu proračunu.",
           },
         ],
       },

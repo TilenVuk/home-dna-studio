@@ -7,7 +7,7 @@ const featuredArticleIds = new Set([
   "home-dna-method",
   "whole-home-cost",
   "custom-kitchen",
-  "nuveli-process",
+  "new-build-designer",
 ]);
 
 export function AiSearchQuestions({ locale = "sl" }: { locale?: Locale }) {
@@ -33,7 +33,14 @@ export function AiSearchQuestions({ locale = "sl" }: { locale?: Locale }) {
               return (
                 <article key={article.id} className="border-t border-border py-8">
                   <p className="eyebrow">{String(index + 1).padStart(2, "0")}</p>
-                  <h3 className="mt-3 font-display text-2xl tracking-tight">{content.title}</h3>
+                  <h3 className="mt-3 font-display text-2xl tracking-tight">
+                    <a
+                      href={articlePath(article, locale)}
+                      className="hover:underline underline-offset-4"
+                    >
+                      {content.title}
+                    </a>
+                  </h3>
                   <p className="mt-4 text-sm leading-7 text-muted-foreground">
                     {content.description}
                   </p>

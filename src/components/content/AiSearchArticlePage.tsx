@@ -1,5 +1,5 @@
 import type { Locale } from "@/lib/i18n";
-import { articlePath, type AiSearchArticle } from "@/content/aiSearchArticles";
+import { articlePath, getArticleById, type AiSearchArticle } from "@/content/aiSearchArticles";
 
 const ui = {
   sl: {
@@ -9,6 +9,7 @@ const ui = {
     estimate: "Osebni report + okvirna ocena investicije",
     faq: "Pogosta vprašanja",
     languages: "Jezik",
+    related: "Povezani vodiči",
   },
   hr: {
     back: "Nuveli Studio",
@@ -17,6 +18,7 @@ const ui = {
     estimate: "Osobni izvještaj + okvirna procjena investicije",
     faq: "Česta pitanja",
     languages: "Jezik",
+    related: "Povezani vodiči",
   },
   en: {
     back: "Nuveli Studio",
@@ -25,6 +27,7 @@ const ui = {
     estimate: "Personal report + indicative investment estimate",
     faq: "Frequently asked questions",
     languages: "Language",
+    related: "Related guides",
   },
 } as const;
 
@@ -38,6 +41,10 @@ export function AiSearchArticlePage({
   const content = article.localized[locale];
   const prefix = locale === "sl" ? "" : `/${locale}`;
   const homeDnaPath = `${prefix}/home-dna`;
+  const relatedArticles = (["whole-home-cost", "custom-kitchen", "new-build-designer"] as const)
+    .filter((id) => id !== article.id)
+    .map((id) => getArticleById(id))
+    .filter((related): related is AiSearchArticle => Boolean(related));
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -90,6 +97,24 @@ export function AiSearchArticlePage({
             </div>
           </section>
         ) : null}
+
+        <nav aria-label={ui[locale].related} className="mt-16 border-t border-border pt-10">
+          <h2 className="font-display text-2xl">{ui[locale].related}</h2>
+          <ul className="mt-5 space-y-4">
+            {relatedArticles.map((related) => (
+              <li key={related.id}>
+                <a href={articlePath(related, locale)} className="underline underline-offset-4">
+                  {related.localized[locale].title}
+                </a>
+              </li>
+            ))}
+            <li>
+              <a href={`${prefix}/vsebine`} className="underline underline-offset-4">
+                {ui[locale].label}
+              </a>
+            </li>
+          </ul>
+        </nav>
 
         <aside className="mt-20 rounded-2xl border border-border bg-muted/40 p-8 md:p-10">
           <p className="eyebrow">Home DNA™ Discovery</p>

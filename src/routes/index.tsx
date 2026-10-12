@@ -10,9 +10,9 @@ import { AiSearchQuestions } from "@/components/nuveli/AiSearchQuestions";
 import { Contact } from "@/components/nuveli/Contact";
 import { Footer } from "@/components/nuveli/Footer";
 
-const title = "Nuveli Studio — metodologija interjerja Home DNA™";
+const title = "Notranje oblikovanje in pohištvo po meri | Nuveli Studio";
 const description =
-  "Nuveli Studio oblikuje celovite interierje po meri. Home DNA™ prilagodi prostor vašemu življenjskemu slogu, navadam in potrebam.";
+  "Notranje oblikovanje za novogradnje in prenove: kuhinje, garderobe in pohištvo po meri. S Home DNA™ načrt prilagodimo vašim navadam in proračunu.";
 const canonicalUrl = "https://nuvelistudio.com/";
 
 export const Route = createFileRoute("/")({
