@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import { brand } from "@/content/site";
 import { getSiteCopy } from "@/content/siteLocalized";
-import type { Locale } from "@/lib/i18n";
+import { localizePath, type Locale } from "@/lib/i18n";
 
 export function SiteNav({ locale = "sl" }: { locale?: Locale }) {
   const [scrolled, setScrolled] = useState(false);
@@ -57,7 +57,7 @@ export function SiteNav({ locale = "sl" }: { locale?: Locale }) {
           ))}
           <div className="flex items-center gap-1 text-[11px]" aria-label={t.nav.language}>
             {(["sl", "hr", "en"] as const).map((target) => {
-              const href = target === "sl" ? "/" : `/${target}/`;
+              const href = localizePath(target);
               return target === locale ? (
                 <span
                   key={target}
@@ -115,7 +115,7 @@ export function SiteNav({ locale = "sl" }: { locale?: Locale }) {
           ))}
           <div className="my-4 flex gap-2 text-xs" aria-label={t.nav.language}>
             {(["sl", "hr", "en"] as const).map((target) => {
-              const href = target === "sl" ? "/" : `/${target}/`;
+              const href = localizePath(target);
               return target === locale ? (
                 <span key={target} className="rounded-full border border-foreground px-3 py-2">
                   {target.toUpperCase()}

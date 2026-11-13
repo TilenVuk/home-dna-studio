@@ -9,11 +9,12 @@ import { Journey } from "@/components/nuveli/Journey";
 import { AiSearchQuestions } from "@/components/nuveli/AiSearchQuestions";
 import { Contact } from "@/components/nuveli/Contact";
 import { Footer } from "@/components/nuveli/Footer";
+import { canonicalUrl, hreflangLinks } from "@/lib/i18n";
 
 const title = "Notranje oblikovanje in pohištvo po meri | Nuveli Studio";
 const description =
   "Notranje oblikovanje za novogradnje in prenove: kuhinje, garderobe in pohištvo po meri. S Home DNA™ načrt prilagodimo vašim navadam in proračunu.";
-const canonicalUrl = "https://nuvelistudio.com/";
+const canonical = canonicalUrl("sl");
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -23,16 +24,10 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: title },
       { property: "og:description", content: description },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: canonicalUrl },
+      { property: "og:url", content: canonical },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [
-      { rel: "canonical", href: canonicalUrl },
-      { rel: "alternate", hrefLang: "sl", href: canonicalUrl },
-      { rel: "alternate", hrefLang: "hr", href: "https://nuvelistudio.com/hr/" },
-      { rel: "alternate", hrefLang: "en", href: "https://nuvelistudio.com/en/" },
-      { rel: "alternate", hrefLang: "x-default", href: canonicalUrl },
-    ],
+    links: [{ rel: "canonical", href: canonical }, ...hreflangLinks()],
     scripts: [
       {
         type: "application/ld+json",
@@ -40,7 +35,7 @@ export const Route = createFileRoute("/")({
           "@context": "https://schema.org",
           "@type": "InteriorDesigner",
           name: "Nuveli Studio",
-          url: canonicalUrl,
+          url: canonical,
           description,
           areaServed: "Slovenija",
           address: { "@type": "PostalAddress", addressLocality: "Ljubljana", addressCountry: "SI" },

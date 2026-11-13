@@ -26,7 +26,7 @@ export function localePrefix(locale: Locale): string {
 export function localizePath(locale: Locale, path = "/"): string {
   const normalized = path.startsWith("/") ? path : `/${path}`;
   if (locale === "sl") return normalized;
-  if (normalized === "/") return `/${locale}/`;
+  if (normalized === "/") return localePrefix(locale);
   return `/${locale}${normalized}`;
 }
 

@@ -1,4 +1,4 @@
-import type { Locale } from "@/lib/i18n";
+import { localizePath, type Locale } from "@/lib/i18n";
 import { aiSearchArticles, articlePath } from "@/content/aiSearchArticles";
 
 const copy = {
@@ -32,7 +32,10 @@ export function AiSearchHub({ locale }: { locale: Locale }) {
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5 md:px-10">
-          <a href={`${prefix}/`} className="font-display text-lg font-medium tracking-[-0.04em]">
+          <a
+            href={localizePath(locale)}
+            className="font-display text-lg font-medium tracking-[-0.04em]"
+          >
             NUVELI <span className="eyebrow ml-1">Studio</span>
           </a>
           <nav className="flex gap-2 text-xs" aria-label="Language">
